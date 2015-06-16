@@ -1,0 +1,14 @@
+node_modules/
+
+bower_components/
+public/cs/
+public/data/projects/AHTI/
+public/data/projects/test/
+public/includes/
+ServerComponents/
+server.js
+layers/*.js
+public/app/*.js
+Scripts/typings/cs/csComp.d.ts
+services/**/*.js
+dist/
