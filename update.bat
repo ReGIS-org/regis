@@ -4,3 +4,4 @@ REM As they are all commands, I need to call them, otherwise the script will exi
 call npm update
 cd public
 call bower update
+call gulp all

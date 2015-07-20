@@ -1,7 +1,7 @@
 // Configure gulp scripts
 // Output application name
 var appName = 'csWebApp';
-var path2csWeb = '../';
+var path2csWeb = '../csWeb/';
 
 var gulp          = require('gulp'),
     del           = require('del'),
@@ -42,14 +42,6 @@ gulp.task('deploy-githubpages', function() {
 
 gulp.task('built_csComp', function() {
     return gulp.src(path2csWeb + 'csComp/js/**/*.js')
-        // .pipe(debug({
-        //     title: 'built_csComp:'
-        // }))
-        // .pipe(debug({title: 'before ordering:'}))
-        // .pipe(order([
-        //     "translations/locale-nl.js"
-        // ]))
-        // .pipe(debug({title: 'after ordering:'}))
         .pipe(concat('csComp.js'))
         .pipe(gulp.dest('./public/cs/js'));
 });
@@ -59,11 +51,7 @@ gulp.task('compile_all', function() {
     exec('cd ' + path2csWeb + 'csComp && tsc');
     exec('tsc');
     exec('cd ' + path2csWeb + 'test && tsc');
-    //exec('gulp all');
-    //return exec('cd ' + path2csWeb + 'test/csComp && karma');
 });
-
-//gulp.task('built', ['compile_all', 'default']);
 
 gulp.task('copy_csServerComp', function() {
     return gulp.src(path2csWeb + 'csServerComp/ServerComponents/**/*.js')
@@ -74,14 +62,11 @@ gulp.task('copy_csServerComp', function() {
 gulp.task('built_csServerComp.d.ts', function() {
     gulp.src(path2csWeb + 'csServerComp/ServerComponents/**/*.d.ts')
         .pipe(plumber())
-        //  .pipe(concat('csServerComp.d.ts'))
         .pipe(gulp.dest('./ServerComponents'));
-    //.pipe(gulp.dest('./public/cs/js'));
 });
 
 gulp.task('copy_csServerComp_scripts', function() {
     return gulp.src(path2csWeb + 'csServerComp/Scripts/**/*.ts')
-        //.pipe(concat('csComp.js'))
         .pipe(gulp.dest('./Scripts'));
 });
 
@@ -92,14 +77,6 @@ gulp.task('copy_example_scripts', function() {
 
 gulp.task('built_csComp_classes', function() {
     return gulp.src(path2csWeb + 'csComp/classes/**/*.ts')
-        // .pipe(debug({
-        //     title: 'built_csComp_classes:'
-        // }))
-        // .pipe(debug({title: 'before ordering:'}))
-        // .pipe(order([
-        //     "translations/locale-nl.js"
-        // ]))
-        // .pipe(debug({title: 'after ordering:'}))
         .pipe(concat('csCompClasses.ts'))
         .pipe(gulp.dest(path2csWeb + 'csServerComp/classes'));
 });
@@ -107,11 +84,6 @@ gulp.task('built_csComp_classes', function() {
 
 gulp.task('built_csComp.d.ts', function() {
     gulp.src(path2csWeb + 'csComp/js/**/*.d.ts')
-        // .pipe(debug({title: 'before ordering:'}))
-        // .pipe(order([
-        //     "translations/locale-nl.js"
-        // ]))
-        // .pipe(debug({title: 'after ordering:'}))
         .pipe(plumber())
         .pipe(concat('csComp.d.ts'))
         .pipe(insert.prepend('/// <reference path="../leaflet/leaflet.d.ts" />\r\n'))
@@ -129,9 +101,6 @@ gulp.task('create_templateCache', function() {
     }
 
     gulp.src(path2csWeb + 'csComp/**/*.tpl.html')
-        // .pipe(debug({
-        //     title: 'create_templateCache:'
-        // }))
         .pipe(templateCache(options))
         .pipe(gulp.dest('public/cs/js'))
 })
@@ -193,9 +162,6 @@ gulp.task('create_dist_of_server', function() {
 gulp.task('create_dist_of_client_and_server', ['create_dist', 'create_dist_of_server']);
 
 gulp.task('minify_csComp', function() {
-    // gulp.src(path2csWeb + 'csComp/dist/csComp.js')
-    //    .pipe(plumber())
-    //    .pipe(gulp.dest('public/js/cs'));
     gulp.src('public/js/cs/csComp.js')
         .pipe(plumber())
         .pipe(uglify())
@@ -207,9 +173,6 @@ gulp.task('minify_csComp', function() {
 
 gulp.task('include_js', function() {
     gulp.src(path2csWeb + 'csComp/includes/js/**/*.*')
-        // .pipe(debug({
-        //     title: 'include_js:'
-        // }))
         .pipe(plumber())
         .pipe(gulp.dest('./public/cs/js'));
 });

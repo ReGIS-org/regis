@@ -11,14 +11,6 @@ import BagDatabase          = require('ServerComponents/database/BagDatabase');
 import ConfigurationService = require('ServerComponents/configuration/ConfigurationService');
 import DynamicProject       = require("ServerComponents/dynamic/DynamicProject");
 
-/**
- * Create a search index file which can be loaded statically.
- */
-// var offlineSearchManager = new offlineSearch('public/data/projects/projects.json', {
-//     propertyNames: ['Name', 'plaatnaam', 'postcode', 'Postcode', 'straat', 'loc_straat', 'KvK', 'gemeente', 'plaats', 'Naam_van_het_concern_DigiMV_2012'],
-//     stopWords    : ['de', 'het', 'een', 'en', 'van', 'aan']
-// });
-
 // setup socket.io object
 var favicon    = require('serve-favicon');
 var bodyParser = require('body-parser')
@@ -42,9 +34,9 @@ config.add("server", "http://localhost:" + port);
 var pr = new DynamicProject.DynamicProjectService(server,cm,messageBus);
 pr.Start(server);
 
-var ds = new DataSource.DataSourceService(cm,"DataSource");
-ds.Start();
-server.get("/datasource", ds.GetDataSource);
+var ds = new DataSource.DataSourceService(cm, "DataSource");
+ds.start();
+server.get("/datasource", ds.getDataSource);
 
 var bagDatabase = new BagDatabase(config);
 var mapLayerFactory = new creator.MapLayerFactory(bagDatabase, messageBus);
