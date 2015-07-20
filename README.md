@@ -21,4 +21,21 @@ Technically, we use the following frameworks:
 
 NOTE
 ====
-csMap is the front-end of the mapping framework. Most components are actually defined in another open source project on GitHub, [csWeb](https://github.com/TNOCS/csWeb). Check-out this project to see how they relate. 
+csMap is the front-end of the mapping framework. Most components are actually defined in another open source project on GitHub, [csWeb](https://github.com/TNOCS/csWeb). Check-out this project to see how they relate.
+
+Getting started
+===============
+Basic setup. Run the following commands:
+```
+git clone git@github.com:TNOCS/csWeb.git
+cd csWeb/
+./updateAll.sh
+cd ..
+git clone git@github.com:NLeSC/sim-city-cs.git
+cd sim-city-cs/
+./update.sh
+tsc
+nodemon server.js
+
+```
+Open a browser on http://localhost:3002/ and you should be good to go.
