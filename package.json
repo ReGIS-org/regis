@@ -1,11 +1,16 @@
 {
-  "name": "csMap",
-  "version": "0.0.0",
-  "description": "CommonSense map application",
+  "name": "sim-city-cs",
+  "version": "0.1.0",
+  "description": "SIM-CITY CommonSense map application",
   "main": "app.js",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NLeSC/sim-city-cs.git"
+  },
   "author": {
-    "name": "Erik Vullings",
-    "email": "erik.vullings@tno.nl"
+    "name": "Carlos Martinez",
+    "email": "c.martinez@esciencecenter.nl"
   },
   "dependencies": {
     "body-parser": "^1.12.4",
