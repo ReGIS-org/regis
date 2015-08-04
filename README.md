@@ -25,6 +25,12 @@ csMap is the front-end of the mapping framework. Most components are actually de
 
 Getting started
 ===============
+Before starting, you should have *tsc bower gulp nodemon* nodeJS modules (globally) installed:
+
+```
+npm install -g tsc bower gulp nodemon
+```
+
 Basic setup. Run the following commands:
 ```
 git clone git@github.com:TNOCS/csWeb.git
