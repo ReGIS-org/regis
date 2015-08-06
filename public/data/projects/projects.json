@@ -1,9 +1,5 @@
 {
   "title": "SimCity CS Map",
-  "maxBounds": {
-    "southWest": [ 12.8, 77.46 ],
-    "northEast": [ 13.1, 77.70 ]
-  },
   "viewBounds": {
       "southWest": [ 12.8, 77.46 ],
       "northEast": [ 13.1, 77.70 ]
@@ -143,6 +139,10 @@
     {
       "title": "SimCity",
       "url": "data/projects/simcity/project.json"
+    },
+    {
+      "title": "Tomatoes",
+      "url": "data/projects/tomato/project.json"
     }
   ]
 }

@@ -1,0 +1,58 @@
+{
+  "featureTypes": {
+    "Tomato": {
+      "style": {
+        "fillColor": "#ffffff",
+        "strokeColor": "#808080",
+        "drawingMode": "Point",
+        "strokeWidth": 2,
+        "iconWidth": 32,
+        "iconHeight": 32,
+        "iconUri": "images/tomato.png"
+      },
+      "propertyTypeData": [
+        {
+          "label": "Name",
+          "type": "text",
+          "languages": {
+            "en": {
+              "title": "Name"
+            }
+          },
+          "isSearchable": true
+        },
+        {
+          "label": "TaxonomyID",
+          "type": "text",
+          "languages": {
+            "en": {
+              "title": "Taxonomy ID"
+            }
+          },
+          "isSearchable": true
+        },
+        {
+          "label": "AccessionName",
+          "type": "text",
+          "languages": {
+            "en": {
+              "title": "Accession Name"
+            }
+          },
+          "isSearchable": true
+        },
+        {
+          "label": "SpeciesName",
+          "type": "text",
+          "languages": {
+            "en": {
+              "title": "Species Name"
+            }
+          },
+          "isSearchable": true
+        }
+      ]
+    }
+  },
+  "propertyTypeData": {}
+}

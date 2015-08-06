@@ -1,0 +1,40 @@
+{
+  "featureTypes": {
+    "ATM": {
+      "style": {
+        "fillColor": "#ffffff",
+        "strokeColor": "#808080",
+        "drawingMode": "Point",
+        "strokeWidth": 2,
+        "iconWidth": 32,
+        "iconHeight": 32,
+        "iconUri": "images/atm.png"
+      },
+      "propertyTypeData": [
+        {
+          "label": "bank",
+          "type": "text",
+          "languages": {
+            "en": {
+              "title": "Bank name"
+            }
+          },
+          "isSearchable": true
+        },
+        {
+          "label": "location",
+          "type": "text",
+          "languages": {
+            "en": {
+              "title": "Location",
+              "section": "Details"
+            }
+          },
+          "isSearchable": true
+        }
+      ]
+    }
+  },
+  "propertyTypeData": {
+  }
+}

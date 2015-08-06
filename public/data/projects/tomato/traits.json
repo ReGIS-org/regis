@@ -1,0 +1,91 @@
+{
+  "type": "FeatureCollection",
+  "totalFeatures": 2,
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.316667,
+          -0.75
+        ]
+      },
+      "properties": {
+        "Name": "EA00536",
+        "TaxonomyID": "XXX",
+        "AccessionName": "L. cheesmanii",
+        "SpeciesName": "Red Tomatoe",
+        "FeatureTypeId": "Tomato"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.616667,
+          -0.9
+        ]
+      },
+      "properties": {
+        "Name": "EA00566",
+        "TaxonomyID": "XXY",
+        "AccessionName": "Something else",
+        "SpeciesName": "Yellow Tomatoe",
+        "FeatureTypeId": "Tomato"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.35,
+          -0.53
+        ]
+      },
+      "properties": {
+        "Name": "EA00568",
+        "TaxonomyID": "XXY",
+        "AccessionName": "Something else",
+        "SpeciesName": "Yellow Tomatoe",
+        "FeatureTypeId": "Tomato"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77,
+          -11.52
+        ]
+      },
+      "properties": {
+        "Name": "EA02071",
+        "TaxonomyID": "XXY",
+        "AccessionName": "Something else",
+        "SpeciesName": "Yellow Tomatoe",
+        "FeatureTypeId": "Tomato"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -12.891667,
+          -72.75
+        ]
+      },
+      "properties": {
+        "Name": "EA05891",
+        "TaxonomyID": "XXY",
+        "AccessionName": "Something else",
+        "SpeciesName": "Yellow Tomatoe",
+        "FeatureTypeId": "Tomato"
+      }
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "title": "SimCity",
+  "description": "Description for SimCity",
+  "url": "https://github.com/NLeSC/sim-city-cs",
+  "logo": "images/CommonSenseRound.png",
+  "connected": true,
+  "datasources": [
+    {
+      "url": "/datasource",
+      "type": "dynamic",
+      "sensors": {
+        "test": {
+          "propertyTypeKey": "sensor_test"
+        },
+        "test2": {
+          "propertyTypeKey": "sensor_test2"
+        }
+      }
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "health",
+      "name": "Health",
+      "showTimeline": false,
+      "showLeftmenu": true,
+      "showMap": true,
+      "visiblelayers": [
+        "zorgkantoor",
+        "Hospitals"
+      ],
+      "widgets": [
+        {
+          "directive": "indicators",
+          "title": "Mobility",
+          "left": "10px",
+          "top": "10px",
+          "borderwidth": 5,
+          "bordercolor": "red",
+          "width": "225px",
+          "height": "365px",
+          "data": {
+            "title": "Simulations",
+            "indicators": [
+              {
+                "title": "Traffic performance",
+                "visual": "circular",
+                "sensor": "datasource/tp",
+                "indexValue": 500000
+              }
+            ]
+          }
+        }
+      ],
+      "baselayer": "Satellite Day"
+    }
+  ],
+  "expertMode": 3,
+  "userPrivileges": {
+    "mca": {
+      "expertMode": true
+    },
+    "heatmap": {
+      "expertMode": true
+    }
+  },
+  "accentColor": "Green",
+  "baselayers": {},
+  "groups": [
+    {
+        "languages": {
+          "en": {
+            "title": "Test layers",
+            "description": "Layers added manually for test purposes"
+          }
+        },
+        "clustering": true,
+        "layers": [
+            {
+                "id": "ATMTest",
+                "reference": "ATMTest",
+                "languages": {
+                    "en": {
+                        "title": "ATMTest",
+                        "description": "Locations of ATMS (manually created)"
+                    }
+                },
+                "type": "GeoJson",
+                "url": "data/projects/simcity/atms.json",
+                "typeUrl": "data/resourceTypes/resources.json",
+                "enabled": false,
+                "opacity": 100
+            }
+        ]
+    },
+    {
+      "languages": {
+        "en": {
+          "title": "Vector layers (dynamic)",
+          "description": "SimCity vector layers from OWS"
+        }
+      },
+      "clustering": true,
+      "layers": [],
+      "owsurl": "http://localhost/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
+      "owsgeojson": true
+    }
+  ]
+}
