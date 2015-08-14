@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html ng-app="csWebApp">
 
 <head>
@@ -75,7 +75,6 @@
     <script src="bower_components/moment/min/moment.min.js"></script>
     <script src="bower_components/spectrum/spectrum.js"></script>
     <script src="bower_components/togeojson/togeojson.js"></script>
-    <!-- <script src="bower_components/topojson/topojson.js"></script> -->
     <script src="cs/js/togeojson.js"></script>
     <script src="cs/js/angular-moment.min.js"></script>
     <script src="cs/js/datetime-picker.js"></script>
@@ -133,7 +132,6 @@
     <map mapid="main" class="map-main" ng-show="vm.$layerService.visual.mapVisible"></map>
 
     <div style="position: absolute;width: 100%;height:100%;pointer-events: none;display:table">
-
       <div ng-show="vm.$layerService.visual.leftPanelVisible" class="leftpanel leftpanel-entrance"  ng-cloak style="pointer-events: all">
         <div style="width:350px;height:100%;background:white">
           <div class="col-xs-3 leftpanel-tab">
@@ -190,6 +188,12 @@
                           <i class="fa fa-gear fa-2x" style="color: black"></i>
                       </a>
                   </li>
+
+                  <li popover="{{'SIMULATIONSETTINGS.TITLE' | translate}}" popover-popup-delay=750 popover-placement="right" popover-trigger="mouseenter" popover-append-to-body="true">
+                      <a href="#simulations" data-toggle="tab" data-ng-if="vm.$mapService.isExpert">
+                          <i class="fa fa-rocket fa-2x" style="color: black"></i>
+                      </a>
+                  </li>
               </ul>
           </div>
 
@@ -215,6 +219,8 @@
                   <dashboard-selection class="tab-pane" id="dashboardselection"></dashboard-selection>
 
                   <project-settings class="tab-pane" id="settings"></project-settings>
+
+                  <simulation-settings class="tab-pane" id="simulations"></simulation-settings>
               </div>
           </div>
           </div>
