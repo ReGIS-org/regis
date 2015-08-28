@@ -20,6 +20,8 @@ var httpServer = require("http").Server(server);
 var cm         = new cc.ConnectionManager(httpServer);
 var messageBus = new MessageBus.MessageBusService();
 var config     = new ConfigurationService("./configuration.json");
+var proxy      = require('express-http-proxy');
+
 
 // all environments
 var port = "3002";
@@ -27,6 +29,20 @@ server.set("port", port);
 server.use(favicon(__dirname + "/public/favicon.ico"));
 server.use(bodyParser.json()); // support json encoded bodies
 server.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
+// Work around cross site scripting
+// Proxy calls from localhost/couchdb -to-> localhost:3002/couchdb
+server.use('/couchdb', proxy('localhost', {
+    forwardPath: function(req, res) {
+        return '/couchdb' + require('url').parse(req.url).path;
+    }
+}));
+// Proxy calls from localhost/explore -to-> localhost:3002/explore
+server.use('/explore', proxy('localhost', {
+    forwardPath: function(req, res) {
+        return '/explore' + require('url').parse(req.url).path;
+    }
+}));
 
 config.add("server", "http://localhost:" + port);
 
