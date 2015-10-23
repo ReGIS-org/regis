@@ -18,7 +18,7 @@
           "bank": "HSBC",
           "owner": "Anand",
           "location": "Inside shopping mall",
-          "FeatureTypeId": "Tomato"
+          "FeatureTypeId": "ATM"
       }
     },
     {
@@ -36,7 +36,7 @@
           "Name": "ATM 2",
           "bank": "ING",
           "location": "By the corner shop",
-          "FeatureTypeId": "Tomato"
+          "FeatureTypeId": "ATM"
       }
     }
   ]

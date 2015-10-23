@@ -5,18 +5,6 @@
   "logo": "images/CommonSenseRound.png",
   "connected": true,
   "datasources": [
-    {
-      "url": "/datasource",
-      "type": "dynamic",
-      "sensors": {
-        "test": {
-          "propertyTypeKey": "sensor_test"
-        },
-        "test2": {
-          "propertyTypeKey": "sensor_test2"
-        }
-      }
-    }
   ],
   "dashboards": [
     {
@@ -26,32 +14,9 @@
       "showLeftmenu": true,
       "showMap": true,
       "visiblelayers": [
-        "zorgkantoor",
-        "Hospitals"
+        "ATMTest"
       ],
-      "widgets": [
-        {
-          "directive": "indicators",
-          "title": "Mobility",
-          "left": "10px",
-          "top": "10px",
-          "borderwidth": 5,
-          "bordercolor": "red",
-          "width": "225px",
-          "height": "365px",
-          "data": {
-            "title": "Simulations",
-            "indicators": [
-              {
-                "title": "Traffic performance",
-                "visual": "circular",
-                "sensor": "datasource/tp",
-                "indexValue": 500000
-              }
-            ]
-          }
-        }
-      ],
+      "widgets": [],
       "baselayer": "Satellite Day"
     }
   ],
@@ -105,5 +70,12 @@
       "owsurl": "http://localhost/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
       "owsgeojson": true
     }
+  ],
+  "simulationEngines": [
+      {
+          "name": "MatSim",
+          "launcher": "http://localhost:3002/explore/simulate/matsim/0.3",
+          "results": "http://localhost:3002/couchdb/simcity/_design/matsim_0.3/_view/all_docs"
+      }
   ]
 }

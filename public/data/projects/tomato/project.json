@@ -7,7 +7,7 @@
   "viewBounds": {
       "northEast": [  10.00, -80.00 ],
       "southWest": [ -10.00, -85.00 ]
-    },
+      },
   "timeLine": {
     "start": 1375315200000,
     "end": 1425168000000,
@@ -174,7 +174,7 @@
         }
       },
       "type": "GeoJson",
-        "url": "data/projects/tomato/traits.json",
+      "url": "data/projects/tomato/traits.json",
       "typeUrl": "data/projects/tomato/resources.json",
       "enabled": false,
       "opacity": 100
