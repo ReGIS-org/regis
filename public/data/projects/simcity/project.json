@@ -5,18 +5,6 @@
   "logo": "images/CommonSenseRound.png",
   "connected": true,
   "datasources": [
-    {
-      "url": "/datasource",
-      "type": "dynamic",
-      "sensors": {
-        "test": {
-          "propertyTypeKey": "sensor_test"
-        },
-        "test2": {
-          "propertyTypeKey": "sensor_test2"
-        }
-      }
-    }
   ],
   "dashboards": [
   ],
@@ -70,5 +58,12 @@
       "owsurl": "http://localhost/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
       "owsgeojson": true
     }
+  ],
+  "simulationEngines": [
+      {
+          "name": "MatSim",
+          "launcher": "http://localhost:3002/explore/simulate/matsim/0.3",
+          "results": "http://localhost:3002/couchdb/simcity/_design/matsim_0.3/_view/all_docs"
+      }
   ]
 }
