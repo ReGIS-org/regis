@@ -19,41 +19,6 @@
     }
   ],
   "dashboards": [
-    {
-      "id": "health",
-      "name": "Health",
-      "showTimeline": false,
-      "showLeftmenu": true,
-      "showMap": true,
-      "visiblelayers": [
-        "zorgkantoor",
-        "Hospitals"
-      ],
-      "widgets": [
-        {
-          "directive": "indicators",
-          "title": "Mobility",
-          "left": "10px",
-          "top": "10px",
-          "borderwidth": 5,
-          "bordercolor": "red",
-          "width": "225px",
-          "height": "365px",
-          "data": {
-            "title": "Simulations",
-            "indicators": [
-              {
-                "title": "Traffic performance",
-                "visual": "circular",
-                "sensor": "datasource/tp",
-                "indexValue": 500000
-              }
-            ]
-          }
-        }
-      ],
-      "baselayer": "Satellite Day"
-    }
   ],
   "expertMode": 3,
   "userPrivileges": {
@@ -77,19 +42,19 @@
         "clustering": true,
         "layers": [
             {
-                "id": "ATMTest",
-                "reference": "ATMTest",
+                "id": "Fire response",
+                "reference": "fireresponse",
                 "languages": {
                     "en": {
-                        "title": "ATMTest",
-                        "description": "Locations of ATMS (manually created)"
+                        "title": "Fire response",
+                        "description": "Emergency response time for each ward"
                     }
                 },
                 "type": "GeoJson",
-                "url": "data/projects/simcity/atms.json",
+                "url": "data/projects/simcity/WardGeoResponse.json",
                 "typeUrl": "data/resourceTypes/resources.json",
                 "enabled": false,
-                "opacity": 100
+                "opacity": 50
             }
         ]
     },
