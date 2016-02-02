@@ -45,3 +45,6 @@ nodemon server.js
 
 ```
 Open a browser on http://localhost:3002/ and you should be good to go.
+
+# UPDATED 2 feb 2016
+Based on https://github.com/TNOCS/csWeb-example

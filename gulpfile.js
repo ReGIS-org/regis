@@ -1,209 +1,188 @@
+var gulp          = require('gulp');
+var tsconfig      = require('gulp-tsconfig-files');
+var exec          = require('child_process').execSync;
+var install       = require('gulp-install');
+var runSequence   = require('run-sequence');
+var del           = require('del');
+var uglify        = require('gulp-uglify');
+var useref        = require('gulp-useref');
+var rename        = require('gulp-rename');
+var debug         = require('gulp-debug');
+var concat        = require('gulp-concat');
+var plumber       = require('gulp-plumber');
+var watch         = require('gulp-watch');
+var changed       = require('gulp-changed');
+var templateCache = require('gulp-angular-templatecache');
+var deploy        = require('gulp-gh-pages');
+var purify        = require('gulp-purifycss');
+var concatCss     = require('gulp-concat-css');
+var OfflineSearch = require('csweb-offline-search');
+
+gulp.task('index', function() {
+    var offlineSearchOptions = {
+        propertyNames: ['Name', 'LOC_NAAM', 'GeoAddress', 'LOC_STRAAT', 'adres', 'gemeente', 'postcode', 'plaats', 'Organisatie'],
+        stopWords: ['de', 'het', 'een', 'en', 'van', 'aan', 'met', 'of', 'the', 'a', 'an']
+    };
+    new OfflineSearch('public/data/projects/projects.json', offlineSearchOptions);
+})
+
+/** Destination of the client/server distribution */
+var dest = 'dist/';
+var path2csWeb = '../csWeb';
+
+function run(command, cb) {
+  console.log('Run command: ' + command);
+  try {
+    exec(command);
+    cb();
+  } catch (err) {
+    console.log('### Exception encountered on command: ' + command);
+    console.log(err.stdout.toString());
+    console.log('####################################');
+    cb();
+    throw err;
+  }
+}
+
+/** Create a new distribution by copying all required CLIENT files to the dist folder. */
+gulp.task('dist_client', function() {
+    // Copy client side files
+    // Copy app, images, css, data and swagger
+    gulp.src('public/app/**/*.js*')
+        .pipe(plumber())
+        .pipe(gulp.dest(dest + 'public/app/'));
+    gulp.src('public/css/**/*.*')
+        .pipe(plumber())
+        .pipe(gulp.dest(dest + 'public/css/'));
+    gulp.src('public/data/**/*.*')
+        .pipe(plumber())
+        .pipe(gulp.dest(dest + 'public/data/'));
+    gulp.src('public/swagger/**/*.*')
+        .pipe(plumber())
+        .pipe(gulp.dest(dest + 'public/swagger/'));
+    gulp.src('./public/images/**/*.*')
+        .pipe(plumber())
+        .pipe(gulp.dest(dest + 'public/images/'));
+    // Copy index files and favicon        
+    gulp.src(['./public/*.html', './public/favicon.ico', './public/mode-json.js'])
+        .pipe(plumber())
+        .pipe(gulp.dest(dest + 'public/'));
+    // Copy bower components of csweb, and others (ignoring any linked csweb files)
+    gulp.src('public/bower_components/csweb/dist-bower/**/*.*')
+        .pipe(plumber())
+        .pipe(gulp.dest(dest + 'public/bower_components/csweb/dist-bower/'));
+    gulp.src(['public/bower_components/**/*.*', '!public/bower_components/csweb/**/*.*'])
+        .pipe(plumber())
+        .pipe(gulp.dest(dest + 'public/bower_components/'));
+});
+
+/** Create a new distribution by copying all required SERVER files to the dist folder. */
+gulp.task('dist_server', function() {
+    // Copy server side files
+    gulp.src(['./server.js', './server.js.map', './configuration.json', './LICENSE'])
+        .pipe(plumber())
+        .pipe(gulp.dest(dest));
+    // Copy npm modules of csweb, and others (ignoring any linked csweb files)
+    gulp.src(['node_modules/**/*.*', '!node_modules/csweb/**/*.*'])
+        .pipe(plumber())
+        .pipe(changed(dest + 'node_modules/'))
+        .pipe(gulp.dest(dest + 'node_modules/'));
+   gulp.src('node_modules/csweb/dist-npm/package.json')
+        .pipe(plumber())        
+        .pipe(gulp.dest(dest + 'node_modules/csweb/'));        
+    return gulp.src('node_modules/csweb/dist-npm/**/*.*')
+        .pipe(plumber())
+        .pipe(changed(dest + 'node_modules/csweb/dist-npm/'))
+        .pipe(gulp.dest(dest + 'node_modules/csweb/dist-npm/'));
+});
+
+/** Create a new distribution by copying all required CLIENT+SERVER files to the dist folder. */
+gulp.task('dist', ['dist_client', 'dist_server']);
+
+gulp.task('update_tsconfig', function() {
+  return gulp.src(['./**/*.ts',
+            '!./node_modules/**/*.ts',
+            '!./dist/**/*.*',
+            '!./public/bower_components/**/*.d.ts',
+        ],
+      {base: ''})
+    .pipe(tsconfig({
+      path:         'tsconfig.json',
+      relative_dir: '',
+    }));
+});
+
+gulp.task('tsc', function(cb) {
+    //var cmd = 'tsc -w -p ' + path2csWeb + 'csServerComp & tsc -w -p ' + path2csWeb + 'csComp & tsc -w -p .'
+    return run("tsc -w -p .", cb);
+});
+
+// Install required npm and bower installs for example folder
+gulp.task('install', function(cb) {
+  return gulp.src([
+      './package.json',       // npm install
+      './public/bower.json',  // bower install
+    ])
+    .pipe(install(cb));
+});
+
+/** Initialiaze the project */
+gulp.task('init', function(cb) {
+  runSequence(
+    'update_tsconfig',
+    'tsc',
+    cb
+  );
+});
+
+// Gulp task upstream...
 // Configure gulp scripts
 // Output application name
 var appName = 'csWebApp';
-var path2csWeb = '../csWeb/';
-
-var gulp          = require('gulp'),
-    del           = require('del'),
-    insert        = require('gulp-insert'),
-    uglify        = require('gulp-uglify'),
-    useref        = require('gulp-useref'),
-    rename        = require('gulp-rename'),
-    debug         = require('gulp-debug'),
-    cache         = require('gulp-cached'),
-    concat        = require('gulp-concat'),
-    plumber       = require('gulp-plumber'),
-    watch         = require('gulp-watch'),
-    gulpif        = require('gulp-if'),
-    exec          = require('child_process').exec,
-    templateCache = require('gulp-angular-templatecache'),
-    deploy        = require('gulp-gh-pages');
 
 gulp.task('clean', function(cb) {
     // NOTE Careful! Removes all generated javascript files and certain folders.
     del([
-        path2csWeb + 'csServerComp/ServerComponents/**/*.js',
-        path2csWeb + 'csComp/js/**',
-        'public/cs/**',
         'dist',
-        'ServerComponents/**',
-        'services/**',
-        path2csWeb + 'test/csComp/**/*.js'
-    ], { force: true }, cb);
+        'public/**/*.js',
+        'public/**/*.js.map'
+    ], {
+        force: true
+    }, cb);
 });
 
+/** Deploy it to the github pages */
 gulp.task('deploy-githubpages', function() {
-    return gulp.src("./dist/**/*")
+    return gulp.src(dest + 'public/**/*')
         .pipe(deploy({
-            branch:'master',
-            cacheDir : '.deploy'
-        }))
+            branch: 'master',
+            cacheDir: '.deploy'
+        }));
 });
 
-gulp.task('built_csComp', function() {
-    return gulp.src(path2csWeb + 'csComp/js/**/*.js')
-        .pipe(concat('csComp.js'))
-        .pipe(gulp.dest('./public/cs/js'));
-});
+// var watchTS = gulp.watch('./**/*.ts');
+// watchTS.on('added', function(event) {
+//   console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+//   update_tsconfig
+// });
 
-gulp.task('compile_all', function() {
-    exec('cd ' + path2csWeb + 'csServerComp && tsc');
-    exec('cd ' + path2csWeb + 'csComp && tsc');
-    exec('tsc');
-    exec('cd ' + path2csWeb + 'test && tsc');
-});
+// gulp.task('watch', function() {
+    // gulp.watch(path2csWeb + 'csServerComp/ServerComponents/**/*.js', ['copy_csServerComp']);
+    // gulp.watch(path2csWeb + 'csServerComp/Scripts/**/*.ts', ['copy_csServerComp_scripts']);
+    //gulp.watch(path2csWeb + 'csServerComp/ServerComponents/**/*.d.ts', ['built_csServerComp.d.ts']);
+    // gulp.watch(path2csWeb + 'csServerComp/ServerComponents/dynamic/ClientConnection.d.ts', ['built_csServerComp.d.ts']);
 
-gulp.task('copy_csServerComp', function() {
-    return gulp.src(path2csWeb + 'csServerComp/ServerComponents/**/*.js')
-        //.pipe(concat('csServerComp.js'))
-        .pipe(gulp.dest('./ServerComponents'));
-});
+    // gulp.watch(path2csWeb + 'csComp/includes/**/*.scss', ['sass']);
+    // gulp.watch(path2csWeb + 'csComp/js/**/*.js', ['built_csComp']);
+    // gulp.watch(path2csWeb + 'csComp/js/**/*.d.ts', ['built_csComp.d.ts']);
+    // gulp.watch(path2csWeb + 'csComp/**/*.tpl.html', ['create_templateCache']);
+    // gulp.watch(path2csWeb + 'csComp/includes/**/*.css', ['include_css']);
+    // gulp.watch(path2csWeb + 'csComp/includes/**/*.js', ['include_js']);
+    // gulp.watch(path2csWeb + 'csComp/includes/images/*.*', ['include_images']);
+// });
 
-gulp.task('built_csServerComp.d.ts', function() {
-    gulp.src(path2csWeb + 'csServerComp/ServerComponents/**/*.d.ts')
-        .pipe(plumber())
-        .pipe(gulp.dest('./ServerComponents'));
-});
+//gulp.task('all', ['create_templateCache', 'copy_csServerComp', 'built_csServerComp.d.ts', 'copy_csServerComp_scripts', 'built_csComp', 'built_csComp.d.ts', 'include_css', 'include_js', 'include_images', 'copy_example_scripts', 'sass']);
 
-gulp.task('copy_csServerComp_scripts', function() {
-    return gulp.src(path2csWeb + 'csServerComp/Scripts/**/*.ts')
-        .pipe(gulp.dest('./Scripts'));
-});
+gulp.task('deploy', ['dist_client', 'deploy-githubpages']);
 
-gulp.task('copy_example_scripts', function() {
-    return gulp.src('./Scripts/**/*.ts')
-        .pipe(gulp.dest(path2csWeb + 'test/Scripts'));
-});
-
-gulp.task('built_csComp_classes', function() {
-    return gulp.src(path2csWeb + 'csComp/classes/**/*.ts')
-        .pipe(concat('csCompClasses.ts'))
-        .pipe(gulp.dest(path2csWeb + 'csServerComp/classes'));
-});
-
-
-gulp.task('built_csComp.d.ts', function() {
-    gulp.src(path2csWeb + 'csComp/js/**/*.d.ts')
-        .pipe(plumber())
-        .pipe(concat('csComp.d.ts'))
-        .pipe(insert.prepend('/// <reference path="../leaflet/leaflet.d.ts" />\r\n'))
-        .pipe(insert.prepend('/// <reference path="../crossfilter/crossfilter.d.ts" />\r\n'))
-        .pipe(gulp.dest('Scripts/typings/cs'));
-    gulp.src('./Scripts/typings/cs/csComp.d.ts')
-        .pipe(gulp.dest(path2csWeb + 'test/Scripts/typings/cs'));
-});
-
-gulp.task('create_templateCache', function() {
-    console.log('Creating templateCache.')
-    var options = {
-        module: appName,
-        filename: 'csTemplates.js'
-    }
-
-    gulp.src(path2csWeb + 'csComp/**/*.tpl.html')
-        .pipe(templateCache(options))
-        .pipe(gulp.dest('public/cs/js'))
-})
-
-gulp.task('create_dist', function() {
-    gulp.src('public/images/*.*')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/images/'));
-
-    gulp.src(path2csWeb + 'csComp/includes/images/*.*')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/cs/images/'));
-
-    gulp.src('public/data/**/*.*')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/data/'));
-
-    gulp.src('public/cs/css/ROsanswebtextregular.ttf')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/css/'));
-
-    gulp.src('public/bower_components/Font-Awesome/fonts/*.*')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/fonts/'));
-
-    var assets = useref.assets();
-
-    return gulp.src('./public/*.html')
-        .pipe(assets)
-        .pipe(assets.restore())
-        .pipe(useref())
-        .pipe(gulp.dest('dist'));
-});
-
-gulp.task('create_dist_of_server', function() {
-    gulp.src('node_modules/express')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/node_modules/'));
-    gulp.src('node_modules/body_parser')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/node_modules/'));
-    gulp.src('node_modules/serve-favicon')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/node_modules/'));
-    gulp.src('node_modules/rootpath')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/node_modules/'));
-    gulp.src('node_modules/socket.io')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/node_modules/'));
-    gulp.src('node_modules/chokidar')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/node_modules/'));
-    gulp.src('server.js')
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/'));
-});
-
-gulp.task('create_dist_of_client_and_server', ['create_dist', 'create_dist_of_server']);
-
-gulp.task('minify_csComp', function() {
-    gulp.src('public/js/cs/csComp.js')
-        .pipe(plumber())
-        .pipe(uglify())
-        .pipe(rename({
-            suffix: '.min'
-        }))
-        .pipe(gulp.dest('public/cs/js'));
-});
-
-gulp.task('include_js', function() {
-    gulp.src(path2csWeb + 'csComp/includes/js/**/*.*')
-        .pipe(plumber())
-        .pipe(gulp.dest('./public/cs/js'));
-});
-
-gulp.task('include_css', function() {
-    gulp.src(path2csWeb + 'csComp/includes/css/*.*')
-        .pipe(plumber())
-        .pipe(gulp.dest('./public/cs/css'));
-});
-
-gulp.task('include_images', function() {
-    gulp.src(path2csWeb + 'csComp/includes/images/*.*')
-        .pipe(plumber())
-        .pipe(gulp.dest('./public/cs/images/'));
-});
-
-gulp.task('watch', function() {
-    gulp.watch(path2csWeb + 'csServerComp/ServerComponents/**/*.js', ['copy_csServerComp']);
-    gulp.watch(path2csWeb + 'csServerComp/Scripts/**/*.ts', ['copy_csServerComp_scripts']);
-    gulp.watch(path2csWeb + 'csServerComp/ServerComponents/**/*.d.ts', ['built_csServerComp.d.ts']);
-
-    gulp.watch(path2csWeb + 'csComp/js/**/*.js', ['built_csComp']);
-    gulp.watch(path2csWeb + 'csComp/js/**/*.d.ts', ['built_csComp.d.ts']);
-    gulp.watch(path2csWeb + 'csComp/**/*.tpl.html', ['create_templateCache']);
-    gulp.watch(path2csWeb + 'csComp/includes/**/*.css', ['include_css']);
-    gulp.watch(path2csWeb + 'csComp/includes/**/*.js', ['include_js']);
-    gulp.watch(path2csWeb + 'csComp/includes/images/*.*', ['include_images']);
-});
-
-gulp.task('all', ['create_templateCache', 'copy_csServerComp', 'built_csServerComp.d.ts', 'copy_csServerComp_scripts', 'built_csComp', 'built_csComp.d.ts', 'include_css', 'include_js', 'include_images', 'copy_example_scripts']);
-
-gulp.task('deploy', ['create_dist','deploy-githubpages']);
-
-gulp.task('default', ['all', 'watch']);
+gulp.task('default', ['init']);
