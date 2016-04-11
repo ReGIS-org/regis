@@ -1,65 +1,41 @@
-require("rootpath")();
-﻿import express              = require("express");
-import http                 = require("http");
-import path                 = require("path");
-//import offlineSearch        = require("cs-offline-search");
-import cc                   = require("ServerComponents/dynamic/ClientConnection");
-import creator              = require("ServerComponents/creator/MapLayerFactory");
-import DataSource           = require("ServerComponents/dynamic/DataSource");
-import MessageBus           = require("ServerComponents/bus/MessageBus");
-import BagDatabase          = require("ServerComponents/database/BagDatabase");
-import ConfigurationService = require("ServerComponents/configuration/ConfigurationService");
-import DynamicProject       = require("ServerComponents/dynamic/DynamicProject");
+import Winston = require('winston');
+import * as csweb from "csweb";
 
-// setup socket.io object
-var favicon    = require("serve-favicon");
-var bodyParser = require("body-parser");
-var server     = express();
+Winston.remove(Winston.transports.Console);
+Winston.add(Winston.transports.Console, <Winston.ConsoleTransportOptions>{
+    colorize: true,
+    label: 'csWeb',
+    prettyPrint: true
+});
 
-var httpServer = require("http").Server(server);
-var cm         = new cc.ConnectionManager(httpServer);
-var messageBus = new MessageBus.MessageBusService();
-var config     = new ConfigurationService("./configuration.json");
-var proxy      = require('express-http-proxy');
+var startDatabaseConnection = false;
 
+var cs = new csweb.csServer(__dirname, <csweb.csServerOptions>{
+    port: 3003,
+    swagger : false,
+    //connectors: { mqtt: { server: 'localhost', port: 1883 }, mongo: { server : '127.0.0.1', port: 27017} }
+});
+cs.start(() => {
 
-// all environments
-var port = "3002";
-server.set("port", port);
-server.use(favicon(__dirname + "/public/favicon.ico"));
-server.use(bodyParser.json()); // support json encoded bodies
-server.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+    if (startDatabaseConnection) {
+        this.config = new csweb.ConfigurationService('./configuration.json');
+        this.config.add('server', 'http://localhost:' + cs.options.port);
+        var bagDatabase = new csweb.BagDatabase(this.config);
+        var mapLayerFactory = new csweb.MapLayerFactory(<any>bagDatabase, cs.messageBus, cs.api);
+        cs.server.post('/bagcontours', (req, res) => {
+            mapLayerFactory.processBagContours(req, res);
+        });
 
-// Work around cross site scripting
-// Proxy calls from localhost/couchdb -to-> localhost:3002/couchdb
-server.use('/couchdb', proxy('localhost', {
-    forwardPath: function(req, res) {
-        return '/couchdb' + require('url').parse(req.url).path;
+        cs.server.post('/bagsearchaddress', (req, res) => {
+            mapLayerFactory.processBagSearchQuery(req, res);
+        });
+
+        cs.server.post('/bagbuurten', (req, res) => {
+            mapLayerFactory.processBagBuurten(req, res);
+        });
     }
-}));
-// Proxy calls from localhost/explore -to-> localhost:3002/explore
-server.use('/explore', proxy('localhost', {
-    forwardPath: function(req, res) {
-        return '/explore' + require('url').parse(req.url).path;
-    }
-}));
 
-config.add("server", "http://localhost:" + port);
-
-var pr = new DynamicProject.DynamicProjectService(server,cm,messageBus);
-pr.Start(server);
-
-var ds = new DataSource.DataSourceService(cm, "DataSource");
-ds.start();
-server.get("/datasource", ds.getDataSource);
-
-var bagDatabase = new BagDatabase(config);
-var mapLayerFactory = new creator.MapLayerFactory(bagDatabase, messageBus);
-server.post("/projecttemplate", (req, res) => mapLayerFactory.process(req, res));
-
-server.use(express.static(path.join(__dirname, "public")));
-console.log("started");
-
-httpServer.listen(server.get("port"),() => {
-    console.log("Express server listening on port " + server.get("port"));
+    console.log('really started');
+    //    //{ key: "imb", s: new ImbAPI.ImbAPI("app-usdebug01.tsn.tno.nl", 4000),options: {} }
+    //    var ml = new MobileLayer.MobileLayer(api, "mobilelayer", "/api/resources/SGBO", server, messageBus, cm);
 });

@@ -1,14 +1,15 @@
 node_modules/
+public/bower_components/
 
-bower_components/
-public/cs/
-public/data/projects/AHTI/
-public/data/projects/test/
-public/includes/
-ServerComponents/
+public/data/templates/
+
+public/**/*.js
+public/**/*.js.map
+
+.vscode
+
+server.js.map
 server.js
-layers/*.js
-public/app/*.js
-Scripts/typings/cs/csComp.d.ts
-services/**/*.js
 dist/
+
+offline_search_result.json

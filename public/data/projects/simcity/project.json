@@ -7,7 +7,23 @@
   "datasources": [
   ],
   "dashboards": [
-  ],
+    {
+      "id": "home",
+      "name": "Home",
+      "editMode": false,
+      "showMap": true,
+      "showTimeline": false,
+      "showLeftmenu": true,
+      "showLegend": true,
+      "showBackgroundImage": false,
+      "visiblelayers": [
+        "fireresponse"
+      ],
+      "widgets": null,
+      "visibleLeftMenuItems": [
+        "!lm-layers"
+      ]
+  }],
   "expertMode": 3,
   "userPrivileges": {
     "mca": {
@@ -43,6 +59,28 @@
                 "typeUrl": "data/resourceTypes/resources.json",
                 "enabled": false,
                 "opacity": 50
+            },
+            {
+              "id": "Hospitals",
+              "title": "Hospitals",
+              "description": "These are the locations of the Dutch hospitals.",
+              "type": "geojson",
+              "renderType": "geojson",
+              "heatmapItems": null,
+              "url": "http://localhost/geoserver/Bangalore/ows?service=wfs&request=getFeature&outputFormat=application/json&typeName=blr_hospitals",
+              "typeUrl": "data/resourceTypes/resources.json",
+              "opacity": 100,
+              "defaultFeatureType": "Hospital",
+              "languages": {
+                "nl": {
+                  "title": "Ziekenhuizen",
+                  "description": "De locaties van de Nederlandse ziekenhuizen."
+                },
+                "en": {
+                  "title": "Hospitals",
+                  "description": "These are the locations of the Dutch hospitals."
+                }
+              }
             }
         ]
     },
