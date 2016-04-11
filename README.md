@@ -29,21 +29,30 @@ If everything went well, you should now have your application up and running. Ho
 
 If you wish to change the underlying csWeb framework, you also need to checkout [csWeb](https://github.com/TNOCS/csWeb). In csWeb, create npm and bower links, which you can subsequently use in csWeb-example.
 
-I assume that csWeb-example and csWeb share the same parent folder. In csWeb, do the following:
+I assume that sim-city-cs and csWeb share the same parent folder. In csWeb, do the following:
 
 ```shell
 gulp init
 bower link
-cd dist-npm && npm link
+cd out/csServerComp && npm link
 ```
 
-And in csWeb-example, run:
+And in sim-city-cs, run:
 
 ```shell
 npm link csweb
 cd public && bower link csweb
-tsc
-node server.js
+gulp
+nodemon server.js
+```
+
+While developing it is useful to run typescript and gulp in watchmode for csweb.
+from the sim-city-cs folder:
+```shell
+tsc -w &
+cd ../csWeb
+tsc -w &
+gulp watch
 ```
 
 ### Developers wishing to just extend their application
