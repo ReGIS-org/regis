@@ -1,7 +1,6 @@
 # SIM-CITY Common Sense based application
-Example project that can be used to quick start a new csWeb application. Fork me and roll-your-own app to get started.
-
-Source code, Wiki's and issue tracker can all be found [here](https://github.com/TNOCS/csWeb).
+This project is the front-end for the sim-city simulation framework.
+It is based on the [csWeb framework](https://github.com/TNOCS/csWeb)
 
 # Getting started
 We depend on node and bower and use typescript to develop. You can install all necessary tools by invoking:
