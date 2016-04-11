@@ -16,6 +16,7 @@ var templateCache = require('gulp-angular-templatecache');
 var deploy        = require('gulp-gh-pages');
 var purify        = require('gulp-purifycss');
 var concatCss     = require('gulp-concat-css');
+var ts            = require('gulp-typescript');
 var OfflineSearch = require('csweb-offline-search');
 
 gulp.task('index', function() {
@@ -28,7 +29,7 @@ gulp.task('index', function() {
 
 /** Destination of the client/server distribution */
 var dest = 'dist/';
-var path2csWeb = '../csWeb';
+var path2csWeb = '../csWeb/';
 
 function run(command, cb) {
   console.log('Run command: ' + command);
@@ -63,7 +64,7 @@ gulp.task('dist_client', function() {
     gulp.src('./public/images/**/*.*')
         .pipe(plumber())
         .pipe(gulp.dest(dest + 'public/images/'));
-    // Copy index files and favicon        
+    // Copy index files and favicon
     gulp.src(['./public/*.html', './public/favicon.ico', './public/mode-json.js'])
         .pipe(plumber())
         .pipe(gulp.dest(dest + 'public/'));
@@ -88,8 +89,8 @@ gulp.task('dist_server', function() {
         .pipe(changed(dest + 'node_modules/'))
         .pipe(gulp.dest(dest + 'node_modules/'));
    gulp.src('node_modules/csweb/dist-npm/package.json')
-        .pipe(plumber())        
-        .pipe(gulp.dest(dest + 'node_modules/csweb/'));        
+        .pipe(plumber())
+        .pipe(gulp.dest(dest + 'node_modules/csweb/'));
     return gulp.src('node_modules/csweb/dist-npm/**/*.*')
         .pipe(plumber())
         .pipe(changed(dest + 'node_modules/csweb/dist-npm/'))
@@ -114,7 +115,10 @@ gulp.task('update_tsconfig', function() {
 
 gulp.task('tsc', function(cb) {
     //var cmd = 'tsc -w -p ' + path2csWeb + 'csServerComp & tsc -w -p ' + path2csWeb + 'csComp & tsc -w -p .'
-    return run("tsc -w -p .", cb);
+    //return run("tsc -p .", cb);
+    var tsProject = ts.createProject('tsconfig.json');
+    return tsProject.src()
+            .pipe(ts(tsProject));
 });
 
 // Install required npm and bower installs for example folder
