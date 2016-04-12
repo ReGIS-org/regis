@@ -30,7 +30,7 @@ module App {
             'messageBusService',
             'dashboardService',
             'geoService'
-        ]; 
+        ];
 
         public areaFilter: AreaFilter.AreaFilterModel;
         public contourAction: ContourAction.ContourActionModel;
@@ -60,10 +60,10 @@ module App {
                     this.contourAction = new ContourAction.ContourActionModel();
                     this.$layerService.addActionService(this.contourAction);
 
-                    if ($scope.$root.$$phase !== '$apply' && $scope.$root.$$phase !== '$digest') { $scope.$apply(); }                    
+                    if ($scope.$root.$$phase !== '$apply' && $scope.$root.$$phase !== '$digest') { $scope.$apply(); }
                 }
             });
-            
+
             $messageBusService.subscribe('feature', this.featureMessageReceived);
             $messageBusService.subscribe('layer', this.layerMessageReceived);
 
@@ -179,7 +179,8 @@ module App {
         'angularUtils.directives.dirPagination',
         'pascalprecht.translate',
         'ngCookies', 'angularSpectrumColorpicker',
-        'wiz.markdown', 'ngAnimate'
+        'wiz.markdown', 'ngAnimate',
+        'simCitySimDirective'
     ])
         .config(localStorageServiceProvider => {
         localStorageServiceProvider.prefix = 'csMap';
