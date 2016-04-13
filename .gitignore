@@ -9,7 +9,6 @@ public/**/*.js
 public/**/*.js.map
 
 .vscode
-tsconfig.json
 
 server.js.map
 server.js
