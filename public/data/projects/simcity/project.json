@@ -4,7 +4,7 @@
     "url": "https://github.com/NLeSC/sim-city-cs",
     "logo": "images/CommonSenseRound.png",
     "connected": true,
-    "isDynamic": true,
+    "isDynamic": false,
     "datasources": [],
     "dashboards": [{
         "id": "home",
