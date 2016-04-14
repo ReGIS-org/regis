@@ -81,13 +81,16 @@
         "layers": [{
             "id": "firestations",
             "title": "Fire Stations",
-            "type": "dynamicgeojson",
+            "type": "editablegeojson",
             "renderType": "geojson",
             "heatmapItems": null,
-            "url": "api/layers/firestations",
+            "data": {
+                "type": "FeatureCollection",
+                "properties": {},
+                "features": []
+            },
             "typeUrl": "api/resources/firestations",
             "opacity": 100,
-            "isDynamic": true,
             "timeaware": false
         }]
     }, {
