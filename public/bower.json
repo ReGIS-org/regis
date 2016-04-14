@@ -26,6 +26,7 @@
   "dependencies": {
     "csweb": "~0.2.8",
     "font-awesome": "^4.5.0",
-    "angularUtils-pagination": "angular-utils-pagination#~0.11.1"
+    "angularUtils-pagination": "angular-utils-pagination#~0.11.1",
+    "simCitySimDirective": "git://github.com/c-martinez/Sim-City-Directive.git"
   }
 }
