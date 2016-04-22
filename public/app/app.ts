@@ -220,5 +220,29 @@ module App {
         $languagesProvider.setLanguages(languages);
     })
 
-        .controller('appCtrl', AppCtrl);
+        .controller('appCtrl', AppCtrl)
+        .run((SchemaService, messageBusService) => {
+            SchemaService.addCustomTypeHandler('list', function(schema, form) {
+                var key = form.key;
+                schema['type'] = 'array';
+        
+                messageBusService.subscribe('feature', function(title, feature){
+                    if(key == feature.layerId) {
+                        var f = {
+                            id: feature.id,
+                            x: feature.geometry.coordinates[0],
+                            y: feature.geometry.coordinates[1]
+                        }
+                        switch (title) {
+                            case 'dropped':
+                                    SchemaService.modelAddValue(key, 'list', f);
+                                    break;
+                            case 'onFeatureUpdated':                
+                                    SchemaService.modelAddValue(key, 'list', f);
+                                    break;
+                        } 
+                    }
+            });
+        });
+    });
 }

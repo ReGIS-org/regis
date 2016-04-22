@@ -1,5 +1,5 @@
 import Winston = require('winston');
-import * as csweb from "csweb";
+import * as csweb from 'csweb';
 
 Winston.remove(Winston.transports.Console);
 Winston.add(Winston.transports.Console, <Winston.ConsoleTransportOptions>{

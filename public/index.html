@@ -239,19 +239,5 @@
 
         <timeline data-ng-show="vm.$mapService.timelineVisible && !vm.$layerService.isMobile" style="height: 100vh;"></timeline>
     </div>
-
-    <script>
-        angular
-          .module('simCitySimDirective')
-          .run(runBlock);
-
-        function runBlock($log, SchemaService) {
-          SchemaService.addCustomTypeHandler('point2d', function(schema, form) {
-            schema['items'] = { 'type': 'object' };
-            form['type'] = 'template';
-            form['template'] = '<div>ADD A POINT HERE...</div>';
-          });
-        }
-    </script>
 </body>
 </html>

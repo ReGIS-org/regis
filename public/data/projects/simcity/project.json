@@ -79,7 +79,7 @@
             }
         },
         "layers": [{
-            "id": "firestations",
+            "id": "fireStations",
             "title": "Fire Stations",
             "type": "editablegeojson",
             "renderType": "geojson",
