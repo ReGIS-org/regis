@@ -82,6 +82,10 @@ Visit http://localhost:3003 to see the application running.
 
 If everything went well, you should now have your application up and running. However, most likely you don't want to call your application csWeb-example, so here are a few steps to make the app your own.
 
+## Credit
+Icons used in projects:
+ - Flame by Nadav Barkan from the Noun Project
+
 ## For developers
 
 ### Developers wishing to change the csWeb framework

@@ -23,9 +23,9 @@
             "directive": "buttonwidget",
             "enabled": true,
             "style": "transparent",
-            "left": "27px",
+            "left": "430px",
             "right": "",
-            "top": "90px",
+            "top": "11px",
             "width": "300px",
             "data": {
                 "layerGroup": "Buttons",
@@ -79,8 +79,8 @@
             }
         },
         "layers": [{
-            "id": "fireStations",
-            "title": "Fire Stations",
+            "id": "matsim",
+            "title": "matsim",
             "type": "editablegeojson",
             "renderType": "geojson",
             "heatmapItems": null,
@@ -89,7 +89,7 @@
                 "properties": {},
                 "features": []
             },
-            "typeUrl": "api/resources/firestations",
+            "typeUrl": "data/projects/simcity/resources/matsim.json",
             "opacity": 100,
             "timeaware": false
         }]

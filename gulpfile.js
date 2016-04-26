@@ -156,6 +156,11 @@ gulp.task('serve', function() {
     })
 });
 
+gulp.task('watch', function() {
+    var allSources = sources.concat(definitions);
+    return gulp.watch(allSources, ['init'])
+});
+
 gulp.task('deploy', ['dist_client', 'deploy-githubpages']);
 
 gulp.task('default', ['init']);
