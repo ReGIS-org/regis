@@ -222,14 +222,12 @@ module App {
 
         .controller('appCtrl', AppCtrl)
         .run((SchemaService, messageBusService) => {
-            SchemaService.addCustomTypeHandler('layer', function(schema, form, mainForm) {
-                schema['type'] = 'array';
-                var layerId = schema.layer;
-                var featureId = schema.featureId;
-                var key = form.key;
-
-                form['maxItems'] = 1;
-                form['minItems'] = 1;
+            SchemaService.addCustomTypeHandler('layer', function(formItem, schemaItem, form) {
+                formItem['type'] = 'array';
+                
+                var layerId = formItem.layer;
+                var featureId = formItem.featureId;
+                var key = formItem.key;
 
                 messageBusService.subscribe('feature', function(title, feature){
                     var supportedOps = ['dropped', 'onFeatureUpdated', 'onFeatureRemoved'];
