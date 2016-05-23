@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "csweb-offline-search": "~0.1.0",
-    "del": "~1.2.0",
+    "del": "~2.2.0",
     "gulp": "~3.9.0",
     "gulp-angular-templatecache": "~1.8.0",
     "gulp-changed": "~1.3.0",
