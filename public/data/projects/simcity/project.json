@@ -1,107 +1,113 @@
 {
-  "title": "SimCity",
-  "description": "Description for SimCity",
-  "url": "https://github.com/NLeSC/sim-city-cs",
-  "logo": "images/CommonSenseRound.png",
-  "connected": true,
-  "datasources": [
-  ],
-  "dashboards": [
-    {
-      "id": "home",
-      "name": "Home",
-      "editMode": false,
-      "showMap": true,
-      "showTimeline": false,
-      "showLeftmenu": true,
-      "showLegend": true,
-      "showBackgroundImage": false,
-      "visiblelayers": [
-        "fireresponse"
-      ],
-      "widgets": null,
-      "visibleLeftMenuItems": [
-        "!lm-layers"
-      ]
-  }],
-  "expertMode": 3,
-  "userPrivileges": {
-    "mca": {
-      "expertMode": true
+    "title": "SimCity",
+    "description": "Description for SimCity",
+    "url": "https://github.com/NLeSC/sim-city-cs",
+    "logo": "images/CommonSenseRound.png",
+    "connected": true,
+    "isDynamic": false,
+    "datasources": [],
+    "dashboards": [{
+        "id": "home",
+        "name": "Home",
+        "editMode": false,
+        "showMap": true,
+        "showTimeline": false,
+        "showLeftmenu": true,
+        "showLegend": true,
+        "showBackgroundImage": false,
+        "visiblelayers": [
+            "fireresponse"
+        ],
+        "widgets": [{
+            "id": "1086ec94-4c54-4d84-dc04-9d3673df6d35",
+            "directive": "buttonwidget",
+            "enabled": true,
+            "style": "transparent",
+            "left": "430px",
+            "right": "",
+            "top": "11px",
+            "width": "300px",
+            "data": {
+                "layerGroup": "Buttons",
+                "buttons": []
+            }
+        }],
+        "visibleLeftMenuItems": [
+            "!lm-layers"
+        ]
+    }],
+    "expertMode": 3,
+    "userPrivileges": {
+        "mca": {
+            "expertMode": true
+        },
+        "heatmap": {
+            "expertMode": true
+        }
     },
-    "heatmap": {
-      "expertMode": true
-    }
-  },
-  "accentColor": "Green",
-  "baselayers": {},
-  "groups": [
-    {
+    "accentColor": "Green",
+    "baselayers": {},
+    "groups": [{
         "languages": {
-          "en": {
-            "title": "Test layers",
-            "description": "Layers added manually for test purposes"
-          }
+            "en": {
+                "title": "Test layers",
+                "description": "Layers added manually for test purposes"
+            }
         },
         "clustering": true,
-        "layers": [
-            {
-                "id": "Fire response",
-                "reference": "fireresponse",
-                "languages": {
-                    "en": {
-                        "title": "Fire response",
-                        "description": "Emergency response time for each ward"
-                    }
-                },
-                "type": "GeoJson",
-                "url": "data/projects/simcity/WardGeoResponse.json",
-                "typeUrl": "data/resourceTypes/resources.json",
-                "enabled": false,
-                "opacity": 50
-            },
-            {
-              "id": "Hospitals",
-              "title": "Hospitals",
-              "description": "These are the locations of the Dutch hospitals.",
-              "type": "geojson",
-              "renderType": "geojson",
-              "heatmapItems": null,
-              "url": "http://localhost/geoserver/Bangalore/ows?service=wfs&request=getFeature&outputFormat=application/json&typeName=blr_hospitals",
-              "typeUrl": "data/resourceTypes/resources.json",
-              "opacity": 100,
-              "defaultFeatureType": "Hospital",
-              "languages": {
-                "nl": {
-                  "title": "Ziekenhuizen",
-                  "description": "De locaties van de Nederlandse ziekenhuizen."
-                },
+        "layers": [{
+            "id": "Fire response",
+            "reference": "fireresponse",
+            "languages": {
                 "en": {
-                  "title": "Hospitals",
-                  "description": "These are the locations of the Dutch hospitals."
+                    "title": "Fire response",
+                    "description": "Emergency response time for each ward"
                 }
-              }
+            },
+            "type": "GeoJson",
+            "url": "data/projects/simcity/WardGeoResponse.json",
+            "typeUrl": "data/resourceTypes/resources.json",
+            "enabled": false,
+            "opacity": 50
+        }]
+    }, {
+        "id": "Buttons",
+        "languages": {
+            "en": {
+                "title": "Buttons",
+                "description": "SimCity layers manipulation buttons"
             }
-        ]
-    },
-    {
-      "languages": {
-        "en": {
-          "title": "Vector layers (dynamic)",
-          "description": "SimCity vector layers from OWS"
-        }
-      },
-      "clustering": true,
-      "layers": [],
-      "owsurl": "http://localhost/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
-      "owsgeojson": true
-    }
-  ],
-  "simulationEngines": [
-      {
-          "name": "MatSim",
-          "launcher": "http://localhost:3002/explore/simulate/matsim/0.3",
-          "results": "http://localhost:3002/couchdb/simcity/_design/matsim_0.3/_view/all_docs"
-      }
-  ]
+        },
+        "layers": [{
+            "id": "matsim",
+            "title": "matsim",
+            "type": "editablegeojson",
+            "renderType": "geojson",
+            "heatmapItems": null,
+            "data": {
+                "type": "FeatureCollection",
+                "properties": {},
+                "features": []
+            },
+            "typeUrl": "data/projects/simcity/resources/matsim.json",
+            "opacity": 100,
+            "timeaware": false
+        }]
+    }, {
+        "languages": {
+            "en": {
+                "title": "Vector layers (dynamic)",
+                "description": "SimCity vector layers from OWS"
+            }
+        },
+        "clustering": true,
+        "layers": [],
+        "owsurl": "http://localhost/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
+        "owsgeojson": true
+    }],
+    "simulationEngines": [{
+        "name": "MatSim",
+        "launcher": "http://localhost:3002/explore/simulate/matsim/0.3",
+        "results": "http://localhost:3002/couchdb/simcity/_design/matsim_0.3/_view/all_docs"
+    }]
 }

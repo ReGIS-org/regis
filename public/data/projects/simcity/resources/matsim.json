@@ -1,0 +1,38 @@
+{
+    "id": "matsim",
+    "title": "matsim",
+    "featureTypes": {
+        "FireStation": {
+            "id": "SimCity#firestation",
+            "name": "FireStation",
+            "style": {
+                "drawingMode": "Point",
+                "iconUri": "images/brandweerposten/Brandweerkazerne.png",
+                "cornerRadius": 50,
+                "fillColor": "#ffffff",
+                "iconWidth": 30,
+                "iconHeight": 30,
+                "strokeColor": "#ffffff"
+            },
+            "propertyTypeKeys": "title,notes",
+            "u": "bower_components/csweb/dist-bower/images/marker.png"
+        },
+        "Fire": {
+            "id": "SimCity#fire",
+            "name": "Fire",
+            "style": {
+                "drawingMode": "Point",
+                "iconUri": "data/images/fire.png",
+                "cornerRadius": 50,
+                "fillColor": "#ffffff",
+                "iconWidth": 30,
+                "iconHeight": 30,
+                "strokeColor": "#ffffff"
+            },
+            "propertyTypeKeys": "title,notes",
+            "u": "bower_components/csweb/dist-bower/images/marker.png"
+        }
+    },
+    "propertyTypeData": {},
+    "isDynamic": false
+}

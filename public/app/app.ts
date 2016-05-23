@@ -30,7 +30,7 @@ module App {
             'messageBusService',
             'dashboardService',
             'geoService'
-        ]; 
+        ];
 
         public areaFilter: AreaFilter.AreaFilterModel;
         public contourAction: ContourAction.ContourActionModel;
@@ -60,10 +60,10 @@ module App {
                     this.contourAction = new ContourAction.ContourActionModel();
                     this.$layerService.addActionService(this.contourAction);
 
-                    if ($scope.$root.$$phase !== '$apply' && $scope.$root.$$phase !== '$digest') { $scope.$apply(); }                    
+                    if ($scope.$root.$$phase !== '$apply' && $scope.$root.$$phase !== '$digest') { $scope.$apply(); }
                 }
             });
-            
+
             $messageBusService.subscribe('feature', this.featureMessageReceived);
             $messageBusService.subscribe('layer', this.layerMessageReceived);
 
@@ -114,7 +114,7 @@ module App {
 
             // NOTE EV: You need to call apply only when an event is received outside the angular scope.
             // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
-            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+            if (this.$scope.$root.$$phase !== '$apply' && this.$scope.$root.$$phase !== '$digest') {
                 this.$scope.$apply();
             }
         }
@@ -179,7 +179,8 @@ module App {
         'angularUtils.directives.dirPagination',
         'pascalprecht.translate',
         'ngCookies', 'angularSpectrumColorpicker',
-        'wiz.markdown', 'ngAnimate'
+        'wiz.markdown', 'ngAnimate',
+        'simCitySimDirective'
     ])
         .config(localStorageServiceProvider => {
         localStorageServiceProvider.prefix = 'csMap';
@@ -197,7 +198,7 @@ module App {
         $locationProvider.html5Mode({
             enabled: true,
             requireBase: false
-        })
+        });
     })
         .config($translateProvider => {
         // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT
@@ -219,5 +220,39 @@ module App {
         $languagesProvider.setLanguages(languages);
     })
 
-        .controller('appCtrl', AppCtrl);
+        .controller('appCtrl', AppCtrl)
+        .run((SchemaService, messageBusService) => {
+            SchemaService.addCustomTypeHandler('layer', function(formItem, schemaItem, form) {
+                formItem['type'] = 'array';
+                
+                var layerId = formItem.layer;
+                var featureId = formItem.featureId;
+                var key = formItem.key;
+
+                messageBusService.subscribe('feature', function(title, feature){
+                    var supportedOps = ['dropped', 'onFeatureUpdated', 'onFeatureRemoved'];
+
+                    if (feature && layerId === feature.layerId && featureId === feature.properties.featureTypeId
+                            && supportedOps.indexOf(title) >= 0 ) {
+                        var f = {
+                            id: feature.properties.Name,
+                            x: feature.geometry.coordinates[0],
+                            y: feature.geometry.coordinates[1]
+                        };
+
+                        switch (title) {
+                            case 'dropped':
+                                    SchemaService.modelAddValue(key, 'list', f);
+                                    break;
+                            case 'onFeatureUpdated':
+                                    SchemaService.modelUpdateValue(key, 'list', f);
+                                    break;
+                            case 'onFeatureRemoved':
+                                    SchemaService.modelDeleteValue(key, 'list', f);
+                                    break;
+                        }
+                    }
+            });
+        });
+    });
 }
