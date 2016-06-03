@@ -23,9 +23,9 @@
             "directive": "buttonwidget",
             "enabled": true,
             "style": "transparent",
-            "left": "430px",
+            "left": "435px",
             "right": "",
-            "top": "11px",
+            "top": "82px",
             "width": "300px",
             "data": {
                 "layerGroup": "Buttons",
@@ -35,7 +35,30 @@
         "visibleLeftMenuItems": [
             "!lm-layers"
         ]
-    }],
+    },
+    {
+        "id": "management",
+        "name": "Simulation Management",
+        "editMode": false,
+        "showMap": false,
+        "showTimeline": false,
+        "showLeftmenu": false,
+        "showLegend": false,
+        "showBackgroundImage": false,
+        "widgets": [
+            {
+                "id": "123456745214907982148970192734",
+                "directive": "simstate",
+                "enabled": true,
+                "style": "simple",
+                "left": "25px",
+                "right": "",
+                "top": "90px",
+                "width": "300px"
+            }
+        ]
+    }
+    ],
     "expertMode": 3,
     "userPrivileges": {
         "mca": {
