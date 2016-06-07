@@ -2,7 +2,6 @@
     "title": "SimCity",
     "description": "Description for SimCity",
     "url": "https://github.com/NLeSC/sim-city-cs",
-    "logo": "images/CommonSenseRound.png",
     "connected": true,
     "isDynamic": false,
     "datasources": [],
@@ -102,12 +101,12 @@
         },
         "clustering": true,
         "layers": [],
-        "owsurl": "http://localhost/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
+        "owsurl": "/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
         "owsgeojson": true
     }],
     "simulationEngines": [{
         "name": "MatSim",
-        "launcher": "http://localhost:3002/explore/simulate/matsim/0.3",
-        "results": "http://localhost:3002/couchdb/simcity/_design/matsim_0.3/_view/all_docs"
+        "launcher": "/explore/simulate/matsim/0.5",
+        "results": "/couchdb/simcity/_design/matsim_0.5/_view/all_docs"
     }]
 }

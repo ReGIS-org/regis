@@ -25,7 +25,7 @@ var nodemon       = require('gulp-nodemon');
 var tsProject = ts.createProject('tsconfig.json');
 
 var sources = ['server.ts',
-              'public/app/app.ts']
+              'public/app/**/*.ts']
 var definitions = ['Scripts/**/*.d.ts']
 
 /** Destination of the client/server distribution */

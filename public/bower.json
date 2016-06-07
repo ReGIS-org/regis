@@ -25,7 +25,10 @@
   ],
   "dependencies": {
     "csweb": "~0.2.15",
-    "sim-city-sim-directive": "git://github.com/indodutch/Sim-City-Directive.git",
-    "angular": "^1.5.5",
+    "angular": "~1.5.5",
+    "angular-schema-form": "~0.8.13",
+    "angular-schema-form-bootstrap": "^0.2.0",
+    "bootstrap": "~3.3.6",
+    "angular-bootstrap": "~1.3.3"
   }
 }
