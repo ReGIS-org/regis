@@ -16,7 +16,7 @@ module App {
     declare var String;
     declare var omnivore;
 
-    class AppCtrl {
+    export class AppCtrl {
         // It provides $injector with information about dependencies to be injected into constructor
         // it is better to have it close to the constructor, because the parameters must match in count and type.
         // See http://docs.angularjs.org/guide/di
@@ -44,12 +44,12 @@ module App {
                     private geoService:csComp.Services.GeoService) {
             sffjs.setCulture('nl-NL');
 
-            $scope.vm = this;
-            $scope.showMenuRight = false;
-            $scope.featureSelected = false;
-            $scope.layersLoading = 0;
+            this.$scope.vm = this;
+            this.$scope.showMenuRight = false;
+            this.$scope.featureSelected = false;
+            this.$scope.layersLoading = 0;
 
-            $messageBusService.subscribe('project', (action:string) => {
+            this.$messageBusService.subscribe('project', (action:string) => {
                 if (action === 'loaded') {
                     this.areaFilter = new AreaFilter.AreaFilterModel();
                     this.$layerService.addActionService(this.areaFilter);
@@ -62,8 +62,8 @@ module App {
                 }
             });
 
-            $messageBusService.subscribe('feature', this.featureMessageReceived);
-            $messageBusService.subscribe('layer', this.layerMessageReceived);
+            this.$messageBusService.subscribe('feature', this.featureMessageReceived);
+            this.$messageBusService.subscribe('layer', this.layerMessageReceived);
 
             this.$layerService.visual.rightPanelVisible = false; // otherwise, the rightpanel briefly flashes open before closing.
 
@@ -73,11 +73,11 @@ module App {
         /**
          * Publish a toggle request.
          */
-        // toggleMenuRight() {
-        //     this.$messageBusService.publish('sidebar', 'toggle');
-        // }
+        public toggleMenuRight() {
+            this.$messageBusService.publish('sidebar', 'toggle');
+        }
 
-        private layerMessageReceived(title:string, layer:csComp.Services.ProjectLayer): void {
+        private layerMessageReceived = (title: string, layer: csComp.Services.ProjectLayer) => {
             switch (title) {
                 case 'loading':
                     this.$scope.layersLoading += 1;
@@ -97,7 +97,7 @@ module App {
 
             var $contextMenu = $('#contextMenu');
 
-            $('body').on('contextmenu', 'table tr', function (e) {
+            $('body').on('contextmenu', 'table tr', e => {
                 $contextMenu.css({
                     display: 'block',
                     left: e.pageX,
@@ -106,7 +106,7 @@ module App {
                 return false;
             });
 
-            $contextMenu.on('click', 'a', function () {
+            $contextMenu.on('click', 'a', () => {
                 $contextMenu.hide();
             });
 
@@ -115,9 +115,9 @@ module App {
             if (this.$scope.$root.$$phase !== '$apply' && this.$scope.$root.$$phase !== '$digest') {
                 this.$scope.$apply();
             }
-        }
+        };
 
-        private featureMessageReceived(title: string): void {
+        private featureMessageReceived = (title: string) => {
             switch (title) {
                 case 'onFeatureSelect':
                     this.$scope.featureSelected = true;
@@ -126,7 +126,7 @@ module App {
                     this.$scope.featureSelected = false;
                     break;
             }
-        }
+        };
 
         /**
          * Callback function
@@ -134,18 +134,18 @@ module App {
          * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
          * @todo {notice the strange syntax, which is to preserve the this reference!}
          */
-        // toggleMenu():void {
-        //     this.$mapService.invalidate();
-        // }
-        //
-        // toggleSidebar():void {
-        //     this.$messageBusService.publish('sidebar', 'toggle');
-        //     window.console.log('Publish toggle sidebar');
-        // }
-        //
-        // private isActive(viewLocation: string): boolean {
-        //     return viewLocation === this.$location.path();
-        // }
+        public toggleMenu():void {
+            this.$mapService.invalidate();
+        }
+
+        public toggleSidebar():void {
+            this.$messageBusService.publish('sidebar', 'toggle');
+            window.console.log('Publish toggle sidebar');
+        }
+
+        public isActive(viewLocation: string): boolean {
+            return viewLocation === this.$location.path();
+        }
     }
 
     // http://jsfiddle.net/mrajcok/pEq6X/
