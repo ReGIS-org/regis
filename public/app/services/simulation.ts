@@ -60,7 +60,7 @@ module App {
             if (version) {
                 url += '/' + version;
             }
-            return this.http('POST', url, params)
+            return this.$http.post(url, params)
                 .then(result => {
                     let returnUrl = result.headers('Location');
                     return {
@@ -110,7 +110,7 @@ module App {
                     } else {
                         status = '(code ' + response.status + ')';
                     }
-                    return this.$q.reject('Cannot load infrastructure overview ' + status);
+                    return this.$q.reject({message: 'Cannot load infrastructure overview ' + status});
                 });
         }
 
