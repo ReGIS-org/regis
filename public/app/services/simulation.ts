@@ -14,7 +14,7 @@ module App {
     }
 
     export class SimWebService {
-        public static $inject = ['$http', '$q', 'webserviceUrl'];
+        public static $inject = ['$http', '$q'];
 
         private simulationsCache: StringMap<ISimWebSimulations>;
 
@@ -47,7 +47,7 @@ module App {
             if (this.simulationsCache[webserviceUrl]) {
                 return this.$q.resolve(this.simulationsCache[webserviceUrl]);
             } else {
-                return this.$http.get(webserviceUrl + '/simulate/')
+                return this.$http.get(webserviceUrl + '/simulate')
                     .then(response => {
                         this.simulationsCache[webserviceUrl] = <ISimWebSimulations> response.data;
                         return this.simulationsCache[webserviceUrl];
@@ -62,13 +62,13 @@ module App {
             }
             return this.http('POST', url, params)
                 .then(result => {
-                    var url = result.headers('Location');
+                    let returnUrl = result.headers('Location');
                     return {
-                        url: url,
-                        name: url.substr(url.lastIndexOf('/') + 1)
+                        url: returnUrl,
+                        name: returnUrl.substr(returnUrl.lastIndexOf('/') + 1)
                     };
                 }, response => {
-                    var detailedMessage = SimWebService.formatHTTPError(response.data, response.status, response.statusText, 'error starting simulation');
+                    let detailedMessage = SimWebService.formatHTTPError(response.data, response.status, response.statusText, 'error starting simulation');
                     var message = 'Cannot add \'' + params.name + '\'';
                     if (response.status === 400 && response.data && response.data.error) {
                         message += ': ' + response.data.error;
@@ -89,7 +89,7 @@ module App {
         public summary(webserviceUrl: string): ng.IPromise<ISimWebSummary> {
             return this.$http.get(webserviceUrl + '/view/totals')
                 .then(response => {
-                    var data = <any> response.data;
+                    let data = <any> response.data;
                     return {
                         tasks: [
                             {name: 'queued', value: <number> data.todo},
@@ -124,8 +124,8 @@ module App {
         }
 
         private static formatHTTPError(data: any, status: number, statusText: string, defaultMsg: string): any {
-            var msg = data.error || defaultMsg;
-            var httpStatusMsg = '(HTTP status ' + status + ': ' + statusText + ')';
+            let msg = data.error || defaultMsg;
+            let httpStatusMsg = '(HTTP status ' + status + ': ' + statusText + ')';
 
             return {
                 message: msg,

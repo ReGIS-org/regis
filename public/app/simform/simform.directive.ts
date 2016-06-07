@@ -13,7 +13,7 @@ module App {
         .directive('simForm', [function (): ng.IDirective {
             return {
                 // templateUrl: currentScriptPath.replace('directive.js', 'directive.html'),  // Dev code
-                templateUrl: 'app/components/sim-city/simform.directive.html',
+                templateUrl: 'app/simform/simform.directive.html',
                 restrict: 'E',
                 scope: {
                     webserviceUrl: '@simWebserviceUrl',
@@ -26,8 +26,7 @@ module App {
 
 
     class SimFormController {
-
-        public static $inject = ['$scope', '$timeout', '$log', 'SchemaService', 'SimWebService', 'messageBusService'];
+        public static $inject = ['$scope', '$log', 'SchemaService', 'SimWebService', 'messageBusService'];
 
         private featureUnSubscribe: MessageBusHandle[];
         private schema: IJsonSchema;
@@ -79,16 +78,16 @@ module App {
                 layer: (formItem, _schemaItem, _form) => {
                     formItem.type = 'array';
 
-                    var layerId = formItem.layer;
-                    var featureId = formItem.featureId;
-                    var key = formItem.key;
+                    let layerId = formItem.layer;
+                    let featureId = formItem.featureId;
+                    let key = formItem.key;
 
-                    var unSubscribe = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
-                        var supportedOps = ['dropped', 'onFeatureUpdated', 'onFeatureRemoved'];
+                    let unSubscribe = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
+                        let supportedOps = ['dropped', 'onFeatureUpdated', 'onFeatureRemoved'];
 
                         if (feature && layerId === feature.layerId && featureId === feature.properties['featureTypeId']
                             && supportedOps.indexOf(title) >= 0) {
-                            var value = {
+                            let value = {
                                 id: feature.properties['Name'],
                                 x: feature.geometry.coordinates[0],
                                 y: feature.geometry.coordinates[1]
@@ -104,7 +103,7 @@ module App {
                                     break;
                                 case 'onFeatureUpdated':
                                     if (key in this.model) {
-                                        var index = this.model[key].map(f => f.id).indexOf(value.id);
+                                        let index = this.model[key].map(f => f.id).indexOf(value.id);
                                         if (index >= 0) {
                                             this.model[key][index] = value;
                                         } else {
@@ -116,7 +115,7 @@ module App {
                                     break;
                                 case 'onFeatureRemoved':
                                     if (key in this.model) {
-                                        var index = this.model[key].map(f => f.id).indexOf(value.id);
+                                        let index = this.model[key].map(f => f.id).indexOf(value.id);
                                         if (index >= -1) {
                                             this.model[key].splice(index, 1);
                                         }
@@ -155,7 +154,7 @@ module App {
             if (this.simulationSelected.simulation.value) {
                 this.resetForm();
                 this.SimWebService.simulations(this.webserviceUrl).then((data) => {
-                    var sim = data[this.simulationSelected.simulation.value];
+                    let sim = data[this.simulationSelected.simulation.value];
                     this.versionOptions = sim.versions.map((version: string) => {
                         return {
                             label: version,

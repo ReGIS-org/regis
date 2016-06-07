@@ -10,6 +10,7 @@ module App {
         properties?: any;
         form?: IAngularForm;
         default?: any;
+        items?: IJsonSchema;
         [key: string]: any;
     }
     export interface IAngularForm extends Array<IAngularFormItem> {
@@ -35,11 +36,11 @@ module App {
 
         private parseSchema(data: IJsonSchema, customTypeParsers: StringMap<ICustomTypeParser>): {schema: IJsonSchema, form: IAngularForm} {
             // Transform Resource object to JSON
-            var newSchema: IJsonSchema = {
+            let newSchema: IJsonSchema = {
                 type: 'object',
                 properties: data.properties
             };
-            var newForm: IAngularForm = [];
+            let newForm: IAngularForm = [];
             data.form.forEach((item: IAngularFormItem) => {
                 this.applyRulesForItem(item, newSchema, newForm, customTypeParsers);
             });
@@ -51,7 +52,7 @@ module App {
         }
 
         private applyRulesForItem(formItem: IAngularFormItem, schema: IJsonSchema, form: IAngularForm, customTypeParsers: StringMap<ICustomTypeParser>) {
-            var formRules: StringMap<ICustomTypeParser> = {
+            let formRules: StringMap<ICustomTypeParser> = {
                 type: (formItem, schemaItem, form) => {
                     var paramType: string = formItem.type;
                     if (paramType in customTypeParsers) {
@@ -63,7 +64,7 @@ module App {
                 },
                 items: (formItem, schemaItem, _form) => {
                     var newItems = [];
-                    formItem.items.forEach(function (item) {
+                    formItem.items.forEach(item => {
                         this.applyRulesForItem(item, schemaItem.items, newItems, customTypeParsers);
                     });
                     formItem.items = newItems;
@@ -75,12 +76,12 @@ module App {
                 }
             };
 
-            var schemaRules: StringMap<ICustomTypeParser> = {
+            let schemaRules: StringMap<ICustomTypeParser> = {
                 minItems: (formItem, schemaItem, _form) => {
                     var key = formItem.key;
                     var minimum = schemaItem.minItems;
-                    formItem.ngModel = function (ngModel) {
-                        ngModel.$validators[key] = function (value) {
+                    formItem.ngModel = (ngModel: ng.INgModelController) => {
+                        ngModel.$validators[key] = value => {
                             if (value && value.length) {
                                 return value.length >= minimum;
                             } else {
@@ -89,11 +90,11 @@ module App {
                         };
                     };
                 },
-                maxItems: function (formItem, schemaItem, _form) {
+                maxItems: (formItem, schemaItem, _form) => {
                     var key = formItem.key;
                     var maximum = schemaItem.minItems;
-                    formItem.ngModel = function (ngModel) {
-                        ngModel.$validators[key] = function (value) {
+                    formItem.ngModel = (ngModel: ng.INgModelController) => {
+                        ngModel.$validators[key] = value => {
                             if (value && value.length) {
                                 return value.length <= maximum;
                             } else {
@@ -120,7 +121,7 @@ module App {
 
                 for (var key in formItem) {
                     if (formItem.hasOwnProperty(key) && key !== 'type' && key in formRules) {
-                        var rule = formRules[key];
+                        let rule = formRules[key];
                         rule(formItem, schemaItem, form);
                     } else {
                         this.$log.debug('SchemaService: no rule know for key: ' + key);
@@ -128,7 +129,7 @@ module App {
                 }
                 for (key in schemaItem) {
                     if (schemaItem.hasOwnProperty(key) && key !== 'type' && key in schemaRules) {
-                        var schemaRule = schemaRules[key];
+                        let schemaRule = schemaRules[key];
                         schemaRule(formItem, schemaItem, form);
                     } else {
                         this.$log.debug('SchemaService: no rule know for key: ' + key);
@@ -137,7 +138,7 @@ module App {
                 var typeAttribute = 'type';
                 // Perform type handlers last so they can use the other values
                 if (typeAttribute in formItem) {
-                    var typeRule = formRules[typeAttribute];
+                    let typeRule = formRules[typeAttribute];
                     typeRule(formItem, schemaItem, form);
                 }
             }

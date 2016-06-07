@@ -2,7 +2,7 @@ module App {
     import NotifyType = csComp.Services.NotifyType;
     angular
         .module('csWebApp')
-        .directive('simForm', [function (): ng.IDirective {
+        .directive('simList', [function (): ng.IDirective {
             return {
                 templateUrl: 'app/simlist/simlist.directive.html',
                 restrict: 'E',
@@ -17,7 +17,7 @@ module App {
             };
         }]);
 
-    class SimListController {
+    export class SimListController {
         public static $inject = ['SimWebService', 'messageBusService'];
 
         private webserviceUrl: string;
