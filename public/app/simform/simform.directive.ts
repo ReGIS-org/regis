@@ -192,8 +192,8 @@ module App {
                             this.messageBusService.notify('New simulation', 'Submitted simulation',
                                 undefined, NotifyType.Success);
                         }, message => {
-                            this.messageBusService.notify('New simulation', 'Failed to submit simulation: ' + message,
-                                undefined, NotifyType.Error);
+                            this.messageBusService.notify('New simulation', 'Failed to submit simulation: '
+                                + message.message, undefined, NotifyType.Error);
                         });
             } else {
                 this.messageBusService.notify('New simulation', 'Form invalid! It has not been submitted!',
