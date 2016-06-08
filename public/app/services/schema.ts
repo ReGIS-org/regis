@@ -66,7 +66,7 @@ module App {
                 },
                 items: (formItem, schemaItem) => {
                     formItem.items
-                        .foreach(item => this.applyRulesForItem(item, schemaItem.items, customTypeParsers));
+                        .forEach(item => this.applyRulesForItem(item, schemaItem.items, customTypeParsers));
                 },
                 'default': (formItem, schema) => {
                     if (formItem.type === 'number') {
