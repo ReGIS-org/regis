@@ -1,7 +1,5 @@
 module App {
 
-    export type IAngularFormItem = IAngularFormSpec | string;
-
     /** Form item as specified in Angular-Schema-Form */
     export interface IAngularFormSpec {
         [key: string]: any;
@@ -9,9 +7,12 @@ module App {
         type?: string;
         items?: IAngularFormItem[];
     }
+    /** Form item can also just be a key name */
+    export type IAngularFormItem = IAngularFormSpec | string;
     export interface IAngularForm extends Array<IAngularFormItem> {
     }
 
+    /** JSON Schema. In our service, this can also have a form property for a Angular Schema Form. */
     export interface IJsonSchema {
         type?: string;
         properties?: any;
@@ -20,39 +21,49 @@ module App {
         items?: IJsonSchema;
         [key: string]: any;
     }
+    /** Parsing function for forms and schemas that modifies the form items and schemas in place. */
     export interface ICustomTypeParser {
         (IAngularFormSpec, IJsonSchema): void;
     }
-
+    /** Simple map of given type. */
     export interface StringMap<ValueType> {
         [key: string]: ValueType;
     }
-
+    /** Service for retrieving a JSON Schema from the SIM-CITY web service
+     *
+     * The web service serves the schema with an Angular Schema Form.
+     */
     export class SchemaService {
         public static $inject = ['$http', '$log'];
 
         constructor(private $http: ng.IHttpService, private $log: ng.ILogService) {}
 
-        public getSchema(webserviceURL: string, simulation: string, version: string, customTypeParsers: StringMap<ICustomTypeParser>): ng.IPromise<{schema: IJsonSchema, form: IAngularForm}> {
-            return this.$http.get(webserviceURL + '/simulate/' + simulation + '/' + version).then(response => {
-                return this.parseSchema(response.data, customTypeParsers);
-            });
+        /**
+         * Get the schema of given simulation with given version from the given webservice URL.
+         * Pass custom form and schema parsers to modify the form or schema in-place. The key of the custom parser
+         * is taken as the type parameter of the schema and form items.
+         */
+        public getSchema(webserviceURL: string, simulation: string, version: string, customTypeParsers: StringMap<ICustomTypeParser> = {}): ng.IPromise<{schema: IJsonSchema, form: IAngularForm}> {
+            return this.$http.get(webserviceURL + '/simulate/' + simulation + '/' + version).then(
+                (response: ng.IHttpPromiseCallbackArg<IJsonSchema>) => {
+                    // Transform Resource object to JSON
+                    let newSchema: IJsonSchema = {
+                        type: 'object',
+                        properties: response.data.properties
+                    };
+                    response.data.form.forEach(item => this.applyRulesForItem(item, newSchema, customTypeParsers));
+
+                    return {
+                        schema: newSchema,
+                        form: response.data.form
+                    };
+                });
         }
 
-        private parseSchema(data: IJsonSchema, customTypeParsers: StringMap<ICustomTypeParser>): {schema: IJsonSchema, form: IAngularForm} {
-            // Transform Resource object to JSON
-            let newSchema: IJsonSchema = {
-                type: 'object',
-                properties: data.properties
-            };
-            data.form.forEach(item => this.applyRulesForItem(item, newSchema, customTypeParsers));
-
-            return {
-                schema: newSchema,
-                form: data.form
-            };
-        }
-
+        /**
+         * Apply custom type parsers and internal type parsers to the form and schema.
+         * It is invoked recursively.
+         */
         private applyRulesForItem(formItem: IAngularFormItem, schema: IJsonSchema, customTypeParsers: StringMap<ICustomTypeParser>) {
             let formRules: StringMap<ICustomTypeParser> = {
                 type: (formItem, schemaItem) => {
