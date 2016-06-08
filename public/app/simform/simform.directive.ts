@@ -37,6 +37,8 @@ module App {
          */
         private simulation: string;
         private version: string;
+        private versionOptions: string[];
+        private simulationOptions: string[];
         private webserviceUrl: string;
 
         private schema: IJsonSchema;
@@ -52,10 +54,7 @@ module App {
         /**
          * Admin form
          */
-        private simulationSelected;
         private hideSimulationForm;
-        private simulationOptions: {label: string, value: string}[];
-        private versionOptions: {label: string, value: string}[];
 
         public static $inject = ['$scope', '$log', '$q', 'SchemaService', 'SimWebService', 'messageBusService', 'mapService'];
 
@@ -73,11 +72,7 @@ module App {
             }
 
             // If not in expert mode or higher we need a simulation and version
-            if (!this.simulation && mapService.expertMode <= Expertise.Expert) {
-                $log.error('SimCityDirective.FormController: No simulation provided');
-                return;
-            }
-            if (!this.version && mapService.expertMode <= Expertise.Expert) {
+            if (!this.simulation || !this.version) {
                 $log.error('SimCityDirective.FormController: No simulation provided');
                 return;
             }
@@ -91,46 +86,30 @@ module App {
             this.model = {};
 
             this.initializeCustomTypes();
+            this.versionOptions = [];
+            this.simulationOptions = [];
 
+            this.getForm(this.simulation, this.version);
             if (mapService.expertMode >= Expertise.Admin) {
                 this.enableExpertMode();
-            } else {
-                this.getForm(this.simulation, this.version);
             }
+
+            this.messageBusService.subscribe('expertMode', (title: string, expertMode: Expertise) => {
+                if (title !== 'newExpertise') return;
+                if (mapService.expertMode >= Expertise.Admin) {
+                    this.enableExpertMode();
+                } else {
+                    this.hideSimulationForm = true;
+                }
+            });
         }
-
-
-        // Functions the controller exposes
-        public simulationChanged(): void {
-            if (this.simulationSelected.simulation.value) {
-                this.resetForm();
-                this.SimWebService.simulations(this.webserviceUrl).then((data) => {
-                    let sim = data[this.simulationSelected.simulation.value];
-                    this.versionOptions = sim.versions.map((version: string) => {
-                        return {
-                            label: version,
-                            value: version
-                        };
-                    });
-                });
-            }
-        }
-
-        public simulationVersionChanged(): void {
-            if (this.simulationSelected.version.value) {
-                this.resetForm();
-                this.getForm(this.simulationSelected.simulation.value,
-                             this.simulationSelected.version.value);
-            }
-        }
-
 
         public onSubmit(form: any) {
             // Then we check if the form is valid
             if (form.$valid) {
                 this.SimWebService.submit(this.webserviceUrl,
-                                          this.simulationSelected.simulation.value,
-                                          this.simulationSelected.version.value,
+                                          this.simulation,
+                                          this.version,
                                           this.model)
                     .then(() => {
                             this.messageBusService.publish('sim-task', 'submitted');
@@ -226,24 +205,30 @@ module App {
         }
 
         private enableExpertMode():void {
-            this.simulationOptions = [];
-            this.versionOptions = [];
-            this.simulationSelected = {
-                simulation: {},
-                version: {}
-            };
-
             this.hideSimulationForm = false;
 
-            this.SimWebService.simulations(this.webserviceUrl)
-                .then((data) => {
-                    this.simulationOptions = Object.keys(data).map((item: string) => {
-                        return {
-                            label: item,
-                            value: item
-                        };
+            if (this.simulationOptions.length === 0) {
+                this.SimWebService.simulations(this.webserviceUrl)
+                    .then((data) => {
+                        this.simulationOptions = Object.keys(data);
+                        if (this.simulation && this.simulation in data) {
+                            this.versionOptions = data[this.simulation].versions;
+                        }
                     });
-                });
+            }
+        }
+
+        // Functions the controller exposes
+        public simulationChanged(): void {
+            this.resetForm();
+            this.SimWebService.simulations(this.webserviceUrl).then(data => {
+                this.versionOptions = data[this.simulation].versions;
+            });
+        }
+
+        public simulationVersionChanged(): void {
+            this.resetForm();
+            this.getForm(this.simulation, this.version);
         }
 
         private indexOfFeature(key: string, id: string): ng.IPromise<number> {
