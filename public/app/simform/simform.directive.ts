@@ -61,6 +61,7 @@ module App {
 
         constructor(private $scope: ISimFormScope,
                     private $log: ng.ILogService,
+                    private $q: ng.IQService,
                     private SchemaService: App.SchemaService,
                     private SimWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
@@ -181,6 +182,11 @@ module App {
                     let featureId = formItem.featureId;
                     let key = formItem.key;
 
+                    // make sure the key is in the model
+                    if (!this.model.hasOwnProperty(key)) {
+                        this.model[key] = [];
+                    }
+
                     let unSubscribe = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
                         let supportedOps = ['dropped', 'onFeatureUpdated', 'onFeatureRemoved'];
 
@@ -194,31 +200,16 @@ module App {
 
                             switch (title) {
                                 case 'dropped':
-                                    if (key in this.model) {
-                                        this.model[key].push(value);
-                                    } else {
-                                        this.model[key] = [value];
-                                    }
+                                    this.model[key].push(value);
                                     break;
                                 case 'onFeatureUpdated':
-                                    if (key in this.model) {
-                                        let index = this.model[key].map(f => f.id).indexOf(value.id);
-                                        if (index >= 0) {
-                                            this.model[key][index] = value;
-                                        } else {
-                                            this.model[key].push(value);
-                                        }
-                                    } else {
-                                        this.model[key] = [value];
-                                    }
+                                    this.indexOfFeature(key, value.id)
+                                        .then(i => this.model[key][i] = value,
+                                              () => this.model[key].push(value));
                                     break;
                                 case 'onFeatureRemoved':
-                                    if (key in this.model) {
-                                        let index = this.model[key].map(f => f.id).indexOf(value.id);
-                                        if (index >= -1) {
-                                            this.model[key].splice(index, 1);
-                                        }
-                                    }
+                                    this.indexOfFeature(key, value.id)
+                                        .then(i => this.model[key].splice(i, 1));
                                     break;
                             }
                         }
@@ -247,6 +238,11 @@ module App {
                         };
                     });
                 });
+        }
+
+        private indexOfFeature(key: string, id: string): ng.IPromise<number> {
+            let index = this.model[key].map(f => f.id).indexOf(id);
+            return this.$q((resolve, reject) => (index >= 0 ? resolve(index) : reject()));
         }
     }
 }
