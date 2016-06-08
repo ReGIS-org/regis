@@ -2,6 +2,7 @@ module App {
     // var scripts = document.getElementsByTagName("script")
     // var currentScriptPath = scripts[scripts.length-1].src;
 
+    import Expertise = csComp.Services.Expertise;
     import NotifyType = csComp.Services.NotifyType;
     import IFeature = csComp.Services.IFeature;
     import MessageBusHandle = csComp.Services.MessageBusHandle;
@@ -17,6 +18,8 @@ module App {
                 restrict: 'E',
                 scope: {
                     webserviceUrl: '@simWebserviceUrl',
+                    simulation: '@simName',
+                    version: '@simVersion'
                 },
                 controller: SimFormController,
                 controllerAs: 'vm',
@@ -24,50 +27,146 @@ module App {
             };
         }]);
 
+    export interface ISimFormScope extends ng.IScope {
+        vm:SimFormController;
+    }
 
     class SimFormController {
-        public static $inject = ['$scope', '$log', 'SchemaService', 'SimWebService', 'messageBusService'];
+        public static $inject = ['$scope', '$log', 'SchemaService', 'SimWebService', 'messageBusService', 'mapService'];
 
-        private featureUnSubscribe: MessageBusHandle[];
+        /**
+         * Directive parameters
+         */
+        private simulation: string;
+        private version: string;
+        private webserviceUrl: string;
+
         private schema: IJsonSchema;
         private form: IAngularForm;
         private model: any;
+
+        /**
+         * Custom type handlers
+         */
+        private featureUnSubscribe: MessageBusHandle[];
         private customTypeParsers: StringMap<ICustomTypeParser>;
+
+        /**
+         * Admin form
+         */
+        private simulationSelected;
+        private hideSimulationForm;
         private simulationOptions: {label: string, value: string}[];
         private versionOptions: {label: string, value: string}[];
-        private simulationSelected;
-        private webserviceUrl: string;
 
-        constructor(private $scope: ng.IScope,
+        constructor(private $scope: ISimFormScope,
                     private $log: ng.ILogService,
                     private SchemaService: App.SchemaService,
                     private SimWebService: App.SimWebService,
-                    private messageBusService: csComp.Services.MessageBusService) {
+                    private messageBusService: csComp.Services.MessageBusService,
+                    private mapService: csComp.Services.MapService) {
+
             if (!this.webserviceUrl) {
                 $log.error('SimCityDirective.FormController: no URL provided');
                 return;
             }
-            this.SimWebService.simulations(this.webserviceUrl)
-                .then((data) => {
-                    this.simulationOptions = Object.keys(data).map((item: string) => {
-                        return {
-                            label: item,
-                            value: item
-                        };
-                    });
-                });
+
+            // If not in expert mode or higher we need a simulation and version
+            if (!this.simulation && mapService.expertMode <= Expertise.Expert) {
+                $log.error('SimCityDirective.FormController: No simulation provided');
+                return;
+            }
+            if (!this.version && mapService.expertMode <= Expertise.Expert) {
+                $log.error('SimCityDirective.FormController: No simulation provided');
+                return;
+            }
+
+            this.$scope.vm = this;
+
+            this.hideSimulationForm = true;
 
             this.schema = {};
             this.form = [];
             this.model = {};
-            this.simulationOptions = [];
-            this.versionOptions = [];
-            this.featureUnSubscribe = [];
-            this.simulationSelected = {
-                simulation: {},
-                version: {}
-            };
 
+            this.initializeCustomTypes();
+
+            if (mapService.expertMode >= Expertise.Admin) {
+                this.enableExpertMode();
+            } else {
+                this.getForm(this.simulation, this.version);
+            }
+        }
+
+
+        // Functions the controller exposes
+        public simulationChanged(): void {
+            if (this.simulationSelected.simulation.value) {
+                this.resetForm();
+                this.SimWebService.simulations(this.webserviceUrl).then((data) => {
+                    let sim = data[this.simulationSelected.simulation.value];
+                    this.versionOptions = sim.versions.map((version: string) => {
+                        return {
+                            label: version,
+                            value: version
+                        };
+                    });
+                });
+            }
+        }
+
+        public simulationVersionChanged(): void {
+            if (this.simulationSelected.version.value) {
+                this.resetForm();
+                this.getForm(this.simulationSelected.simulation.value,
+                             this.simulationSelected.version.value);
+            }
+        }
+
+
+        public onSubmit(form: any) {
+            // Then we check if the form is valid
+            if (form.$valid) {
+                this.SimWebService.submit(this.webserviceUrl,
+                                          this.simulationSelected.simulation.value,
+                                          this.simulationSelected.version.value,
+                                          this.model)
+                    .then(() => {
+                            this.messageBusService.notify('New simulation', 'Submitted simulation',
+                                undefined, NotifyType.Success);
+                        }, message => {
+                            this.messageBusService.notify('New simulation', 'Failed to submit simulation: '
+                                + message.message, undefined, NotifyType.Error);
+                        });
+            } else {
+                this.messageBusService.notify('New simulation', 'Form invalid! It has not been submitted!',
+                    undefined, NotifyType.Success);
+            }
+        }
+
+        private resetForm(): void {
+            this.featureUnSubscribe.forEach(handle => {
+                this.messageBusService.unsubscribe(handle);
+            });
+            this.featureUnSubscribe = [];
+            this.form = [];
+            this.schema = {};
+        }
+
+        private getForm(simulation, value): void {
+            this.SchemaService.getSchema(this.webserviceUrl,
+                simulation, value,
+                this.customTypeParsers).then(
+                    data => {
+                        this.schema = data.schema;
+                        this.form = data.form;
+
+                        this.$scope.$broadcast('schemaFormValidate');
+                    });
+        }
+
+        private initializeCustomTypes(): void {
+            this.featureUnSubscribe = [];
             this.customTypeParsers = {
                 point2d: (formItem, _schemaItem, _form): void => {
                     formItem.type = 'template';
@@ -129,76 +228,25 @@ module App {
             };
         }
 
+        private enableExpertMode():void {
+            this.simulationOptions = [];
+            this.versionOptions = [];
+            this.simulationSelected = {
+                simulation: {},
+                version: {}
+            };
 
-        // Functions the controller exposes
+            this.hideSimulationForm = false;
 
-        // Initialize controller
-        // the vm.simulationurl should already be set by angular
-        // try {
-        //   vm.simulationurl = $scope.$parent.widget.data.schemaurl;
-        // } catch(e) {
-        //   // Do nothing...
-        // }
-
-        // Add the model of this form to the schema service so it can be updated
-        private resetForm(): void {
-            this.featureUnSubscribe.forEach(handle => {
-                this.messageBusService.unsubscribe(handle);
-            });
-            this.featureUnSubscribe = [];
-            this.form = [];
-            this.schema = {};
-        }
-
-        public simulationChanged(): void {
-            if (this.simulationSelected.simulation.value) {
-                this.resetForm();
-                this.SimWebService.simulations(this.webserviceUrl).then((data) => {
-                    let sim = data[this.simulationSelected.simulation.value];
-                    this.versionOptions = sim.versions.map((version: string) => {
+            this.SimWebService.simulations(this.webserviceUrl)
+                .then((data) => {
+                    this.simulationOptions = Object.keys(data).map((item: string) => {
                         return {
-                            label: version,
-                            value: version
+                            label: item,
+                            value: item
                         };
                     });
                 });
-            }
-        }
-
-        public simulationVersionChanged(): void {
-            if (this.simulationSelected.version.value) {
-                this.resetForm();
-                this.SchemaService.getSchema(this.webserviceUrl,
-                    this.simulationSelected.simulation.value,
-                    this.simulationSelected.version.value,
-                    this.customTypeParsers).then(
-                        data => {
-                            this.schema = data.schema;
-                            this.form = data.form;
-
-                            this.$scope.$broadcast('schemaFormValidate');
-                        });
-            }
-        }
-
-        public onSubmit(form: any) {
-            // Then we check if the form is valid
-            if (form.$valid) {
-                this.SimWebService.submit(this.webserviceUrl,
-                                          this.simulationSelected.simulation.value,
-                                          this.simulationSelected.version.value,
-                                          this.model)
-                    .then(() => {
-                            this.messageBusService.notify('New simulation', 'Submitted simulation',
-                                undefined, NotifyType.Success);
-                        }, message => {
-                            this.messageBusService.notify('New simulation', 'Failed to submit simulation: '
-                                + message.message, undefined, NotifyType.Error);
-                        });
-            } else {
-                this.messageBusService.notify('New simulation', 'Form invalid! It has not been submitted!',
-                    undefined, NotifyType.Success);
-            }
         }
     }
 }
