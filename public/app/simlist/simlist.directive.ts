@@ -56,29 +56,31 @@ module App {
                 'Remove simulation',
                 'Are you sure you want to remove simulation "' + task.input.simulation +
                 ' (with id "' + task.id + '" from ensemble ' + task.ensemble + ')',
-                () => {
-                    this.SimWebService.delete(this.webserviceUrl, task.id, task.rev)
-                        .then(this.updateView,
-                            (response) => {
-                                if (response.status === 409) {
-                                    this.messageBusService.notify('Simulation', 'cannot remove simulation: ' +
-                                        'it was modified', undefined, NotifyType.Error);
-                                } else if (response.data) {
-                                    this.messageBusService.notify('Simulation', 'cannot remove simulation: ' +
-                                        response.data, undefined, NotifyType.Error);
-                                } else {
-                                    this.messageBusService.notify('Simulation', 'cannot remove simulation',
-                                        undefined, NotifyType.Error);
-                                }
-                            })
-                        .then(
-                            () => {
-                                this.messageBusService.notify('Simulation', 'Removed simulation.',
-                                    undefined, NotifyType.Success);
-                            }, () => {
-                                this.messageBusService.notify('Simulation', 'Removed simulation (but failed to ' +
-                                    'reload simulation overview).', undefined, NotifyType.Success);
-                            });
+                (confirmed: boolean) => {
+                    if (confirmed) {
+                        this.SimWebService.delete(this.webserviceUrl, task.id, task.rev)
+                            .then(this.updateView,
+                                (response) => {
+                                    if (response.status === 409) {
+                                        this.messageBusService.notify('Simulation', 'cannot remove simulation: ' +
+                                            'it was modified', undefined, NotifyType.Error);
+                                    } else if (response.data) {
+                                        this.messageBusService.notify('Simulation', 'cannot remove simulation: ' +
+                                            response.data, undefined, NotifyType.Error);
+                                    } else {
+                                        this.messageBusService.notify('Simulation', 'cannot remove simulation',
+                                            undefined, NotifyType.Error);
+                                    }
+                                })
+                            .then(
+                                () => {
+                                    this.messageBusService.notify('Simulation', 'Removed simulation.',
+                                        undefined, NotifyType.Success);
+                                }, () => {
+                                    this.messageBusService.notify('Simulation', 'Removed simulation (but failed to ' +
+                                        'reload simulation overview).', undefined, NotifyType.Success);
+                                });
+                    }
             });
         }
     }
