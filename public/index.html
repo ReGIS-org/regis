@@ -28,6 +28,7 @@
     <!-- build:css css/csWeb.css -->
     <link rel="stylesheet" href="bower_components/csweb/dist-bower/csWeb-dep.css" />
     <link rel="stylesheet" href="bower_components/csweb/dist-bower/css/csStyles.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
 
     <link rel="stylesheet" href="css/style.css">
     <!-- endbuild -->
@@ -52,24 +53,23 @@
 
     <script src="bower_components/angularUtils-pagination/dirPagination.js"></script>
     <script src="bower_components/csweb/dist-bower/csComp.js"></script>
+    <script src="app/index.js"></script>
     <script src="app/app.js"></script>
+    <script src="app/services/schema.js"></script>
+    <script src="app/services/simulation.js"></script>
+    <script src="app/simform/simform.directive.js"></script>
+    <script src="app/simlist/simlist.directive.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script src="bower_components/csweb/dist-bower/csTemplates.js"></script>
 
-    <!--<script src="bower_components/CitySimDirective/bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/angular/angular.js"></script>-->
-    <script src="bower_components/angular-resource/angular-resource.js"></script>
-    <!--<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>-->
-    <script src="bower_components/malarkey/dist/malarkey.min.js"></script>
-    <script src="bower_components/angular-toastr/dist/angular-toastr.tpls.js"></script>
-    <script src="bower_components/moment/moment.js"></script>
+    <!--<script src="bower_components/jquery/dist/jquery.min.js"></script>-->
+    <!--<script src="bower_components/angular/angular.min.js"></script>-->
     <script src="bower_components/tv4/tv4.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
     <script src="bower_components/objectpath/lib/ObjectPath.js"></script>
-    <script src="bower_components/angular-schema-form/dist/schema-form.js"></script>
-    <script src="bower_components/angular-schema-form/dist/bootstrap-decorator.js"></script>
+    <script src="bower_components/angular-schema-form/dist/schema-form.min.js"></script>
     <script src="bower_components/angular-schema-form-bootstrap/bootstrap-decorator.min.js"></script>
-    <script src="bower_components/simCitySimDirective/dist/scripts/app.js"></script>
-
     <!-- endbuild -->
 
     <div class="body" style="top:0">
@@ -171,7 +171,11 @@
                             </svg>
                         </li>
 
-                        <li class="lp-tab" data-target="#simdirective" data-toggle="tab">
+                        <li class="lp-tab" data-target="#simform" data-toggle="tab">
+                            <i class="fa fa-fire" aria-hidden="true"></i>
+                        </li>
+
+                        <li class="lp-tab" data-target="#simlist" data-toggle="tab">
                             <i class="fa fa-fire" aria-hidden="true"></i>
                         </li>
                     </ul>
@@ -186,8 +190,11 @@
                         <style-list class="tab-pane" id="styles"></style-list>
                         <dashboard-selection class="tab-pane" id="dashboardselection"></dashboard-selection>
                         <project-settings class="tab-pane" id="settings"></project-settings>
-                        <div style="overflow-y: auto; overflow-x: hidden; padding:5px; margin-top: -40px; margin-left:10px;" class="tab-pane ng-isolate-scope scrolling leftpanel-scroll" id="simdirective">
-                            <sim-form webservice-url="http://localhost/explore/simulate"></sim-form>
+                        <div style="overflow-y: auto; overflow-x: hidden; padding:5px; margin-top: -40px; margin-left:10px;" class="tab-pane ng-isolate-scope scrolling leftpanel-scroll" id="simform">
+                            <sim-form sim-webservice-url="/explore"></sim-form>
+                        </div>
+                        <div style="overflow-y: auto; overflow-x: hidden; padding:5px; margin-top: -40px; margin-left:10px;" class="tab-pane ng-isolate-scope scrolling leftpanel-scroll" id="simlist">
+                            <sim-list sim-webservice-url="/explore" sim-name="matsim" sim-version="latest"></sim-list>
                         </div>
                     </div>
                 </div>

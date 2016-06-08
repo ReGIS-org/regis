@@ -4,38 +4,6 @@ It is based on the [csWeb framework](https://github.com/TNOCS/csWeb)
 
 ## Specifics for getting SimDirective working:
 
-Must include JS includes on index.html (possibly can be injected):
-```
-<script src="bower_components/simCitySimDirective/bower_components/angular-resource/angular-resource.js"></script>
-<script src="bower_components/simCitySimDirective/bower_components/malarkey/dist/malarkey.min.js"></script>
-<script src="bower_components/simCitySimDirective/bower_components/angular-toastr/dist/angular-toastr.tpls.js"></script>
-<script src="bower_components/simCitySimDirective/bower_components/moment/moment.js"></script>
-<script src="bower_components/simCitySimDirective/bower_components/tv4/tv4.js"></script>
-<script src="bower_components/simCitySimDirective/bower_components/angular-sanitize/angular-sanitize.js"></script>
-<script src="bower_components/simCitySimDirective/bower_components/objectpath/lib/ObjectPath.js"></script>
-<script src="bower_components/simCitySimDirective/bower_components/angular-schema-form/dist/schema-form.js"></script>
-<script src="bower_components/simCitySimDirective/bower_components/angular-schema-form/dist/bootstrap-decorator.js"></script>
-<script src="bower_components/simCitySimDirective/bower_components/angular-schema-form-bootstrap/bootstrap-decorator.min.js"></script>
-
-<script src="bower_components/simCitySimDirective/src/app/components/sim-city/tempcode.js"></script>
-<script src="bower_components/simCitySimDirective/src/app/index.module.js"></script>
-<script src="bower_components/simCitySimDirective/src/app/components/sim-city/submitSimulation.service.js"></script>
-<script src="bower_components/simCitySimDirective/src/app/components/sim-city/simform.directive.js"></script>
-<script src="bower_components/simCitySimDirective/src/app/components/sim-city/schema.service.js"></script>
-<script src="bower_components/simCitySimDirective/src/app/components/sim-city/form.controller.js"></script>
-<script src="bower_components/simCitySimDirective/src/app/index.run.js"></script>
-<script src="bower_components/simCitySimDirective/src/app/index.constants.js"></script>
-<script src="bower_components/simCitySimDirective/src/app/index.config.js"></script>
-```
-
-Must include in app/app.ts:
-```
-angular.module('csWebApp', [
-    ...
-    'simCitySimDirective'   ** <- Include this line**
-])
-```
-
 Add directive to side menu:
 ```
 <div class="leftpanel-tab">
@@ -65,7 +33,7 @@ AND
 # Getting started
 We depend on node and bower and use typescript to develop. You can install all necessary tools by invoking:
 ```shell
-npm i -g typescript@1.6.2 bower nodemon http-server
+npm i -g typescript bower nodemon http-server
 ```
 ## Compiling and Running
 ```shell

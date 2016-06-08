@@ -1,0 +1,40 @@
+<div>
+    <fieldset class="schema-form-fieldset">
+        <legend>Simulation Selection</legend>
+        <form name="selectForm">
+            <select name="simulationSelect"
+                    class="btn btn-default form-control"
+                    style="margin-bottom: 15px"
+                    data-ng-model="vm.simulationSelected.simulation"
+                    data-ng-change="vm.simulationChanged()"
+                    data-ng-options="item as item.label for item in vm.simulationOptions track by item.value">
+                <option value="">-- choose simulation --</option>
+            </select>
+            <select name="versionSelect"
+                    class="btn btn-default form-control"
+                    style="margin-bottom: 15px"
+                    data-ng-hide="!vm.versionOptions"
+                    data-ng-model="vm.simulationSelected.version"
+                    data-ng-change="vm.simulationVersionChanged()"
+                    data-ng-options="item as item.label for item in vm.versionOptions track by item.value">
+                <option value="">-- choose version --</option>
+            </select>
+        </form>
+    </fieldset>
+    <fieldset class="schema-form-fieldset">
+        <legend>Simulation Parameters</legend>
+        <form name="simulationForm"
+              data-ng-hide="!vm.schema"
+              sf-schema="vm.schema"
+              sf-form="vm.form"
+              sf-model="vm.model"
+              sf-options="">
+        </form>
+        <button data-ng-hide="!vm.schema"
+                data-ng-click="vm.onSubmit(simulationForm)"
+                class="btn btn-success"
+                data-ng-disabled="simulationForm.$invalid">Submit
+        </button>
+    </fieldset>
+</div>
+

@@ -2,13 +2,13 @@ node_modules/
 public/bower_components/
 
 public/data/templates/
-public/data/api/resourceTypes/
-public/data/api/layers/
+public/data/api/
 
 public/**/*.js
 public/**/*.js.map
 
-.vscode
+.vscode/
+.idea/
 
 server.js.map
 server.js

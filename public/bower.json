@@ -24,12 +24,11 @@
     "tests"
   ],
   "dependencies": {
-    "csweb": "~0.2.8",
-    "font-awesome": "^4.5.0",
-    "angularUtils-pagination": "angular-utils-pagination#~0.11.1",
-    "simCitySimDirective": "git://github.com/c-martinez/Sim-City-Directive.git"
-  },
-  "resolutions": {
-    "angular": ">=1.1.4"
+    "csweb": "~0.2.15",
+    "angular": "~1.5.5",
+    "angular-schema-form": "~0.8.13",
+    "angular-schema-form-bootstrap": "^0.2.0",
+    "bootstrap": "~3.3.6",
+    "angular-bootstrap": "~1.3.3"
   }
 }

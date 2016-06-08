@@ -1,0 +1,35 @@
+<div>
+    <div>
+        <label><input ng-model="searchText" placeholder="filter..."/></label>
+    </div>
+    <div>
+        <table class="table table-condensed">
+            <thead>
+            <tr ng-show="vm.status">
+                <th ng-bind="vm.status"></th>
+            <tr>
+            <tr ng-hide="vm.status">
+                <th>ensemble</th>
+                <th>name</th>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            </thead>
+            <tbody ng-hide="vm.status" vs-repeat>
+            <tr ng-repeat="task in vm.tasks track by task.id | filter:searchText">
+                <td ng-bind="task.ensemble"></td>
+                <td ng-bind="task.input.simulation"></td>
+                <td ng-switch="task.done">
+                    <span ng-switch-when="-1" title="simulation error" class="glyphicon glyphicon-warning-sign"></span>
+                    <span ng-switch-when="0" title="no output" class="glyphicon glyphicon-eye-close"></span>
+                </td>
+                <td><a href="#" ng-click="vm.viewTask(task)" title="Show data">
+                    <span class="glyphicon glyphicon-save-file"></span></a></td>
+                <td><a href="#" ng-click="vm.remove(task)" class="text-danger" title="Remove simulation">
+                    <span class="glyphicon glyphicon-remove-circle"></span></a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
