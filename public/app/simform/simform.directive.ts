@@ -70,13 +70,13 @@ module App {
             };
 
             this.customTypeParsers = {
-                point2d: (formItem, _schemaItem, _form): void => {
+                point2d: (formItem, _schemaItem): void => {
                     formItem.type = 'template';
                     formItem.template =
                         '<div ng-if="item.id">{{item.id}}</div>' +
                         '<div ng-if="!item.id">({{item.x}}, {{item.y}})</div>';
                 },
-                layer: (formItem, _schemaItem, _form) => {
+                layer: (formItem, _schemaItem) => {
                     formItem.type = 'array';
 
                     let layerId = formItem.layer;

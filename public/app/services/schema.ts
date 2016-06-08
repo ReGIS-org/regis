@@ -1,7 +1,9 @@
 module App {
 
+    export type IAngularFormItem = IAngularFormSpec | string;
+
     /** Form item as specified in Angular-Schema-Form */
-    export interface IAngularFormItem {
+    export interface IAngularFormSpec {
         [key: string]: any;
         key: string;
         type?: string;
@@ -19,7 +21,7 @@ module App {
         [key: string]: any;
     }
     export interface ICustomTypeParser {
-        (IAngularFormItem, IJsonSchema, IAngularForm): void;
+        (IAngularFormSpec, IJsonSchema): void;
     }
 
     export interface StringMap<ValueType> {
@@ -43,44 +45,38 @@ module App {
                 type: 'object',
                 properties: data.properties
             };
-            let newForm: IAngularForm = [];
-            data.form.forEach((item: IAngularFormItem) => {
-                this.applyRulesForItem(item, newSchema, newForm, customTypeParsers);
-            });
+            data.form.forEach(item => this.applyRulesForItem(item, newSchema, customTypeParsers));
 
             return {
                 schema: newSchema,
-                form: newForm
+                form: data.form
             };
         }
 
-        private applyRulesForItem(formItem: IAngularFormItem, schema: IJsonSchema, form: IAngularForm, customTypeParsers: StringMap<ICustomTypeParser>) {
+        private applyRulesForItem(formItem: IAngularFormItem, schema: IJsonSchema, customTypeParsers: StringMap<ICustomTypeParser>) {
             let formRules: StringMap<ICustomTypeParser> = {
-                type: (formItem, schemaItem, form) => {
+                type: (formItem, schemaItem) => {
                     var paramType: string = formItem.type;
                     if (paramType in customTypeParsers) {
-                        customTypeParsers[paramType](formItem, schemaItem, form);
+                        customTypeParsers[paramType](formItem, schemaItem);
                     } else {
                         this.$log.debug('SchemaService: no mapping known for type: ' + paramType);
                         schema.type = paramType;
                     }
                 },
-                items: (formItem, schemaItem, _form) => {
-                    var newItems = [];
-                    formItem.items.forEach(item => {
-                        this.applyRulesForItem(item, schemaItem.items, newItems, customTypeParsers);
-                    });
-                    formItem.items = newItems;
+                items: (formItem, schemaItem) => {
+                    formItem.items
+                        .foreach(item => this.applyRulesForItem(item, schemaItem.items, customTypeParsers));
                 },
-                default: (formItem, schema, _form) => {
+                'default': (formItem, schema) => {
                     if (formItem.type === 'number') {
-                        schema.default = Number(formItem.default);
+                        schema['default'] = Number(formItem.default);
                     }
                 }
             };
 
             let schemaRules: StringMap<ICustomTypeParser> = {
-                minItems: (formItem, schemaItem, _form) => {
+                minItems: (formItem, schemaItem) => {
                     var key = formItem.key;
                     var minimum = schemaItem.minItems;
                     formItem.ngModel = (ngModel: ng.INgModelController) => {
@@ -93,7 +89,7 @@ module App {
                         };
                     };
                 },
-                maxItems: (formItem, schemaItem, _form) => {
+                maxItems: (formItem, schemaItem) => {
                     var key = formItem.key;
                     var maximum = schemaItem.minItems;
                     formItem.ngModel = (ngModel: ng.INgModelController) => {
@@ -114,42 +110,40 @@ module App {
                 name = formItem;
                 schemaItem = schema.properties[name];
             } else {
-                if ('key' in formItem) {
-                    name = formItem.key;
+                let formSpec = <IAngularFormSpec> formItem;
+                if ('key' in formSpec) {
+                    name = formSpec.key;
                     schemaItem = schema.properties[name];
                 } else {
                     name = undefined;
                     schemaItem = undefined;
                 }
 
-                for (var key in formItem) {
-                    if (formItem.hasOwnProperty(key) && key !== 'type' && key in formRules) {
-                        let rule = formRules[key];
-                        rule(formItem, schemaItem, form);
+                for (var key in formSpec) {
+                    if (formSpec.hasOwnProperty(key) && key !== 'type' && key in formRules) {
+                        formRules[key](formSpec, schemaItem);
                     } else {
                         this.$log.debug('SchemaService: no rule know for key: ' + key);
                     }
                 }
                 for (key in schemaItem) {
                     if (schemaItem.hasOwnProperty(key) && key !== 'type' && key in schemaRules) {
-                        let schemaRule = schemaRules[key];
-                        schemaRule(formItem, schemaItem, form);
+                        schemaRules[key](formSpec, schemaItem);
                     } else {
                         this.$log.debug('SchemaService: no rule know for key: ' + key);
                     }
                 }
                 var typeAttribute = 'type';
                 // Perform type handlers last so they can use the other values
-                if (typeAttribute in formItem) {
+                if (typeAttribute in formSpec) {
                     let typeRule = formRules[typeAttribute];
-                    typeRule(formItem, schemaItem, form);
+                    typeRule(formSpec, schemaItem);
                 }
             }
 
             if (angular.isDefined(schemaItem)) {
                 schema.properties[name] = schemaItem;
             }
-            form.push(formItem);
         }
     }
 
