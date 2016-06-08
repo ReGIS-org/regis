@@ -13,6 +13,39 @@ module App {
         jobs: {name: string, value: number}[];
     }
 
+    export interface ISimWebList<RowContent> {
+        total_rows: number;
+        offset: number;
+        rows: {id: string, key: string, value: RowContent}[];
+    }
+
+    export interface ITask {
+        id?: string;
+        rev?: string;
+        _id?: string;
+        _rev?: string;
+        url?: string;
+        lock: number;
+        done: number;
+        error: any[];
+        input: {
+            simulation: string;
+            ensemble: string;
+            [key: string]: any;
+        };
+        output?: any;
+        uploads?: { [key: string]: string };
+        _attachments?: { [key: string]: any };
+        hostname?: string;
+        name?: string;
+        ensemble?: string;
+        scrub_count?: number;
+        type?: string;
+        version?: string;
+        command?: string;
+        arguments?: string;
+    }
+
     export class SimWebService {
         public static $inject = ['$http', '$q'];
 
@@ -22,11 +55,11 @@ module App {
             this.simulationsCache = {};
         }
 
-        public list(webserviceUrl: string, simulation: string, version: string): ng.IHttpPromise<any> {
+        public list(webserviceUrl: string, simulation: string, version: string): ng.IHttpPromise<ISimWebList<ITask>> {
             return this.$http.get(webserviceUrl + '/view/simulations/' + simulation + '/' + version);
         }
 
-        public get(webserviceUrl: string, id: string): ng.IHttpPromise<any> {
+        public get(webserviceUrl: string, id: string): ng.IHttpPromise<ITask> {
             return this.$http.get(webserviceUrl + '/simulation/' + id);
         }
 
@@ -81,7 +114,7 @@ module App {
                 });
         }
 
-        public delete(webserviceUrl: string, id: string, rev: string): ng.IHttpPromise<any> {
+        public delete(webserviceUrl: string, id: string, rev: string): ng.IHttpPromise<void> {
             return this.http('DELETE', webserviceUrl + '/simulation/' + id, {rev: rev});
         }
 
@@ -123,7 +156,7 @@ module App {
             });
         }
 
-        private static formatHTTPError(data: any, status: number, statusText: string, defaultMsg: string): any {
+        private static formatHTTPError(data: any, status: number, statusText: string, defaultMsg: string): {message: string, httpStatusMessage: string, formatted: string} {
             let msg = data.error || defaultMsg;
             let httpStatusMsg = '(HTTP status ' + status + ': ' + statusText + ')';
 

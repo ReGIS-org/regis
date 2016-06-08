@@ -1,10 +1,15 @@
 module App {
+
+    /** Form item as specified in Angular-Schema-Form */
     export interface IAngularFormItem {
         [key: string]: any;
         key: string;
         type?: string;
         items?: IAngularFormItem[];
     }
+    export interface IAngularForm extends Array<IAngularFormItem> {
+    }
+
     export interface IJsonSchema {
         type?: string;
         properties?: any;
@@ -12,8 +17,6 @@ module App {
         default?: any;
         items?: IJsonSchema;
         [key: string]: any;
-    }
-    export interface IAngularForm extends Array<IAngularFormItem> {
     }
     export interface ICustomTypeParser {
         (IAngularFormItem, IJsonSchema, IAngularForm): void;

@@ -23,7 +23,7 @@ module App {
         private webserviceUrl: string;
         private simulation: string;
         private version: string;
-        private tasks: any[];
+        private tasks: ITask[];
         private status: string;
 
         constructor(private SimWebService: App.SimWebService,
@@ -31,9 +31,9 @@ module App {
             this.updateView();
         }
 
-        public updateView(): ng.IPromise<void> {
+        public updateView = (): ng.IPromise<void> => {
             return this.SimWebService.list(this.webserviceUrl, this.simulation, this.version)
-                .then(response => {
+                .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<ITask>>) => {
                     this.tasks = response.data.rows.map(el => el.value);
                     if (this.status) {
                         delete this.status;
@@ -49,9 +49,9 @@ module App {
                         this.status = 'Cannot load infrastructure overview ' + status;
                     }
                 });
-        }
+        };
 
-        public remove(task) {
+        public remove = (task: ITask) => {
             this.messageBusService.confirm(
                 'Remove simulation',
                 'Are you sure you want to remove simulation "' + task.input.simulation +
@@ -82,6 +82,6 @@ module App {
                                 });
                     }
             });
-        }
+        };
     }
 }
