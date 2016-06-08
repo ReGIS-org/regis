@@ -36,6 +36,12 @@ module App {
             this.tasks = [];
         }
 
+        /**
+         * Callback function for when the view may be updated.
+         * @see http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript
+         * @see http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback
+         * @todo notice the strange syntax, which is to preserve the this reference!
+         */
         public updateView = (): ng.IPromise<void> => {
             return this.SimWebService.list(this.webserviceUrl, this.simulation, this.version)
                 .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<ITask>>) => {
@@ -56,7 +62,8 @@ module App {
                 });
         };
 
-        public remove = (task: ITask) => {
+        /** Remove given task. */
+        public remove(task: ITask) {
             this.messageBusService.confirm(
                 'Remove simulation',
                 'Are you sure you want to remove simulation "' + task.input.simulation +

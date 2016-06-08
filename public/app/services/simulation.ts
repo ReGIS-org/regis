@@ -1,24 +1,29 @@
 module App {
 
+    /** Simulator metadata */
     export interface ISimWebSimulation {
         name: string;
         versions: string[];
     }
+    /** Simulator metadata listing */
     export interface ISimWebSimulations {
         [key: string]: ISimWebSimulation;
     }
 
+    /** Infrastructure summary*/
     export interface ISimWebSummary {
         tasks: {name: string, value: number}[];
         jobs: {name: string, value: number}[];
     }
 
+    /** Raw CouchDB view. */
     export interface ISimWebList<RowContent> {
         total_rows: number;
         offset: number;
         rows: {id: string, key: string, value: RowContent}[];
     }
 
+    /** Task data. */
     export interface ITask {
         id?: string;
         rev?: string;
@@ -46,6 +51,11 @@ module App {
         arguments?: string;
     }
 
+    /**
+     * Interface to the SIM-CITY webservice.
+     *
+     * All methods take a webservice base URL.
+     */
     export class SimWebService {
         public static $inject = ['$http', '$q'];
 
@@ -55,15 +65,18 @@ module App {
             this.simulationsCache = {};
         }
 
+        /** List all tasks from a given simulator of a given version. */
         public list(webserviceUrl: string, simulation: string, version: string): ng.IHttpPromise<ISimWebList<ITask>> {
             return this.$http.get(webserviceUrl + '/view/simulations/' + simulation + '/' + version);
         }
 
+        /** Get a detailed task view of a single task. */
         public get(webserviceUrl: string, id: string): ng.IHttpPromise<ITask> {
             return this.$http.get(webserviceUrl + '/simulation/' + id);
         }
 
-        public startJob(webserviceUrl: string, host: string): ng.IPromise<any> {
+        /** Start a job on the infrastructure. */
+        public startJob(webserviceUrl: string, host: string = null): ng.IPromise<any> {
             return this.$http.post(host ? webserviceUrl + '/job/' + host : webserviceUrl + '/job', null)
                 .then(null, response => {
                     if (response.status === 503) {
@@ -76,6 +89,7 @@ module App {
                 });
         }
 
+        /** List possible simulators. */
         public simulations(webserviceUrl: string): ng.IPromise<ISimWebSimulations>  {
             if (this.simulationsCache[webserviceUrl]) {
                 return this.$q.resolve(this.simulationsCache[webserviceUrl]);
@@ -88,6 +102,7 @@ module App {
             }
         }
 
+        /** Submit a new task to the webservice, where the parameters adhere to the JSON Schema of the simulator. */
         public submit(webserviceUrl: string, model: string, version: string, params: any): ng.IPromise<{name: string, url: string}> {
             var url = webserviceUrl + '/simulate/' + model;
             if (version) {
@@ -114,11 +129,12 @@ module App {
                 });
         }
 
+        /** Delete a task. If the task is currently active, it may re-appear. */
         public delete(webserviceUrl: string, id: string, rev: string): ng.IHttpPromise<void> {
             return this.http('DELETE', webserviceUrl + '/simulation/' + id, {rev: rev});
         }
 
-
+        /** Summary of the infrastructure that the webservice is currently using. */
         public summary(webserviceUrl: string): ng.IPromise<ISimWebSummary> {
             return this.$http.get(webserviceUrl + '/view/totals')
                 .then(response => {
@@ -147,6 +163,7 @@ module App {
                 });
         }
 
+        /** Make a HTTP call, passing given parameters in the URL. */
         private http(method: string, url: string, params: any): ng.IHttpPromise<any> {
             return this.$http({
                 method: method,
@@ -156,6 +173,7 @@ module App {
             });
         }
 
+        /** Format an error message from given HTTP response. */
         private static formatHTTPError(data: any, status: number, statusText: string, defaultMsg: string): {message: string, httpStatusMessage: string, formatted: string} {
             let msg = data.error || defaultMsg;
             let httpStatusMsg = '(HTTP status ' + status + ': ' + statusText + ')';

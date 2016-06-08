@@ -1,4 +1,6 @@
 module App {
+    /** Angular initialization */
+
     // Start the application
     angular.module('csWebApp', [
         'csComp',

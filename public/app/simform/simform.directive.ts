@@ -195,6 +195,7 @@ module App {
                             };
 
                             // make sure the key is in the model
+                            // we cannot do this earlier, or validation will fail.
                             if (!this.model.hasOwnProperty(key)) {
                                 this.model[key] = [];
                             }

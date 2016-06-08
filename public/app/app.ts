@@ -17,6 +17,10 @@ module App {
     declare var omnivore;
 
     export class AppCtrl {
+
+        public areaFilter:AreaFilter.AreaFilterModel;
+        public contourAction:ContourAction.ContourActionModel;
+
         // It provides $injector with information about dependencies to be injected into constructor
         // it is better to have it close to the constructor, because the parameters must match in count and type.
         // See http://docs.angularjs.org/guide/di
@@ -29,19 +33,15 @@ module App {
             'dashboardService',
             'geoService'
         ];
-
-        public areaFilter:AreaFilter.AreaFilterModel;
-        public contourAction:ContourAction.ContourActionModel;
-
         // dependencies are injected via AngularJS $injector
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        constructor(private $scope:IAppScope,
-                    private $location:IAppLocationService,
-                    private $mapService:csComp.Services.MapService,
-                    private $layerService:csComp.Services.LayerService,
-                    private $messageBusService:csComp.Services.MessageBusService,
-                    private $dashboardService:csComp.Services.DashboardService,
-                    private geoService:csComp.Services.GeoService) {
+        constructor(private $scope: IAppScope,
+                    private $location: IAppLocationService,
+                    private $mapService: csComp.Services.MapService,
+                    private $layerService: csComp.Services.LayerService,
+                    private $messageBusService: csComp.Services.MessageBusService,
+                    private $dashboardService: csComp.Services.DashboardService,
+                    private geoService: csComp.Services.GeoService) {
             sffjs.setCulture('nl-NL');
 
             this.$scope.vm = this;
@@ -77,6 +77,12 @@ module App {
             this.$messageBusService.publish('sidebar', 'toggle');
         }
 
+        /**
+         * Callback function for when a layer action is performed
+         * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
+         * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
+         * @todo {notice the strange syntax, which is to preserve the this reference!}
+         */
         private layerMessageReceived = (title: string, layer: csComp.Services.ProjectLayer) => {
             switch (title) {
                 case 'loading':
@@ -117,6 +123,12 @@ module App {
             }
         };
 
+        /**
+         * Callback function for when a feature action is performed
+         * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
+         * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
+         * @todo {notice the strange syntax, which is to preserve the this reference!}
+         */
         private featureMessageReceived = (title: string) => {
             switch (title) {
                 case 'onFeatureSelect':
@@ -127,13 +139,6 @@ module App {
                     break;
             }
         };
-
-        /**
-         * Callback function
-         * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
-         * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
-         * @todo {notice the strange syntax, which is to preserve the this reference!}
-         */
         public toggleMenu():void {
             this.$mapService.invalidate();
         }
