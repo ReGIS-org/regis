@@ -133,6 +133,7 @@ module App {
                                           this.simulationSelected.version.value,
                                           this.model)
                     .then(() => {
+                            this.messageBusService.publish('sim-task', 'submitted');
                             this.messageBusService.notify('New simulation', 'Submitted simulation',
                                 undefined, NotifyType.Success);
                         }, message => {

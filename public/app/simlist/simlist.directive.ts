@@ -18,7 +18,6 @@ module App {
         }]);
 
     export class SimListController {
-        public static $inject = ['SimWebService', 'messageBusService'];
 
         private webserviceUrl: string;
         private simulation: string;
@@ -26,9 +25,15 @@ module App {
         private tasks: ITask[];
         private status: string;
 
+        public static $inject = ['SimWebService', 'messageBusService', '$interval'];
+
         constructor(private SimWebService: App.SimWebService,
-                    private messageBusService: csComp.Services.MessageBusService) {
+                    private messageBusService: csComp.Services.MessageBusService,
+                    private $interval: ng.IIntervalService) {
             this.updateView();
+            this.messageBusService.subscribe('sim-task', this.updateView);
+            this.$interval(this.updateView, 10000);
+            this.tasks = [];
         }
 
         public updateView = (): ng.IPromise<void> => {
@@ -59,26 +64,21 @@ module App {
                 (confirmed: boolean) => {
                     if (confirmed) {
                         this.SimWebService.delete(this.webserviceUrl, task.id, task.rev)
-                            .then(this.updateView,
-                                (response) => {
+                            .then(() => {
+                                    this.messageBusService.publish('sim-task', 'removed');
+                                    this.messageBusService.notify('Simulation', 'Removed simulation.',
+                                        undefined, NotifyType.Success);
+                                }, (response: ng.IHttpPromiseCallbackArg<{error: string}>) => {
                                     if (response.status === 409) {
                                         this.messageBusService.notify('Simulation', 'cannot remove simulation: ' +
                                             'it was modified', undefined, NotifyType.Error);
                                     } else if (response.data) {
                                         this.messageBusService.notify('Simulation', 'cannot remove simulation: ' +
-                                            response.data, undefined, NotifyType.Error);
+                                            response.data.error, undefined, NotifyType.Error);
                                     } else {
                                         this.messageBusService.notify('Simulation', 'cannot remove simulation',
                                             undefined, NotifyType.Error);
                                     }
-                                })
-                            .then(
-                                () => {
-                                    this.messageBusService.notify('Simulation', 'Removed simulation.',
-                                        undefined, NotifyType.Success);
-                                }, () => {
-                                    this.messageBusService.notify('Simulation', 'Removed simulation (but failed to ' +
-                                        'reload simulation overview).', undefined, NotifyType.Success);
                                 });
                     }
             });
