@@ -55,7 +55,7 @@ module App {
             this.messageBusService.confirm(
                 'Remove simulation',
                 'Are you sure you want to remove simulation "' + task.input.simulation +
-                ' (with id "' + task.id + '" from ensemble ' + task.ensemble + ')',
+                ' (with id "' + task.id + '" from ensemble ' + task.input.ensemble + ')',
                 (confirmed: boolean) => {
                     if (confirmed) {
                         this.SimWebService.delete(this.webserviceUrl, task.id, task.rev)
