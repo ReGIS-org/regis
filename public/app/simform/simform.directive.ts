@@ -182,11 +182,6 @@ module App {
                     let featureId = formItem.featureId;
                     let key = formItem.key;
 
-                    // make sure the key is in the model
-                    if (!this.model.hasOwnProperty(key)) {
-                        this.model[key] = [];
-                    }
-
                     let unSubscribe = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
                         let supportedOps = ['dropped', 'onFeatureUpdated', 'onFeatureRemoved'];
 
@@ -197,6 +192,11 @@ module App {
                                 x: feature.geometry.coordinates[0],
                                 y: feature.geometry.coordinates[1]
                             };
+
+                            // make sure the key is in the model
+                            if (!this.model.hasOwnProperty(key)) {
+                                this.model[key] = [];
+                            }
 
                             switch (title) {
                                 case 'dropped':
@@ -211,6 +211,10 @@ module App {
                                     this.indexOfFeature(key, value.id)
                                         .then(i => this.model[key].splice(i, 1));
                                     break;
+                            }
+
+                            if (this.model[key].length === 0) {
+                                delete this.model[key];
                             }
                         }
                     });
