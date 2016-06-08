@@ -17,7 +17,7 @@
             </tr>
             </thead>
             <tbody ng-hide="vm.status" vs-repeat>
-            <tr ng-repeat="task in vm.tasks track by task.id | filter:searchText">
+            <tr ng-repeat="task in vm.tasks | filter:searchText track by task.id">
                 <td ng-bind="task.input.ensemble"></td>
                 <td ng-bind="task.input.simulation"></td>
                 <td ng-switch="task.done">
