@@ -111,7 +111,7 @@
                 "properties": {},
                 "features": []
             },
-            "typeUrl": "data/projects/simcity/resources/matsim.json",
+            "typeUrl": "/explore/resource/matsim",
             "opacity": 100,
             "timeaware": false
         }]
