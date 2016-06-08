@@ -32,8 +32,6 @@ module App {
     }
 
     class SimFormController {
-        public static $inject = ['$scope', '$log', 'SchemaService', 'SimWebService', 'messageBusService', 'mapService'];
-
         /**
          * Directive parameters
          */
@@ -58,6 +56,8 @@ module App {
         private hideSimulationForm;
         private simulationOptions: {label: string, value: string}[];
         private versionOptions: {label: string, value: string}[];
+
+        public static $inject = ['$scope', '$log', '$q', 'SchemaService', 'SimWebService', 'messageBusService', 'mapService'];
 
         constructor(private $scope: ISimFormScope,
                     private $log: ng.ILogService,
