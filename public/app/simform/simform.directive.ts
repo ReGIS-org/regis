@@ -121,7 +121,7 @@ module App {
                         });
             } else {
                 this.messageBusService.notify('New simulation', 'Form invalid! It has not been submitted!',
-                    undefined, NotifyType.Success);
+                    undefined, NotifyType.Error);
             }
         }
 
