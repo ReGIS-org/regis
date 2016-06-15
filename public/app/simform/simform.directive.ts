@@ -9,6 +9,20 @@ module App {
     import ICustomTypeParser = App.ICustomTypeParser;
     import StringMap = App.StringMap;
 
+    /**
+     * Define sim-form directive.
+     *
+     * This directive allows the user to specify the parameters of a simulation
+     * and submit the task to the sim-city-webservice
+     *
+     * The directive requires a url for the webservice, a simulation name and a
+     * simulation version.
+     *
+     * If admin mode is enabled the user is able to change the simulation name
+     * and version
+     *
+     * @depends: json-schema-form
+     */
     angular
         .module('csWebApp')
         .directive('simForm', [function (): ng.IDirective {
@@ -27,20 +41,35 @@ module App {
             };
         }]);
 
+    /**
+     * Extension of the standard angular scope with our controller
+     */
     export interface ISimFormScope extends ng.IScope {
         vm:SimFormController;
     }
 
+    /**
+     * The SimFormController controls two forms
+     *
+     * 1) The simulation submition form for the parameters and submitting a task.
+     *    This form is generated using angular-json-schema-form from the json description
+     *    provided by the sim-city-webservice.
+     *
+     * 2) The admin form to change the simulation and version, this is only visible
+     *    if admin mode is on.
+     */
     class SimFormController {
         /**
          * Directive parameters
          */
         private simulation: string;
         private version: string;
-        private versionOptions: string[];
-        private simulationOptions: string[];
         private webserviceUrl: string;
 
+        /**
+         * The schema, and form for simulation submision
+         * and the corresonding model
+         */
         private schema: IJsonSchema;
         private form: IAngularForm;
         private model: any;
@@ -48,13 +77,15 @@ module App {
         /**
          * Custom type handlers
          */
-        private featureUnSubscribe: MessageBusHandle[];
+        private featureSubscriptions: MessageBusHandle[];
         private customTypeParsers: StringMap<ICustomTypeParser>;
 
         /**
          * Admin form
          */
-        private hideSimulationForm;
+        private hideAdminForm;
+        private versionOptions: string[];
+        private simulationOptions: string[];
 
         public static $inject = ['$scope', '$log', '$q', 'SchemaService', 'SimWebService', 'messageBusService', 'mapService'];
 
@@ -77,35 +108,45 @@ module App {
                 return;
             }
 
+            // Add this controller to the angular scope
             this.$scope.vm = this;
 
-            this.hideSimulationForm = true;
-
+            // Initialize the simulation form
             this.schema = {};
             this.form = [];
             this.model = {};
 
+            // Initialize custom type mapping BEFORE getting
+            // the simulation form
             this.initializeCustomTypes();
+
+            // Get the simulation form from the webservice
+            this.getForm(this.simulation, this.version);
+
+            // Initialize the admin form
+            this.hideAdminForm = true;
             this.versionOptions = [];
             this.simulationOptions = [];
-
-            this.getForm(this.simulation, this.version);
             if (mapService.expertMode >= Expertise.Admin) {
                 this.enableExpertMode();
             }
 
+            // Subscribe to changes in admin status
             this.messageBusService.subscribe('expertMode', (title: string, expertMode: Expertise) => {
                 if (title !== 'newExpertise') return;
                 if (mapService.expertMode >= Expertise.Admin) {
                     this.enableExpertMode();
                 } else {
-                    this.hideSimulationForm = true;
+                    this.hideAdminForm = true;
                 }
             });
         }
 
+        /**
+         * Submit the simulation from to the webservice
+         */
         public onSubmit(form: any) {
-            // Then we check if the form is valid
+            // Check if the form is valid
             if (form.$valid) {
                 this.SimWebService.submit(this.webserviceUrl,
                                           this.simulation,
@@ -125,15 +166,21 @@ module App {
             }
         }
 
+        /**
+         * Reset the simulation form
+         */
         private resetForm(): void {
-            this.featureUnSubscribe.forEach(handle => {
+            this.featureSubscriptions.forEach(handle => {
                 this.messageBusService.unsubscribe(handle);
             });
-            this.featureUnSubscribe = [];
+            this.featureSubscriptions = [];
             this.form = [];
             this.schema = {};
         }
 
+        /**
+         * Get the simulation form from the webservice.
+         */
         private getForm(simulation, value): void {
             this.SchemaService.getSchema(this.webserviceUrl,
                 simulation, value,
@@ -146,25 +193,36 @@ module App {
                     });
         }
 
+        /**
+         * Initializing custom type handlers.
+         *
+         * These handlers are used called when a schema is parsed
+         */
         private initializeCustomTypes(): void {
-            this.featureUnSubscribe = [];
+            this.featureSubscriptions = [];
             this.customTypeParsers = {
                 point2d: (formItem, _schemaItem): void => {
+                    // A point2d is a cartesian coordinate point on the map
                     formItem.type = 'template';
                     formItem.template =
                         '<div ng-if="item.id">{{item.id}}</div>' +
                         '<div ng-if="!item.id">({{item.x}}, {{item.y}})</div>';
                 },
                 layer: (formItem, _schemaItem) => {
+                    // A layer schema element means the parameter requires
+                    // specific features from the map (typically a point2d)
                     formItem.type = 'array';
 
                     let layerId = formItem.layer;
                     let featureId = formItem.featureId;
                     let key = formItem.key;
 
-                    let unSubscribe = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
+                    // Subscribe to feature update messages
+                    let subscription = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
+                        // We respond to additions, updates and removals
                         let supportedOps = ['dropped', 'onFeatureUpdated', 'onFeatureRemoved'];
 
+                        // Only respond to the right layer and feature type
                         if (feature && layerId === feature.layerId && featureId === feature.properties['featureTypeId']
                             && supportedOps.indexOf(title) >= 0) {
                             let value = {
@@ -179,6 +237,7 @@ module App {
                                 this.model[key] = [];
                             }
 
+                            // Update the model
                             switch (title) {
                                 case 'dropped':
                                     this.model[key].push(value);
@@ -199,13 +258,16 @@ module App {
                             }
                         }
                     });
-                    this.featureUnSubscribe.push(unSubscribe);
+                    this.featureSubscriptions.push(subscription);
                 }
             };
         }
 
+        /**
+         * Enable the admin form
+         */
         private enableExpertMode():void {
-            this.hideSimulationForm = false;
+            this.hideAdminForm = false;
 
             if (this.simulationOptions.length === 0) {
                 this.SimWebService.simulations(this.webserviceUrl)
@@ -219,6 +281,12 @@ module App {
         }
 
         // Functions the controller exposes
+
+        /**
+         * The simulation has been changed using the admin form.
+         *
+         * Populate the version select
+         */
         public simulationChanged(): void {
             this.resetForm();
             this.SimWebService.simulations(this.webserviceUrl).then(data => {
@@ -226,11 +294,19 @@ module App {
             });
         }
 
+        /**
+         * The simulation version has changed.
+         *
+         * Update the schema, form and model
+         */
         public simulationVersionChanged(): void {
             this.resetForm();
             this.getForm(this.simulation, this.version);
         }
 
+        /**
+         * Helper function to find the object index in the model of a feature
+         */
         private indexOfFeature(key: string, id: string): ng.IPromise<number> {
             let index = this.model[key].map(f => f.id).indexOf(id);
             return this.$q((resolve, reject) => (index >= 0 ? resolve(index) : reject()));
