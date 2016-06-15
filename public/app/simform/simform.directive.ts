@@ -8,6 +8,7 @@ module App {
     import MessageBusHandle = csComp.Services.MessageBusHandle;
     import ICustomTypeParser = App.ICustomTypeParser;
     import StringMap = App.StringMap;
+    import ProjectLayer = csComp.Services.ProjectLayer;
 
     /**
      * Define sim-form directive.
@@ -87,7 +88,7 @@ module App {
         private versionOptions: string[];
         private simulationOptions: string[];
 
-        public static $inject = ['$scope', '$log', '$q', 'SchemaService', 'SimWebService', 'messageBusService', 'mapService'];
+        public static $inject = ['$scope', '$log', '$q', 'SchemaService', 'SimWebService', 'messageBusService', 'mapService', 'layerService'];
 
         constructor(private $scope: ISimFormScope,
                     private $log: ng.ILogService,
@@ -95,7 +96,8 @@ module App {
                     private SchemaService: App.SchemaService,
                     private SimWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
-                    private mapService: csComp.Services.MapService) {
+                    private mapService: csComp.Services.MapService,
+                    private layerService: csComp.Services.LayerService) {
 
             if (!this.webserviceUrl) {
                 $log.error('SimCityDirective.FormController: no URL provided');
@@ -217,6 +219,13 @@ module App {
                     let featureId = formItem.featureId;
                     let key = formItem.key;
 
+                    // Check if layer exists, and if not create it.
+                    this.messageBusService.subscribe('project', (action:string) => {
+                        if (action === 'loaded') {
+                            this.checkAndCreateLayer(layerId);
+                        }
+                    });
+
                     // Subscribe to feature update messages
                     let subscription = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
                         // We respond to additions, updates and removals
@@ -310,6 +319,50 @@ module App {
         private indexOfFeature(key: string, id: string): ng.IPromise<number> {
             let index = this.model[key].map(f => f.id).indexOf(id);
             return this.$q((resolve, reject) => (index >= 0 ? resolve(index) : reject()));
+        }
+
+        /**
+         * Check if the specified layer exists, and if it doesn't, create it.
+         *
+         *
+         */
+        private checkAndCreateLayer(layerId: string) {
+            if (!this.layerService.findLayer(layerId)) {
+                let newLayer = new ProjectLayer();
+                let group = this.layerService.findGroupById('Buttons');
+
+                newLayer.id = layerId;
+                newLayer.type = 'editablegeojson';
+                newLayer.renderType = 'geojson';
+                newLayer.typeUrl = '/explore/resource/matsim';
+                // For some reason using .timeAware gives an error when compiling
+                newLayer['timeAware'] = false;
+                newLayer.data = {
+                    'type': 'FeatureCollection',
+                    'properties': {},
+                    'features': []
+                };
+
+                this.layerService.initLayer(group, newLayer);
+                group.layers.push(newLayer);
+            }
+            /*
+            {
+            "id": "matsim",
+            "title": "matsim",
+            "type": "editablegeojson",
+            "renderType": "geojson",
+            "heatmapItems": null,
+            "data": {
+                "type": "FeatureCollection",
+                "properties": {},
+                "features": []
+            },
+            "typeUrl": "/explore/resource/matsim",
+            "opacity": 100,
+            "timeaware": false
+            }
+            */
         }
     }
 }

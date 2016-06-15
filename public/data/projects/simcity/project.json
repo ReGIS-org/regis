@@ -100,21 +100,7 @@
                 "description": "SimCity layers manipulation buttons"
             }
         },
-        "layers": [{
-            "id": "matsim",
-            "title": "matsim",
-            "type": "editablegeojson",
-            "renderType": "geojson",
-            "heatmapItems": null,
-            "data": {
-                "type": "FeatureCollection",
-                "properties": {},
-                "features": []
-            },
-            "typeUrl": "/explore/resource/matsim",
-            "opacity": 100,
-            "timeaware": false
-        }]
+        "layers": []
     }, {
         "languages": {
             "en": {
