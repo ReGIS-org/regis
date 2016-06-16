@@ -138,7 +138,7 @@
                                 <path d="M13.5 45.3v14.5h21L45 51l-31.5-5.7z" />
                             </svg>
                         </li>
-                        <li class="lp-tab active" data-target="#layers" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate">
+                        <li class="lp-tab" data-target="#layers" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                                 <g fill="#010002">
                                     <path d="M64 19.4L32 2 0 19.4l32 17.4z" />
@@ -164,12 +164,8 @@
                             </svg>
                         </li>
 
-                        <li class="lp-tab" data-target="#simform" data-toggle="tab">
+                        <li class="lp-tab active" data-target="#simform" data-toggle="tab">
                             <i class="fa fa-flask" aria-hidden="true"></i>
-                        </li>
-
-                        <li class="lp-tab" data-target="#simlist" data-toggle="tab">
-                            <i class="fa fa-fire" aria-hidden="true"></i>
                         </li>
 
                         <li class="lp-tab" data-target="#settings" data-toggle="tab">
@@ -183,17 +179,14 @@
 
                 <div class="leftpanel-content">
                     <!-- Tab panes -->
-                    <div class="tab-content ">
+                    <div class="tab-content">
                         <base-map-list class="tab-pane" id="basestyles"></base-map-list>
-                        <layers-directive class="tab-pane active" id="layers"></layers-directive>
+                        <layers-directive class="tab-pane" id="layers"></layers-directive>
                         <filter-list ng-hide="vm.$layerService.noFilters" class="tab-pane" id="filters"></filter-list>
                         <style-list class="tab-pane" id="styles"></style-list>
                         <dashboard-selection class="tab-pane" id="dashboardselection"></dashboard-selection>
-                        <div style="overflow-y: auto; overflow-x: hidden; padding:5px; margin-top: -40px; margin-left:10px;" class="tab-pane ng-isolate-scope scrolling leftpanel-scroll" id="simform">
+                        <div style="overflow-y: auto; overflow-x: hidden; padding:5px;" class="tab-pane active ng-isolate-scope scrolling leftpanel-scroll" id="simform">
                             <sim-form sim-webservice-url="/explore" sim-name="matsim" sim-version="latest"></sim-form>
-                        </div>
-                        <div style="overflow-y: auto; overflow-x: hidden; padding:5px; margin-top: -40px; margin-left:10px;" class="tab-pane ng-isolate-scope scrolling leftpanel-scroll" id="simlist">
-                            <sim-list sim-webservice-url="/explore" sim-name="matsim" sim-version="latest"></sim-list>
                         </div>
                         <project-settings class="tab-pane" id="settings"></project-settings>
                     </div>

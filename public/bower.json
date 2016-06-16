@@ -24,7 +24,7 @@
     "tests"
   ],
   "dependencies": {
-    "csweb": "~0.2.15",
+    "csweb": "~0.3.0",
     "angular": "~1.5.5",
     "angular-schema-form": "~0.8.13",
     "angular-schema-form-bootstrap": "^0.2.0",

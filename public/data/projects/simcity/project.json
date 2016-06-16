@@ -3,7 +3,7 @@
     "description": "Description for SimCity",
     "url": "https://github.com/NLeSC/sim-city-cs",
     "connected": true,
-    "isDynamic": false,
+    "isDynamic": true,
     "datasources": [],
     "dashboards": [{
         "id": "home",
@@ -47,13 +47,18 @@
         "widgets": [
             {
                 "id": "123456745214907982148970192734",
-                "directive": "simstate",
+                "directive": "sim-list",
                 "enabled": true,
                 "style": "simple",
                 "left": "25px",
                 "right": "",
                 "top": "90px",
-                "width": "300px"
+                "width": "300px",
+                "parameters": {
+                    "webserviceUrl": "/explore",
+                    "simulation": "matsim",
+                    "version": "latest"
+                }
             }
         ]
     }
@@ -88,9 +93,10 @@
             },
             "type": "GeoJson",
             "url": "data/projects/simcity/WardGeoResponse.json",
-            "typeUrl": "data/resourceTypes/resources.json",
+            "typeUrl": "data/projects/simcity/resources/matsim.json",
             "enabled": false,
-            "opacity": 50
+            "opacity": 50,
+            "defaultFeatureType": "Ward"
         }]
     }, {
         "id": "Buttons",

@@ -17,6 +17,12 @@ module App {
             };
         }]);
 
+    export interface ISimListParameters {
+        webserviceUrl: string;
+        simulation: string;
+        version: string;
+    }
+
     export class SimListController {
 
         private webserviceUrl: string;
@@ -24,12 +30,46 @@ module App {
         private version: string;
         private tasks: ITask[];
         private status: string;
+        private parameters: ISimListParameters;
 
-        public static $inject = ['SimWebService', 'messageBusService', '$interval'];
+        public static $inject = ['SimWebService', 'messageBusService', '$interval', '$scope', '$log'];
 
         constructor(private SimWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
-                    private $interval: ng.IIntervalService) {
+                    private $interval: ng.IIntervalService,
+                    private $scope: ng.IScope,
+                    private $log: ng.ILogService) {
+
+            if ($scope.$parent.hasOwnProperty('widget') && $scope.$parent['widget'].hasOwnProperty('parameters')) {
+                this.parameters = $scope.$parent['widget']['parameters'];
+            }
+            if (!this.webserviceUrl) {
+                if (this.parameters.webserviceUrl) {
+                    this.webserviceUrl = this.parameters.webserviceUrl;
+                } else {
+                    $log.error('SimCityDirective.SimListController: no URL provided');
+                    return;
+                }
+            }
+
+            if (!this.simulation) {
+                if (this.parameters.simulation) {
+                    this.simulation = this.parameters.simulation;
+                } else {
+                    $log.error('SimCityDirective.SimListController: No simulation provided');
+                    return;
+                }
+            }
+
+            if (!this.version) {
+                if (this.parameters.version) {
+                    this.version = this.parameters.version;
+                } else {
+                    $log.error('SimCityDirective.SimListController: No simulation version provided');
+                    return;
+                }
+            }
+
             this.updateView();
             this.messageBusService.subscribe('sim-task', this.updateView);
             this.$interval(this.updateView, 10000);
