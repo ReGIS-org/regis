@@ -1,5 +1,5 @@
 var gulp          = require('gulp');
-var tsconfig      = require('gulp-tsconfig-files');
+var tsconfig      = require('gulp-tsconfig');
 var exec          = require('child_process').execSync;
 var install       = require('gulp-install');
 var runSequence   = require('run-sequence');
@@ -18,15 +18,11 @@ var purify        = require('gulp-purifycss');
 var concatCss     = require('gulp-concat-css');
 var ts            = require('gulp-typescript');
 var tslint        = require('gulp-tslint');
+var tstypings     = require('gulp-typings');
 var OfflineSearch = require('csweb-offline-search');
 var sourcemaps    = require('gulp-sourcemaps');
 var debug         = require('gulp-debug');
 var nodemon       = require('gulp-nodemon');
-var tsProject = ts.createProject('tsconfig.json');
-
-var sources = ['server.ts',
-              'public/app/**/*.ts']
-var definitions = ['Scripts/**/*.d.ts']
 
 /** Destination of the client/server distribution */
 var dest = 'dist/';
@@ -91,8 +87,55 @@ gulp.task('dist_server', function() {
 /** Create a new distribution by copying all required CLIENT+SERVER files to the dist folder. */
 gulp.task('dist', ['dist_client', 'dist_server']);
 
+
+gulp.task('typings', function (cb) {
+    return gulp.src("./typings.json")
+        .pipe(tstypings());
+        cb();
+        //will install all typingsfiles in pipeline.
+});
+
+function buildTsconfig(config, globPattern, basedir) {
+    config.tsConfig.comment = '! This tsconfig.json file has been generated automatically, please DO NOT edit manually.';
+    return gulp.src(globPattern, { base: '.' })
+        .pipe(rename(function (path) {
+            path.dirname = path.dirname.replace(basedir, '.');
+        }))
+        .pipe(tsconfig(config)())
+        .pipe(gulp.dest(basedir));
+}
+
+// This task updates the typescript dependencies on tsconfig file
+gulp.task('tsconfig', function () {
+    var globPattern = [
+        "typings/index.d.ts",
+        "server.ts",
+        "public/app/**/*.ts",
+    ];
+    var config = {
+        tsOrder: ['**/*.ts'],
+        tsConfig: {
+            version: '1.8.9',
+            compilerOptions: {
+                target: 'es5',
+                module: 'commonjs',
+                declaration: true,
+                noImplicitAny: false,
+                removeComments: false,
+                preserveConstEnums: true,
+                noLib: false,
+                outDir: '.',
+                sourceMap: true,
+            },
+            filesGlob: globPattern
+        }
+    };
+    return buildTsconfig(config, globPattern, './');
+});
+
 gulp.task('ts-lint', function () {
-    return gulp.src(sources)
+    var tsProject = ts.createProject('tsconfig.json');
+    return tsProject.src()
         .pipe(tslint())
         .pipe(tslint.report('prose', {
           emitError: false
@@ -100,9 +143,8 @@ gulp.task('ts-lint', function () {
 });
 
 gulp.task('tsc', function() {
-    var allSources = sources.concat(definitions);
-    return gulp.src(allSources,
-        {base: '.'})
+    var tsProject = ts.createProject('tsconfig.json');
+    return tsProject.src()
         .pipe(sourcemaps.init())
         .pipe(ts(tsProject))
         .pipe(sourcemaps.write('.'))
@@ -122,6 +164,8 @@ gulp.task('install', function(cb) {
 /** Initialiaze the project */
 gulp.task('init', function() {
   runSequence(
+    'typings',
+    'tsconfig',
     'ts-lint',
     'tsc'
   );
@@ -130,9 +174,7 @@ gulp.task('init', function() {
 gulp.task('clean', function(cb) {
     // NOTE Careful! Removes all generated javascript files and certain folders.
     del([
-        'dist',
-        'public/**/*.js',
-        'public/**/*.js.map'
+        'public/app/**/*.js',
     ], {
         force: true
     }, cb);
@@ -149,7 +191,7 @@ gulp.task('deploy-githubpages', function() {
 
 gulp.task('serve', function() {
     nodemon({
-        script: 'server.js'     
+        script: 'server.js'
       , verbose: false
       , ext: 'js html'
       , env: { 'NODE_ENV': 'development' }
