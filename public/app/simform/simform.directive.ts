@@ -59,7 +59,7 @@ module App {
      * 2) The admin form to change the simulation and version, this is only visible
      *    if admin mode is on.
      */
-    class SimFormController {
+    export class SimFormController {
         /**
          * Directive parameters
          */
@@ -336,7 +336,7 @@ module App {
                 newLayer.renderType = 'geojson';
                 newLayer.typeUrl = '/explore/resource/matsim';
                 // For some reason using .timeAware gives an error when compiling
-                newLayer['timeAware'] = false;
+                newLayer.timeAware = false;
                 newLayer.data = {
                     'type': 'FeatureCollection',
                     'properties': {},
