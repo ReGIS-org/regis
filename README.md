@@ -2,6 +2,57 @@
 This project is the front-end for the sim-city simulation framework.
 It is based on the [csWeb framework](https://github.com/TNOCS/csWeb)
 
+# Getting started
+
+## Tools
+We depend on node and bower and use typescript to develop. You can install all necessary tools by invoking:
+```shell
+npm i -g typescript bower nodemon http-server
+```
+## Dependencies
+Currently sim-city-cs depends on our own slightly modified version of [csWeb](https::/github.com/indodutch/csWeb).
+
+### Getting and compiling dependencies.
+Clone the csWeb project into a directory and build it:
+```shell
+git clone git@github.com:indodutch/csWeb.git
+
+cd csWeb
+npm install
+gulp init
+```
+
+Now we need to make sure csWeb is available for npm and bower to use in the sim-city-cs project. To do this we link the project in the following way:
+
+```shell
+bower link
+
+cd out/csServerComp
+npm link
+```
+
+## Compiling and Running sim-city-cs
+1. Install the npm and bower dependencies:
+```shell
+npm install
+cd public && bower install && cd ..
+```
+
+2. Link the csWeb npm and bower components:
+```shell
+npm link csweb
+cd public && bower link csweb && cd ..
+```
+
+3. Build the project using gulp and start the server
+``` shell
+gulp
+gulp serve
+```
+Alternatively, replace the last command with `nodemon server.js` or go to the public folder and run `http-server`.
+Visit http://localhost:3003 to see the application running.
+
+
 ## Specifics for getting SimDirective working:
 
 Add directive to side menu:
@@ -29,26 +80,6 @@ AND
     </div>
 </div>
 ```
-
-# Getting started
-We depend on node and bower and use typescript to develop. You can install all necessary tools by invoking:
-```shell
-npm i -g typescript bower nodemon http-server
-```
-## Compiling and Running
-```shell
-npm install
-cd public && bower install
-cd ..
-tsc -p .
-node server.js
-```
-Alternatively, replace the last command with `nodemon server.js` or go to the public folder and run `http-server`.
-Visit http://localhost:3003 to see the application running.
-
-## Configuring the application
-
-If everything went well, you should now have your application up and running. However, most likely you don't want to call your application csWeb-example, so here are a few steps to make the app your own.
 
 ## Credit
 Icons used in projects:
