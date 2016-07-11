@@ -32,13 +32,14 @@ module App {
         private status: string;
         private parameters: ISimListParameters;
 
-        public static $inject = ['SimWebService', 'messageBusService', '$interval', '$scope', '$log'];
+        public static $inject = ['SimWebService', 'messageBusService', '$interval', '$scope', '$log', 'SimTaskService'];
 
         constructor(private SimWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private $interval: ng.IIntervalService,
                     private $scope: ng.IScope,
-                    private $log: ng.ILogService) {
+                    private $log: ng.ILogService,
+                    private SimTaskService: App.SimTaskService) {
 
             if ($scope.$parent.hasOwnProperty('widget') && $scope.$parent['widget'].hasOwnProperty('parameters')) {
                 this.parameters = $scope.$parent['widget']['parameters'];
@@ -101,6 +102,10 @@ module App {
                     }
                 });
         };
+
+        public viewTask(task: ITask) {
+            this.SimTaskService.show(this.webserviceUrl, task);
+        }
 
         /** Remove given task. */
         public remove(task: ITask) {
