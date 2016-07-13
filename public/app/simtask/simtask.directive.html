@@ -79,7 +79,7 @@
                     <th>Value</th>
                 </tr>
                 <tr>
-                    <td>ID</td><td ng-bind="vm.task.id"></td>
+                    <td>ID</td><td ng-bind="vm.task._id"></td>
                 </tr>
                 <tr>
                     <td>command</td><td ng-bind="vm.task.command"></td>
@@ -91,7 +91,7 @@
                     <td>host</td><td ng-bind="vm.task.hostname"></td>
                 </tr>
                 <tr>
-                    <td>URL</td><td><a href="{{vm.urlBase}}{{vm.task.id}}" target="_blank" title="raw JSON output" ng-bind="vm.urlBase + vm.task.id"></a></td>
+                    <td>URL</td><td><a href="vm.task.url" target="_blank" title="raw JSON output" ng-bind="vm.task.url"></a></td>
                 </tr>
                 <tr>
                     <td>started processing</td><td ng-bind="vm.task.lockDate"></td>
@@ -100,7 +100,7 @@
                     <td>done processing</td><td ng-bind="vm.task.doneDate"></td>
                 </tr>
                 <tr>
-                    <td>revision</td><td ng-bind="vm.task.rev"></td>
+                    <td>revision</td><td ng-bind="vm.task._rev"></td>
                 </tr>
             </table>
         </div>

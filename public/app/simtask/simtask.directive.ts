@@ -23,14 +23,16 @@ module App {
         private task: ITask;
         private status: string;
 
-        public static $inject = ['SimWebService', '$log'];
+        public static $inject = ['SimWebService', '$log', '$scope'];
 
-        constructor(private SimWebService:App.SimWebService,
-                    private $log:ng.ILogService) {
+        constructor(private SimWebService: App.SimWebService,
+                    private $log: ng.ILogService,
+                    private $scope: ng.IScope) {
 
-            var parameters: any;
-            if ($scope.$parent.hasOwnProperty('widget') && $scope.$parent['widget'].hasOwnProperty('parameters')) {
-                parameters = $scope.$parent['widget']['parameters'];
+            var parameters: any = {};
+            console.log($scope.$parent);
+            if ($scope.$parent.hasOwnProperty('data')) {
+                parameters = $scope.$parent['data'];
             }
             if (!this.webserviceUrl) {
                 if (parameters.webserviceUrl) {

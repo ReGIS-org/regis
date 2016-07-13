@@ -9,7 +9,7 @@ module App {
 
         public show(webserviceUrl:string, task:ITask) {
             var panel = new RightPanelTab();
-            panel.title = 'Simulation ' + this.task.id;
+            panel.title = 'Simulation ' + task.id;
             panel.container = 'rightpanel';
             panel.directive = 'sim-task';
             panel.data = {
@@ -19,7 +19,6 @@ module App {
             this.$dashboardService.activateTab(panel);
         }
     }
-
 
     angular
         .module('csWebApp')
