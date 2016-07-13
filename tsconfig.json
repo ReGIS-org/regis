@@ -3,7 +3,6 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
-        "declaration": true,
         "noImplicitAny": false,
         "removeComments": false,
         "preserveConstEnums": true,
@@ -16,10 +15,14 @@
     ],
     "comment": "! This tsconfig.json file has been generated automatically, please DO NOT edit manually.",
     "files": ["public/app/app.ts", "public/app/index.ts",
+        "public/app/services/bytes.filter.ts",
         "public/app/services/schema.ts",
         "public/app/services/simulation.ts",
         "public/app/simform/simform.directive.ts",
-        "public/app/simlist/simlist.directive.ts", "server.ts",
+        "public/app/simlist/simlist.directive.ts",
+        "public/app/simsummary/simsummary.directive.ts",
+        "public/app/simtask/simtask.directive.ts",
+        "public/app/simtask/simtask.service.ts", "server.ts",
         "typings/index.d.ts"
     ]
 }

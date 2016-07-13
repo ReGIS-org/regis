@@ -119,7 +119,6 @@ gulp.task('tsconfig', function () {
             compilerOptions: {
                 target: 'es5',
                 module: 'commonjs',
-                declaration: true,
                 noImplicitAny: false,
                 removeComments: false,
                 preserveConstEnums: true,
