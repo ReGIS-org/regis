@@ -90,8 +90,7 @@ gulp.task('dist', ['dist_client', 'dist_server']);
 
 gulp.task('typings', function (cb) {
     return gulp.src("./typings.json")
-        .pipe(tstypings());
-        cb();
+        .pipe(tstypings(), cb);
         //will install all typingsfiles in pipeline.
 });
 
@@ -111,6 +110,7 @@ gulp.task('tsconfig', function () {
         "typings/index.d.ts",
         "server.ts",
         "public/app/**/*.ts",
+        "!public/app/**/*.d.ts"
     ];
     var config = {
         tsOrder: ['**/*.ts'],
@@ -174,7 +174,8 @@ gulp.task('init', function() {
 gulp.task('clean', function(cb) {
     // NOTE Careful! Removes all generated javascript files and certain folders.
     del([
-        'public/app/**/*.js',
+        'server.js',
+        'public/app/**/*.js'
     ], {
         force: true
     }, cb);
