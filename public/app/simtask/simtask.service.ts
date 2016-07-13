@@ -9,12 +9,12 @@ module App {
 
         public show(webserviceUrl:string, task:ITask) {
             var panel = new RightPanelTab();
-            panel.title = 'Simulation ' + task.id;
+            panel.title = 'Simulation ' + task._id;
             panel.container = 'rightpanel';
             panel.directive = 'sim-task';
             panel.data = {
                 webserviceUrl: webserviceUrl,
-                id: task.id
+                id: task._id
             };
             this.$dashboardService.activateTab(panel);
         }

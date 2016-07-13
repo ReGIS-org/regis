@@ -1,6 +1,6 @@
 <div data-ng-cloak class="rightpanel-content" id="simtask-content">
     <h4 class="rightpanel-header" ng-if="vm.status" ng-bind="vm.status"></h4>
-    <h4 class="rightpanel-header" ng-hide="vm.status" ng-bind-template="Simulation '{{vm.task.ensemble}} ({{vm.task.id}})'"></h4>
+    <h4 class="rightpanel-header" ng-hide="vm.status" ng-bind-template="Simulation '{{vm.task.ensemble}} ({{vm.task._id}})'"></h4>
 
     <div class="container-fluid rightpanel-tabs" ng-hide="vm.status">
         <div class="container-fluid rightpanel-tabs" style="position: relative;height:45px">
@@ -12,8 +12,8 @@
                     <li data-toggle="tab" ng-if="vm.task.uploads || vm.task._attachments">
                         <a data-target="#sim-task-output" data-toggle="tab"><span class="fa fa-files-o"></span></a>
                     </li>
-                    <li data-toggle="tab" ng-if="vm.task.error">
-                        <a data-target="#sim-task-errors" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span></a>
+                    <li data-toggle="tab" ng-if="vm.task.error.length">
+                        <a data-target="#sim-task-error" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span></a>
                     </li>
                     <li data-toggle="tab">
                         <a data-target="#sim-task-details" data-toggle="tab">Details</a>
@@ -49,19 +49,19 @@
                 <tr ng-repeat="(name, attachment) in vm.task._attachments track by name">
                     <td ng-bind="name"></td><td ng-bind="attachment.length | bytes" class="text-right"></td><td>
                     <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show" ng-click="vm.visualize(name)"><span class="glyphicon glyphicon-eye-open"></span></a>
-                    <a href="{{vm.urlBase}}{{vm.task.id}}/{{name}}" title="download" download><span class="glyphicon glyphicon-download-alt"></span></a>
+                    <a href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}/{{name}}" title="download"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
                 <tr ng-repeat="(name, attachment) in vm.task.uploads track by name">
                     <td ng-bind="name"></td><td>&nbsp;</td><td>
                     <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show" ng-click="vm.visualize(attachment)"><span class="glyphicon glyphicon-eye-open"></span></a>
-                    <a href="{{attachment}}" title="download" download><span class="glyphicon glyphicon-download-alt"></span></a>
+                    <a href="{{attachment}}" title="download"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
             </table>
         </div>
 
-        <div class="tab-pane" id="sim-task-error" ng-if="vm.task.error">
+        <div class="tab-pane" id="sim-task-error" ng-if="vm.task.error.length">
             <table class="table">
                 <tr>
                     <th>Time</th><th>Message</th><th>Details</th>
@@ -91,7 +91,7 @@
                     <td>host</td><td ng-bind="vm.task.hostname"></td>
                 </tr>
                 <tr>
-                    <td>URL</td><td><a href="vm.task.url" target="_blank" title="raw JSON output" ng-bind="vm.task.url"></a></td>
+                    <td>URL</td><td><a href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}" target="_blank" title="raw JSON output">{{vm.webserviceUrl}}/simulation/{{vm.task._id}}</a></td>
                 </tr>
                 <tr>
                     <td>started processing</td><td ng-bind="vm.task.lockDate"></td>

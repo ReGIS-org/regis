@@ -112,10 +112,10 @@ module App {
             this.messageBusService.confirm(
                 'Remove simulation',
                 'Are you sure you want to remove simulation "' + task.input.simulation +
-                ' (with id "' + task.id + '" from ensemble ' + task.input.ensemble + ')',
+                ' (with id "' + task._id + '" from ensemble ' + task.input.ensemble + ')',
                 (confirmed: boolean) => {
                     if (confirmed) {
-                        this.SimWebService.delete(this.webserviceUrl, task.id, task.rev)
+                        this.SimWebService.delete(this.webserviceUrl, task._id, task._rev)
                             .then(() => {
                                     this.messageBusService.publish('sim-task', 'removed');
                                     this.messageBusService.notify('Simulation', 'Removed simulation.',

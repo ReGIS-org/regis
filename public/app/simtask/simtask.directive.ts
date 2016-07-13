@@ -30,7 +30,6 @@ module App {
                     private $scope: ng.IScope) {
 
             var parameters: any = {};
-            console.log($scope.$parent);
             if ($scope.$parent.hasOwnProperty('data')) {
                 parameters = $scope.$parent['data'];
             }
@@ -62,10 +61,10 @@ module App {
          * @see http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
-        public updateTask = ():ng.IPromise<void> => {
+        public updateTask = (): ng.IPromise<void> => {
             return this.SimWebService.get(this.webserviceUrl, this.id)
-                .then((response:ng.IHttpPromiseCallbackArg<ITask>) => {
-                    this.task = response.data;
+                .then((task: ITask) => {
+                    this.task = task;
                     if (this.status) {
                         delete this.status;
                     }
