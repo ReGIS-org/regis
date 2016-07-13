@@ -32,13 +32,14 @@ module App {
         private status: string;
         private parameters: ISimListParameters;
 
-        public static $inject = ['SimWebService', 'messageBusService', '$interval', '$scope', '$log'];
+        public static $inject = ['SimWebService', 'messageBusService', '$interval', '$scope', '$log', 'SimTaskService'];
 
         constructor(private SimWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private $interval: ng.IIntervalService,
                     private $scope: ng.IScope,
-                    private $log: ng.ILogService) {
+                    private $log: ng.ILogService,
+                    private SimTaskService: App.SimTaskService) {
 
             if ($scope.$parent.hasOwnProperty('widget') && $scope.$parent['widget'].hasOwnProperty('parameters')) {
                 this.parameters = $scope.$parent['widget']['parameters'];
@@ -102,15 +103,19 @@ module App {
                 });
         };
 
+        public viewTask(task: ITask) {
+            this.SimTaskService.show(this.webserviceUrl, task);
+        }
+
         /** Remove given task. */
         public remove(task: ITask) {
             this.messageBusService.confirm(
                 'Remove simulation',
                 'Are you sure you want to remove simulation "' + task.input.simulation +
-                ' (with id "' + task.id + '" from ensemble ' + task.input.ensemble + ')',
+                ' (with id "' + task._id + '" from ensemble ' + task.input.ensemble + ')',
                 (confirmed: boolean) => {
                     if (confirmed) {
-                        this.SimWebService.delete(this.webserviceUrl, task.id, task.rev)
+                        this.SimWebService.delete(this.webserviceUrl, task._id, task._rev)
                             .then(() => {
                                     this.messageBusService.publish('sim-task', 'removed');
                                     this.messageBusService.notify('Simulation', 'Removed simulation.',
