@@ -25,30 +25,30 @@ module App {
 
     /** Task data. */
     export interface ITask {
-        id?: string;
-        rev?: string;
-        _id?: string;
-        _rev?: string;
-        url?: string;
-        lock: number;
-        done: number;
-        error: any[];
+        _id: string;  // ID
+        _rev: string;  // CouchDB revision
+        url?: string;  // url of the task
+        lock: number;  // time (seconds) the task has started processing (0 if not yet started)
+        lockDate?: string; // textual representation of lock
+        done: number;  // time (seconds) the task was completed (0 if not completed, -1 if in error)
+        doneDate?: string; // text representation of the done
+        error: any[]; // errors occurred during processing
         input: {
-            simulation: string;
-            ensemble: string;
+            simulation: string; // simulation name
+            ensemble: string; // ensemble name
             [key: string]: any;
         };
-        output?: any;
-        uploads?: { [key: string]: string };
-        _attachments?: { [key: string]: any };
-        hostname?: string;
-        name?: string;
-        ensemble?: string;
-        scrub_count?: number;
-        type?: string;
-        version?: string;
-        command?: string;
-        arguments?: string;
+        output?: any; // output values
+        uploads?: { [key: string]: string }; // filename: urls of uploaded files
+        _attachments?: { [key: string]: any }; // CouchDB attachments
+        hostname?: string; // hostname the task was last processed on
+        name?: string; // simulation name
+        ensemble?: string; // ensemble name
+        scrub_count?: number; // number of times the task was restarted after error
+        type?: string; // document type: "task"
+        version?: string; // simulation engine version
+        command?: string; // simulation engine command
+        arguments?: string[]; // simulation engine arguments
     }
 
     /**
