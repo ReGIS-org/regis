@@ -34,7 +34,7 @@ module App {
                 parameters = $scope.$parent['data'];
             }
             if (!this.webserviceUrl) {
-                if (parameters.webserviceUrl) {
+                if (parameters.hasOwnProperty('webserviceUrl')) {
                     this.webserviceUrl = parameters.webserviceUrl;
                 } else {
                     $log.error('SimCityDirective.SimTaskController: no webserviceURL provided');
@@ -43,7 +43,7 @@ module App {
             }
 
             if (!this.id) {
-                if (parameters.id) {
+                if (parameters.hasOwnProperty('id')) {
                     this.id = parameters.id;
                 } else {
                     $log.error('SimCityDirective.SimTaskController: No id provided');

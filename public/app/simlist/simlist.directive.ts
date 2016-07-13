@@ -45,7 +45,7 @@ module App {
                 this.parameters = $scope.$parent['widget']['parameters'];
             }
             if (!this.webserviceUrl) {
-                if (this.parameters.webserviceUrl) {
+                if (this.parameters.hasOwnProperty('webserviceUrl')) {
                     this.webserviceUrl = this.parameters.webserviceUrl;
                 } else {
                     $log.error('SimCityDirective.SimListController: no URL provided');
@@ -54,7 +54,7 @@ module App {
             }
 
             if (!this.simulation) {
-                if (this.parameters.simulation) {
+                if (this.parameters.hasOwnProperty('simulation')) {
                     this.simulation = this.parameters.simulation;
                 } else {
                     $log.error('SimCityDirective.SimListController: No simulation provided');
@@ -63,7 +63,7 @@ module App {
             }
 
             if (!this.version) {
-                if (this.parameters.version) {
+                if (this.parameters.hasOwnProperty('version')) {
                     this.version = this.parameters.version;
                 } else {
                     $log.error('SimCityDirective.SimListController: No simulation version provided');
@@ -73,7 +73,7 @@ module App {
 
             this.updateView();
             this.messageBusService.subscribe('sim-task', this.updateView);
-            this.$interval(this.updateView, 10000);
+            this.$interval(this.updateView, 100000);
             this.tasks = [];
         }
 
