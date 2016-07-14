@@ -1,5 +1,7 @@
 module App {
     import NotifyType = csComp.Services.NotifyType;
+    import MessageBusHandle = csComp.Services.MessageBusHandle;
+
     angular
         .module('csWebApp')
         .directive('simList', [function (): ng.IDirective {
@@ -31,6 +33,7 @@ module App {
         private tasks: ITask[];
         private status: string;
         private parameters: ISimListParameters;
+        private subscriptions: MessageBusHandle[];
 
         public static $inject = ['SimWebService', 'messageBusService', '$interval', '$scope', '$log', 'SimTaskService'];
 
@@ -72,9 +75,22 @@ module App {
             }
 
             this.updateView();
-            this.messageBusService.subscribe('sim-task', this.updateView);
+            this.subscriptions = [];
+            this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
             this.$interval(this.updateView, 100000);
             this.tasks = [];
+        }
+
+        /**
+         * When the widget is stopped, unsubscribe from the messageBusService
+         *
+         * The widget is stopped when the dashboard is switched
+         */
+        public stop() {
+            this.subscriptions.forEach((handle: MessageBusHandle) => {
+                this.messageBusService.unsubscribe(handle);
+            });
+            this.subscriptions = [];
         }
 
         /**
