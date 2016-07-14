@@ -85,6 +85,9 @@ module App {
                     } else {
                         task.lockDate = 'not processing';
                     }
+                    task.error.forEach((error: any) => {
+                        error.date = new Date(error.time * 1000).toString();
+                    });
                     return task;
                 });
         }

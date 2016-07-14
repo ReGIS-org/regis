@@ -67,7 +67,7 @@
                     <th>Time</th><th>Message</th><th>Details</th>
                 </tr>
                 <tr ng-repeat="error in vm.task.error">
-                    <td ng-bind="error.time"></td><td ng-bind="error.message"></td><td ng-bind="error.exception || ''"></td>
+                    <td ng-bind="error.date"></td><td ng-bind="error.message"></td><td ng-bind="error.exception || ''"></td>
                 </tr>
             </table>
         </div>
