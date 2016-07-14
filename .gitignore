@@ -7,12 +7,14 @@ public/data/api/
 
 public/**/*.js
 public/**/*.js.map
+public/**/*.d.ts
 
 .vscode/
 .idea/
 
 server.js.map
 server.js
+server.d.ts
 dist/
 
 offline_search_result.json
