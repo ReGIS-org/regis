@@ -119,8 +119,8 @@ module App {
                 });
         };
 
-        public viewTask(task: ITask) {
-            this.SimTaskService.show(this.webserviceUrl, task);
+        public viewTask(task: ITask, activeTab: string) {
+            this.SimTaskService.show(this.webserviceUrl, task, activeTab);
         }
 
         /** Remove given task. */

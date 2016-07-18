@@ -6,10 +6,10 @@
         <div class="container-fluid rightpanel-tabs" style="position: relative;height:45px">
             <div class="row">
                 <ul class="nav nav-tabs" id="taskTabs" style="margin-left:10px">
-                    <li data-toggle="tab" class="active">
+                    <li data-toggle="tab" ng-class="{active: vm.tab!=='files'}">
                         <a data-target="#sim-task-input" data-toggle="tab"><span class="fa fa-info"></span></a>
                     </li>
-                    <li data-toggle="tab" ng-if="vm.task.uploads || vm.task._attachments">
+                    <li data-toggle="tab" ng-if="vm.task.uploads || vm.task._attachments" ng-class="{active: vm.tab==='files'}">
                         <a data-target="#sim-task-output" data-toggle="tab"><span class="fa fa-files-o"></span></a>
                     </li>
                     <li data-toggle="tab" ng-if="vm.task.error.length">
@@ -18,13 +18,16 @@
                     <li data-toggle="tab">
                         <a data-target="#sim-task-details" data-toggle="tab">Details</a>
                     </li>
+                    <li data-toggle="tab">
+                        <a data-target="#sim-task-debug" data-toggle="tab">Debug</a>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 
     <div class="tab-content" style="top:50px; overflow-y: auto; overflow-x: hidden; width: 100%" resize resize-y="150">
-        <div class="tab-pane active" id="sim-task-input">
+        <div class="tab-pane" ng-class="{active: vm.tab!=='files'}" id="sim-task-input">
             <table class="table">
                 <tr>
                     <th>Parameter</th>
@@ -41,20 +44,20 @@
             </table>
         </div>
 
-        <div class="tab-pane" id="sim-task-output"  ng-if="vm.task.uploads || vm.task._attachments">
+        <div class="tab-pane" ng-class="{active: vm.tab==='files'}" id="sim-task-output"  ng-if="vm.task.uploads || vm.task._attachments">
             <table class="table">
                 <tr>
                     <th>File</th><th>Size</th><td>&nbsp;</td>
                 </tr>
                 <tr ng-repeat="(name, attachment) in vm.task._attachments track by name">
                     <td ng-bind="name"></td><td ng-bind="attachment.length | bytes" class="text-right"></td><td>
-                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show" ng-click="vm.visualize(name)"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show" ng-click="vm.visualize(name, attachment, 'attachment')"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}/{{name}}" title="download"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
                 <tr ng-repeat="(name, attachment) in vm.task.uploads track by name">
                     <td ng-bind="name"></td><td>&nbsp;</td><td>
-                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show" ng-click="vm.visualize(attachment)"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show" ng-click="vm.visualize(name, attachment, 'upload')"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a href="{{attachment}}" title="download"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
@@ -103,6 +106,9 @@
                     <td>revision</td><td ng-bind="vm.task._rev"></td>
                 </tr>
             </table>
+        </div>
+        <div class="tab-pane" id="sim-task-debug">
+            <pre>{{vm.task | json:2}}</pre>
         </div>
     </div>
 </div><!-- /.modal -->

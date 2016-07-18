@@ -92,7 +92,7 @@
                 }
             },
             "type": "GeoJson",
-            "url": "data/projects/simcity/WardGeoResponse.json",
+            "url": "/explore/simulation/mock_done_task_5/WardGeoResponse.json",
             "typeUrl": "data/projects/simcity/resources/matsim.json",
             "enabled": false,
             "opacity": 50,

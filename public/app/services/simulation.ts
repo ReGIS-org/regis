@@ -41,6 +41,8 @@ module App {
         output?: any; // output values
         uploads?: { [key: string]: string }; // filename: urls of uploaded files
         _attachments?: { [key: string]: any }; // CouchDB attachments
+        typeUrl?: string; // url of the feature type
+        defaultFeatureType: string; // name of the default feature type if any
         hostname?: string; // hostname the task was last processed on
         name?: string; // simulation name
         ensemble?: string; // ensemble name
