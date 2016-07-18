@@ -135,11 +135,12 @@ module App {
 
             // Subscribe to changes in admin status
             this.messageBusService.subscribe('expertMode', (title: string, expertMode: Expertise) => {
-                if (title !== 'newExpertise') return;
-                if (mapService.expertMode >= Expertise.Admin) {
-                    this.enableExpertMode();
-                } else {
-                    this.hideAdminForm = true;
+                if (title === 'newExpertise') {
+                    if (mapService.expertMode >= Expertise.Admin) {
+                        this.enableExpertMode();
+                    } else {
+                        this.hideAdminForm = true;
+                    }
                 }
             });
         }
