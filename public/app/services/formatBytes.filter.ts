@@ -1,9 +1,9 @@
 module App {
 
     angular.module('csWebApp')
-        .filter('bytes', bytes);
+        .filter('formatBytes', formatBytes);
 
-    function bytes() {
+    function formatBytes() {
         var units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'];
 
         return (bytes: string, precision: number): String => {
