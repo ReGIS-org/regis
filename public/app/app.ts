@@ -90,7 +90,9 @@ module App {
                     console.log('Loading');
                     break;
                 case 'activated':
-                    if (this.$scope.layersLoading >= 1) this.$scope.layersLoading -= 1;
+                    if (this.$scope.layersLoading >= 1) {
+                         this.$scope.layersLoading -= 1;
+                    }
                     console.log('Activated');
                     break;
                 case 'error':

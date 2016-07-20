@@ -2,7 +2,6 @@ module App {
     // var scripts = document.getElementsByTagName("script")
     // var currentScriptPath = scripts[scripts.length-1].src;
 
-    import Expertise = csComp.Services.Expertise;
     import NotifyType = csComp.Services.NotifyType;
     import IFeature = csComp.Services.IFeature;
     import MessageBusHandle = csComp.Services.MessageBusHandle;
@@ -34,7 +33,8 @@ module App {
                 scope: {
                     webserviceUrl: '@simWebserviceUrl',
                     simulation: '@simName',
-                    version: '@simVersion'
+                    version: '@simVersion',
+                    layerGroup: '@layerGroup'
                 },
                 controller: SimFormController,
                 controllerAs: 'vm',
@@ -50,14 +50,9 @@ module App {
     }
 
     /**
-     * The SimFormController controls two forms
-     *
-     * 1) The simulation submition form for the parameters and submitting a task.
+     * The SimFormController controls The simulation submition form for the parameters and submitting a task.
      *    This form is generated using angular-json-schema-form from the json description
      *    provided by the sim-city-webservice.
-     *
-     * 2) The admin form to change the simulation and version, this is only visible
-     *    if admin mode is on.
      */
     export class SimFormController {
         /**
@@ -66,6 +61,8 @@ module App {
         private simulation: string;
         private version: string;
         private webserviceUrl: string;
+        private subscriptions: MessageBusHandle[];
+        private layerGroup: string;
 
         /**
          * The schema, and form for simulation submision
@@ -81,14 +78,7 @@ module App {
         private featureSubscriptions: MessageBusHandle[];
         private customTypeParsers: StringMap<ICustomTypeParser>;
 
-        /**
-         * Admin form
-         */
-        private hideAdminForm;
-        private versionOptions: string[];
-        private simulationOptions: string[];
-
-        public static $inject = ['$scope', '$log', '$q', 'SchemaService', 'SimWebService', 'messageBusService', 'mapService', 'layerService'];
+        public static $inject = ['$scope', '$log', '$q', 'SchemaService', 'SimWebService', 'messageBusService', 'layerService'];
 
         constructor(private $scope: ISimFormScope,
                     private $log: ng.ILogService,
@@ -96,7 +86,6 @@ module App {
                     private SchemaService: App.SchemaService,
                     private SimWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
-                    private mapService: csComp.Services.MapService,
                     private layerService: csComp.Services.LayerService) {
 
             if (!this.webserviceUrl) {
@@ -108,6 +97,11 @@ module App {
             if (!this.simulation || !this.version) {
                 $log.error('SimCityDirective.FormController: No simulation provided');
                 return;
+            }
+
+            if (!this.layerGroup) {
+                $log.warn('SimCityDirective.FormController: No layerGroup defined using SimCity');
+                this.layerGroup = 'SimCity';
             }
 
             // Add this controller to the angular scope
@@ -125,24 +119,26 @@ module App {
             // Get the simulation form from the webservice
             this.getForm(this.simulation, this.version);
 
-            // Initialize the admin form
-            this.hideAdminForm = true;
-            this.versionOptions = [];
-            this.simulationOptions = [];
-            if (mapService.expertMode >= Expertise.Admin) {
-                this.enableExpertMode();
-            }
-
-            // Subscribe to changes in admin status
-            this.messageBusService.subscribe('expertMode', (title: string, expertMode: Expertise) => {
-                if (title === 'newExpertise') {
-                    if (mapService.expertMode >= Expertise.Admin) {
-                        this.enableExpertMode();
-                    } else {
-                        this.hideAdminForm = true;
-                    }
+            this.subscriptions = [];
+            this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
+                if (title === 'simulation-changed') {
+                    this.simulation = data.simulation;
+                    this.version = data.version;
+                    this.simulationChanged();
                 }
+            }));
+        }
+
+        /**
+         * When the widget is stopped, unsubscribe from the messageBusService
+         *
+         * The widget is stopped when the dashboard is switched
+         */
+        public stop() {
+            this.subscriptions.forEach((handle: MessageBusHandle) => {
+                this.messageBusService.unsubscribe(handle);
             });
+            this.subscriptions = [];
         }
 
         /**
@@ -179,6 +175,7 @@ module App {
             this.featureSubscriptions = [];
             this.form = [];
             this.schema = {};
+            this.model = {};
         }
 
         /**
@@ -188,11 +185,17 @@ module App {
             this.SchemaService.getSchema(this.webserviceUrl,
                 simulation, value,
                 this.customTypeParsers).then(
-                    data => {
-                        this.schema = data.schema;
-                        this.form = data.form;
+                    (data) => {
+                        if (data != null) {
+                            this.schema = data.schema;
+                            this.form = data.form;
 
-                        this.$scope.$broadcast('schemaFormValidate');
+                            this.$scope.$broadcast('schemaFormValidate');
+                        } else {
+                            this.resetForm();
+
+                            this.messageBusService.notifyError('No valid form', 'The webservice did not return a valid form for this simulation: ' + this.simulation + '@' + this.version);
+                        }
                     });
         }
 
@@ -273,44 +276,16 @@ module App {
             };
         }
 
-        /**
-         * Enable the admin form
-         */
-        private enableExpertMode():void {
-            this.hideAdminForm = false;
-
-            if (this.simulationOptions.length === 0) {
-                this.SimWebService.simulations(this.webserviceUrl)
-                    .then((data) => {
-                        this.simulationOptions = Object.keys(data);
-                        if (this.simulation && this.simulation in data) {
-                            this.versionOptions = data[this.simulation].versions;
-                        }
-                    });
-            }
-        }
-
         // Functions the controller exposes
 
         /**
-         * The simulation has been changed using the admin form.
-         *
-         * Populate the version select
-         */
-        public simulationChanged(): void {
-            this.resetForm();
-            this.SimWebService.simulations(this.webserviceUrl).then(data => {
-                this.versionOptions = data[this.simulation].versions;
-            });
-        }
-
-        /**
-         * The simulation version has changed.
+         * The simulation has changed.
          *
          * Update the schema, form and model
          */
-        public simulationVersionChanged(): void {
+        public simulationChanged = (): void => {
             this.resetForm();
+            this.resetLayers();
             this.getForm(this.simulation, this.version);
         }
 
@@ -322,6 +297,16 @@ module App {
             return this.$q((resolve, reject) => (index >= 0 ? resolve(index) : reject()));
         }
 
+        private resetLayers() {
+            let group = this.layerService.findGroupById(this.layerGroup);
+            group.layers.forEach((layer) => {
+                // unfortunately there is no reset layer function
+                layer.data.features.forEach(function (f) {
+                    layer.layerSource.service.removeFeature(f);
+                });
+            });
+        }
+
         /**
          * Check if the specified layer exists, and if it doesn't, create it.
          *
@@ -330,7 +315,7 @@ module App {
         private checkAndCreateLayer(layerId: string) {
             if (!this.layerService.findLayer(layerId)) {
                 let newLayer = new ProjectLayer();
-                let group = this.layerService.findGroupById('Buttons');
+                let group = this.layerService.findGroupById(this.layerGroup);
 
                 newLayer.id = layerId;
                 newLayer.type = 'editablegeojson';

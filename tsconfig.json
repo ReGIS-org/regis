@@ -18,6 +18,7 @@
         "public/app/services/bytes.filter.ts",
         "public/app/services/schema.ts",
         "public/app/services/simulation.ts",
+        "public/app/simadmin/simadmin.directive.ts",
         "public/app/simform/simform.directive.ts",
         "public/app/simlist/simlist.directive.ts",
         "public/app/simsummary/simsummary.directive.ts",

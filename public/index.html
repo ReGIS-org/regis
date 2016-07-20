@@ -59,6 +59,7 @@
     <script src="app/services/schema.js"></script>
     <script src="app/services/simulation.js"></script>
     <script src="app/simtask/simtask.service.js"></script>
+    <script src="app/simadmin/simadmin.directive.js"></script>
     <script src="app/simform/simform.directive.js"></script>
     <script src="app/simlist/simlist.directive.js"></script>
     <script src="app/simtask/simtask.directive.js"></script>
@@ -189,7 +190,7 @@
                         <style-list class="tab-pane" id="styles"></style-list>
                         <dashboard-selection class="tab-pane" id="dashboardselection"></dashboard-selection>
                         <div style="overflow-y: auto; overflow-x: hidden; padding:5px;" class="tab-pane active ng-isolate-scope scrolling leftpanel-scroll" id="simform">
-                            <sim-form sim-webservice-url="/explore" sim-name="matsim" sim-version="latest"></sim-form>
+                            <sim-form sim-webservice-url="/explore" sim-name="matsim" sim-version="latest" layer-group="SimCity"></sim-form>
                         </div>
                         <project-settings class="tab-pane" id="settings"></project-settings>
                     </div>

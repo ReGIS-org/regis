@@ -1,24 +1,4 @@
 <div>
-    <fieldset data-ng-hide="vm.hideAdminForm" class="schema-form-fieldset">
-        <legend>Simulation Selection</legend>
-        <form name="selectForm">
-            <select name="simulationSelect"
-                    class="btn btn-default form-control"
-                    style="margin-bottom: 15px"
-                    data-ng-model="vm.simulation"
-                    data-ng-change="vm.simulationChanged()"
-                    data-ng-options="item for item in vm.simulationOptions">
-            </select>
-            <select name="versionSelect"
-                    class="btn btn-default form-control"
-                    style="margin-bottom: 15px"
-                    data-ng-hide="!vm.versionOptions"
-                    data-ng-model="vm.version"
-                    data-ng-change="vm.simulationVersionChanged()"
-                    data-ng-options="item for item in vm.versionOptions">
-            </select>
-        </form>
-    </fieldset>
     <fieldset class="schema-form-fieldset">
         <legend>Simulation Parameters</legend>
         <form name="simulationForm"

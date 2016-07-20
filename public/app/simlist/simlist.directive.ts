@@ -77,6 +77,13 @@ module App {
             this.updateView();
             this.subscriptions = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
+            this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
+                if (title === 'simulation-changed') {
+                    this.simulation = data.simulation;
+                    this.version = data.version;
+                    this.updateView();
+                }
+            }));
             this.$interval(this.updateView, 100000);
             this.tasks = [];
         }

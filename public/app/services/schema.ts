@@ -51,7 +51,13 @@ module App {
                         type: 'object',
                         properties: response.data.properties
                     };
-                    response.data.form.forEach(item => this.applyRulesForItem(item, newSchema, customTypeParsers));
+
+                    if (response.data.hasOwnProperty('form')) {
+                        response.data.form.forEach(item => this.applyRulesForItem(item, newSchema, customTypeParsers));
+                    } else {
+                        console.error('Schema: no form defined in the response');
+                        return null;
+                    }
 
                     return {
                         schema: newSchema,

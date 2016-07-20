@@ -27,7 +27,7 @@
             "top": "82px",
             "width": "300px",
             "data": {
-                "layerGroup": "Buttons",
+                "layerGroup": "SimCity",
                 "buttons": []
             }
         }],
@@ -58,6 +58,19 @@
                     "webserviceUrl": "/explore",
                     "simulation": "matsim",
                     "version": "latest"
+                }
+            },
+            {
+                "id": "432156745214907982148970192734",
+                "directive": "sim-admin",
+                "enabled": true,
+                "style": "simple",
+                "left": "350px",
+                "right": "",
+                "top": "90px",
+                "width": "300px",
+                "parameters": {
+                    "webserviceUrl": "/explore"
                 }
             }
         ]
@@ -99,10 +112,10 @@
             "defaultFeatureType": "Ward"
         }]
     }, {
-        "id": "Buttons",
+        "id": "SimCity",
         "languages": {
             "en": {
-                "title": "Buttons",
+                "title": "SimCity",
                 "description": "SimCity layers manipulation buttons"
             }
         },
