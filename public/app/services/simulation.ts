@@ -30,7 +30,11 @@ module App {
         url?: string;  // url of the task
         lock: number;  // time (seconds) the task has started processing (0 if not yet started)
         done: number;  // time (seconds) the task was completed (0 if not completed, -1 if in error)
-        error: any[]; // errors occurred during processing
+        error: {
+            time: number,
+            message?: string,
+            exception?: string
+        }[]; // errors occurred during processing
         input: {
             simulation: string; // simulation name
             ensemble: string; // ensemble name
