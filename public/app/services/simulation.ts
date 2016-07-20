@@ -29,9 +29,7 @@ module App {
         _rev: string;  // CouchDB revision
         url?: string;  // url of the task
         lock: number;  // time (seconds) the task has started processing (0 if not yet started)
-        lockDate?: string; // textual representation of lock
         done: number;  // time (seconds) the task was completed (0 if not completed, -1 if in error)
-        doneDate?: string; // text representation of the done
         error: any[]; // errors occurred during processing
         input: {
             simulation: string; // simulation name
