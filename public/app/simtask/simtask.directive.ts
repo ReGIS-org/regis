@@ -74,8 +74,8 @@ module App {
          */
         public updateTask = (): ng.IPromise<void> => {
             return this.SimWebService.get(this.webserviceUrl, this.id)
-                .then((task: ITask) => {
-                    this.task = task;
+                .then((result: ng.IHttpPromiseCallbackArg<ITask>) => {
+                    this.task = result.data;
                     if (this.status) {
                         delete this.status;
                     }

@@ -73,25 +73,8 @@ module App {
         }
 
         /** Get a detailed task view of a single task. */
-        public get(webserviceUrl: string, id: string): ng.IPromise<ITask> {
-            return this.$http.get(webserviceUrl + '/simulation/' + id)
-                .then((response: ng.IHttpPromiseCallbackArg<ITask>): ITask => {
-                    var task: ITask = response.data;
-                    if (task.done > 0) {
-                        task.doneDate = new Date(task.done * 1000).toString();
-                    } else {
-                        task.doneDate = 'not done';
-                    }
-                    if (task.lock > 0) {
-                        task.lockDate = new Date(task.lock * 1000).toString();
-                    } else {
-                        task.lockDate = 'not processing';
-                    }
-                    task.error.forEach((error: any) => {
-                        error.date = new Date(error.time * 1000).toString();
-                    });
-                    return task;
-                });
+        public get(webserviceUrl: string, id: string): ng.IHttpPromise<ITask> {
+            return this.$http.get(webserviceUrl + '/simulation/' + id);
         }
 
         /** Start a job on the infrastructure. */
