@@ -18,15 +18,19 @@ module App {
         public webserviceUrl;
         public simulationName;
         public simulationVersion;
+        private deferredWebserviceUrl: ng.IDeferred<string>;
 
-        $inject = ['messageBusService'];
+        $inject = ['messageBusService', '$q'];
 
-        constructor (private messageBusService) {
+        constructor (private messageBusService: csComp.Services.MessageBusService, private $q: ng.IQService) {
+            this.deferredWebserviceUrl = $q.defer();
             this.messageBusService.subscribe('project', (topic: string, project: SimProject) => {
                 if (topic === 'loaded') {
                     this.webserviceUrl = project.simAdmin.webserviceUrl;
                     this.simulationName = project.simAdmin.simulationName;
                     this.simulationVersion = project.simAdmin.simulationVersion;
+
+                    this.deferredWebserviceUrl.resolve(this.webserviceUrl);
 
                     let simAdminMessage:SimAdminMessage =  {
                         'simulation': this.simulationName, 'version': this.simulationVersion
@@ -34,6 +38,10 @@ module App {
                     this.messageBusService.publish('sim-admin', 'simulation-changed', simAdminMessage);
                 }
             });
+        }
+
+        public getWebserviceUrl(): ng.IPromise<string> {
+            return this.deferredWebserviceUrl.promise;
         }
     }
 
