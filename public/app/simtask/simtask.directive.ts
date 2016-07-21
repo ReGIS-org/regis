@@ -111,7 +111,7 @@ module App {
                 newGroup.id = groupId;
                 newGroup.languages = {
                     'en': {
-                        'title': groupId,
+                        'title': this.task.input.ensemble + ': ' + this.task.input.simulation,
                         'description': 'Layers added manually for test purposes'
                     }
                 };
@@ -129,6 +129,7 @@ module App {
                 let newLayer = new ProjectLayer();
 
                 newLayer.id = layerId;
+                newLayer.title = name;
                 newLayer.type = 'geojson';
                 newLayer.renderType = 'geojson';
                 newLayer.url = url;

@@ -53,12 +53,7 @@
                 "left": "25px",
                 "right": "",
                 "top": "90px",
-                "width": "300px",
-                "parameters": {
-                    "webserviceUrl": "/explore",
-                    "simulation": "matsim",
-                    "version": "latest"
-                }
+                "width": "300px"
             },
             {
                 "id": "432156745214907982148970192734",
@@ -68,10 +63,7 @@
                 "left": "350px",
                 "right": "",
                 "top": "90px",
-                "width": "300px",
-                "parameters": {
-                    "webserviceUrl": "/explore"
-                }
+                "width": "300px"
             }
         ]
     }
@@ -132,6 +124,11 @@
         "owsurl": "/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
         "owsgeojson": true
     }],
+    "simAdmin": {
+        "webserviceUrl": "http://localhost/explore",
+        "simulationName": "matsim",
+        "simulationVersion": "latest"
+    },
     "simulationEngines": [{
         "name": "MatSim",
         "launcher": "/explore/simulate/matsim/0.5",

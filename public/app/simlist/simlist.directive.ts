@@ -26,61 +26,25 @@ module App {
     }
 
     export class SimListController {
-
-        private webserviceUrl: string;
-        private simulation: string;
-        private version: string;
         private tasks: ITask[];
         private status: string;
-        private parameters: ISimListParameters;
         private subscriptions: MessageBusHandle[];
 
-        public static $inject = ['SimWebService', 'messageBusService', '$interval', '$scope', '$log', 'SimTaskService'];
+        public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', '$interval', '$scope', '$log', 'SimTaskService'];
 
-        constructor(private SimWebService: App.SimWebService,
+        constructor(private SimAdminService: App.SimAdminService,
+                    private SimWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private $interval: ng.IIntervalService,
                     private $scope: ng.IScope,
                     private $log: ng.ILogService,
                     private SimTaskService: App.SimTaskService) {
 
-            if ($scope.$parent.hasOwnProperty('widget') && $scope.$parent['widget'].hasOwnProperty('parameters')) {
-                this.parameters = $scope.$parent['widget']['parameters'];
-            }
-            if (!this.webserviceUrl) {
-                if (this.parameters.hasOwnProperty('webserviceUrl')) {
-                    this.webserviceUrl = this.parameters.webserviceUrl;
-                } else {
-                    $log.error('SimCityDirective.SimListController: no URL provided');
-                    return;
-                }
-            }
-
-            if (!this.simulation) {
-                if (this.parameters.hasOwnProperty('simulation')) {
-                    this.simulation = this.parameters.simulation;
-                } else {
-                    $log.error('SimCityDirective.SimListController: No simulation provided');
-                    return;
-                }
-            }
-
-            if (!this.version) {
-                if (this.parameters.hasOwnProperty('version')) {
-                    this.version = this.parameters.version;
-                } else {
-                    $log.error('SimCityDirective.SimListController: No simulation version provided');
-                    return;
-                }
-            }
-
             this.updateView();
             this.subscriptions = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
             this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
                 if (title === 'simulation-changed') {
-                    this.simulation = data.simulation;
-                    this.version = data.version;
                     this.updateView();
                 }
             }));
@@ -107,7 +71,9 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateView = (): ng.IPromise<void> => {
-            return this.SimWebService.list(this.webserviceUrl, this.simulation, this.version)
+            return this.SimWebService.list(this.SimAdminService.webserviceUrl,
+                                           this.SimAdminService.simulationName,
+                                           this.SimAdminService.simulationVersion)
                 .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<ITask>>) => {
                     this.tasks = response.data.rows.map(el => el.value);
                     if (this.status) {
@@ -127,7 +93,7 @@ module App {
         };
 
         public viewTask(task: ITask, activeTab: string) {
-            this.SimTaskService.show(this.webserviceUrl, task, activeTab);
+            this.SimTaskService.show(this.SimAdminService.webserviceUrl, task, activeTab);
         }
 
         /** Remove given task. */
@@ -138,7 +104,7 @@ module App {
                 ' (with id "' + task._id + '" from ensemble ' + task.input.ensemble + ')',
                 (confirmed: boolean) => {
                     if (confirmed) {
-                        this.SimWebService.delete(this.webserviceUrl, task._id, task._rev)
+                        this.SimWebService.delete(this.SimAdminService.webserviceUrl, task._id, task._rev)
                             .then(() => {
                                     this.messageBusService.publish('sim-task', 'removed');
                                     this.messageBusService.notify('Simulation', 'Removed simulation.',

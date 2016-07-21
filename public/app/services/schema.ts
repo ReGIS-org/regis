@@ -1,5 +1,4 @@
 module App {
-
     /** Form item as specified in Angular-Schema-Form */
     export interface IAngularFormSpec {
         [key: string]: any;
@@ -34,17 +33,23 @@ module App {
      * The web service serves the schema with an Angular Schema Form.
      */
     export class SchemaService {
-        public static $inject = ['$http', '$log'];
+        public static $inject = ['SimAdminService', '$http', '$log'];
 
-        constructor(private $http: ng.IHttpService, private $log: ng.ILogService) {}
+        constructor(private SimAdminService: App.SimAdminService,
+                    private $http: ng.IHttpService,
+                    private $log: ng.ILogService) {
+
+        }
 
         /**
          * Get the schema of given simulation with given version from the given webservice URL.
          * Pass custom form and schema parsers to modify the form or schema in-place. The key of the custom parser
          * is taken as the type parameter of the schema and form items.
          */
-        public getSchema(webserviceURL: string, simulation: string, version: string, customTypeParsers: StringMap<ICustomTypeParser> = {}): ng.IPromise<{schema: IJsonSchema, form: IAngularForm}> {
-            return this.$http.get(webserviceURL + '/simulate/' + simulation + '/' + version).then(
+        public getSchema(customTypeParsers: StringMap<ICustomTypeParser> = {}): ng.IPromise<{schema: IJsonSchema, form: IAngularForm}> {
+            return this.$http.get(this.SimAdminService.webserviceUrl + '/simulate/' +
+                                  this.SimAdminService.simulationName + '/' +
+                                  this.SimAdminService.simulationVersion).then(
                 (response: ng.IHttpPromiseCallbackArg<IJsonSchema>) => {
                     // Transform Resource object to JSON
                     let newSchema: IJsonSchema = {

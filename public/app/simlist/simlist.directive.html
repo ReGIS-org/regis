@@ -23,12 +23,12 @@
                 <td ng-switch="task.done">
                     <span ng-switch-when="-1" title="simulation error" class="glyphicon glyphicon-warning-sign"></span>
                     <span ng-switch-when="0" title="no output" class="glyphicon glyphicon-eye-close"></span>
-                    <a ng-if="task.done>0" href="#" ng-click="vm.viewTask(task, 'files')" title="Show Output">
+                    <a ng-switch-default href="#" ng-click="vm.viewTask(task, 'files')" title="Show Output">
                         <span title="show output" class="glyphicon glyphicon-eye-open"></span>
                     </a>
                 </td>
                 <td><a href="#" ng-click="vm.viewTask(task)" title="Show data">
-                    <span class="glyphicon glyphicon-save-file"></span></a></td>
+                    <span class="glyphicon glyphicon-info"></span></a></td>
                 <td><a href="#" ng-click="vm.remove(task)" class="text-danger" title="Remove simulation">
                     <span class="glyphicon glyphicon-remove-circle"></span></a></td>
             </tr>

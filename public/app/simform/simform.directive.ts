@@ -58,9 +58,6 @@ module App {
         /**
          * Directive parameters
          */
-        private simulation: string;
-        private version: string;
-        private webserviceUrl: string;
         private subscriptions: MessageBusHandle[];
         private layerGroup: string;
 
@@ -78,26 +75,16 @@ module App {
         private featureSubscriptions: MessageBusHandle[];
         private customTypeParsers: StringMap<ICustomTypeParser>;
 
-        public static $inject = ['$scope', '$log', '$q', 'SchemaService', 'SimWebService', 'messageBusService', 'layerService'];
+        public static $inject = ['$scope', '$log', '$q', 'SimAdminService', 'SchemaService', 'SimWebService', 'messageBusService', 'layerService'];
 
         constructor(private $scope: ISimFormScope,
                     private $log: ng.ILogService,
                     private $q: ng.IQService,
+                    private SimAdminService: App.SimAdminService,
                     private SchemaService: App.SchemaService,
                     private SimWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private layerService: csComp.Services.LayerService) {
-
-            if (!this.webserviceUrl) {
-                $log.error('SimCityDirective.FormController: no URL provided');
-                return;
-            }
-
-            // If not in expert mode or higher we need a simulation and version
-            if (!this.simulation || !this.version) {
-                $log.error('SimCityDirective.FormController: No simulation provided');
-                return;
-            }
 
             if (!this.layerGroup) {
                 $log.warn('SimCityDirective.FormController: No layerGroup defined using SimCity');
@@ -116,14 +103,9 @@ module App {
             // the simulation form
             this.initializeCustomTypes();
 
-            // Get the simulation form from the webservice
-            this.getForm(this.simulation, this.version);
-
             this.subscriptions = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
                 if (title === 'simulation-changed') {
-                    this.simulation = data.simulation;
-                    this.version = data.version;
                     this.simulationChanged();
                 }
             }));
@@ -147,9 +129,9 @@ module App {
         public onSubmit(form: any) {
             // Check if the form is valid
             if (form.$valid) {
-                this.SimWebService.submit(this.webserviceUrl,
-                                          this.simulation,
-                                          this.version,
+                this.SimWebService.submit(this.SimAdminService.webserviceUrl,
+                                          this.SimAdminService.simulationName,
+                                          this.SimAdminService.simulationVersion,
                                           this.model)
                     .then(() => {
                             this.messageBusService.publish('sim-task', 'submitted');
@@ -181,10 +163,8 @@ module App {
         /**
          * Get the simulation form from the webservice.
          */
-        private getForm(simulation, value): void {
-            this.SchemaService.getSchema(this.webserviceUrl,
-                simulation, value,
-                this.customTypeParsers).then(
+        private getForm(): void {
+            this.SchemaService.getSchema(this.customTypeParsers).then(
                     (data) => {
                         if (data != null) {
                             this.schema = data.schema;
@@ -193,8 +173,9 @@ module App {
                             this.$scope.$broadcast('schemaFormValidate');
                         } else {
                             this.resetForm();
-
-                            this.messageBusService.notifyError('No valid form', 'The webservice did not return a valid form for this simulation: ' + this.simulation + '@' + this.version);
+                            this.messageBusService.notifyError('No valid form', 'The webservice did not return a valid form for this simulation: ' +
+                                                                this.SimAdminService.simulationName + '@' +
+                                                                this.SimAdminService.simulationVersion);
                         }
                     });
         }
@@ -224,11 +205,7 @@ module App {
                     let key = formItem.key;
 
                     // Check if layer exists, and if not create it.
-                    this.messageBusService.subscribe('project', (action:string) => {
-                        if (action === 'loaded') {
-                            this.checkAndCreateLayer(layerId);
-                        }
-                    });
+                   this.checkAndCreateLayer(layerId);
 
                     // Subscribe to feature update messages
                     let subscription = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
@@ -286,7 +263,7 @@ module App {
         public simulationChanged = (): void => {
             this.resetForm();
             this.resetLayers();
-            this.getForm(this.simulation, this.version);
+            this.getForm();
         }
 
         /**

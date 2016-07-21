@@ -1,4 +1,9 @@
 module App {
+    /** Specific simulation */
+    export interface ISimWebSimulationVersion {
+        name: string;
+        version: string;
+    }
 
     /** Simulator metadata */
     export interface ISimWebSimulation {
@@ -56,16 +61,19 @@ module App {
     }
 
     /**
-     * Interface to the SIM-CITY webservice.
+     * Interface to the SIM-CITY webservice
      *
      * All methods take a webservice base URL.
      */
     export class SimWebService {
-        public static $inject = ['$http', '$q'];
+        public static $inject = ['layerService', 'messageBusService', '$http', '$q'];
 
         private simulationsCache: StringMap<ISimWebSimulations>;
 
-        constructor(private $http: ng.IHttpService, private $q: ng.IQService) {
+        constructor(private layerService: csComp.Services.LayerService,
+                    private messageBusService: csComp.Services.MessageBusService,
+                    private $http: ng.IHttpService,
+                    private $q: ng.IQService) {
             this.simulationsCache = {};
         }
 
@@ -107,8 +115,8 @@ module App {
         }
 
         /** Submit a new task to the webservice, where the parameters adhere to the JSON Schema of the simulator. */
-        public submit(webserviceUrl: string, model: string, version: string, params: any): ng.IPromise<{name: string, url: string}> {
-            var url = webserviceUrl + '/simulate/' + model;
+        public submit(webserviceUrl: string, simulation: string, version: string, params: any): ng.IPromise<{name: string, url: string}> {
+            var url = webserviceUrl + '/simulate/' + simulation;
             if (version) {
                 url += '/' + version;
             }
