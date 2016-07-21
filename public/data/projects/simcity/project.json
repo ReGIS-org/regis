@@ -64,6 +64,16 @@
                 "right": "",
                 "top": "90px",
                 "width": "300px"
+            },
+            {
+                "id": "243215674521490798970192734",
+                "directive": "sim-summary",
+                "enabled": true,
+                "style": "simple",
+                "left": "700px",
+                "right": "",
+                "top": "90px",
+                "width": "300px"
             }
         ]
     }
