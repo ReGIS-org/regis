@@ -70,7 +70,7 @@
                     <th>Time</th><th>Message</th><th>Details</th>
                 </tr>
                 <tr ng-repeat="error in vm.task.error">
-                    <td ng-bind="error.date"></td><td ng-bind="error.message"></td><td ng-bind="error.exception || ''"></td>
+                    <td ng-bind="error.time | formatSeconds"></td><td ng-bind="error.message"></td><td ng-bind="error.exception || ''"></td>
                 </tr>
             </table>
         </div>
@@ -97,10 +97,10 @@
                     <td>URL</td><td><a href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}" target="_blank" title="raw JSON output">{{vm.webserviceUrl}}/simulation/{{vm.task._id}}</a></td>
                 </tr>
                 <tr>
-                    <td>started processing</td><td ng-bind="vm.task.lockDate"></td>
+                    <td>started processing</td><td ng-bind="vm.task.lock | formatSeconds: 'not processing'"></td>
                 </tr>
                 <tr>
-                    <td>done processing</td><td ng-bind="vm.task.doneDate"></td>
+                    <td>done processing</td><td ng-bind="vm.task.done | formatSeconds: 'not done'"></td>
                 </tr>
                 <tr>
                     <td>revision</td><td ng-bind="vm.task._rev"></td>
