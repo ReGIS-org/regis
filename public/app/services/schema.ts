@@ -47,6 +47,12 @@ module App {
          * is taken as the type parameter of the schema and form items.
          */
         public getSchema(customTypeParsers: StringMap<ICustomTypeParser> = {}): ng.IPromise<{schema: IJsonSchema, form: IAngularForm}> {
+            if (typeof this.SimAdminService.webserviceUrl === 'undefined' ||
+                typeof this.SimAdminService.simulationName === 'undefined' ||
+                typeof this.SimAdminService.simulationVersion === 'undefined') {
+                    this.$log.error('SchemaService: SimAdminService parameters not set!');
+                    return null;
+            }
             return this.$http.get(this.SimAdminService.webserviceUrl + '/simulate/' +
                                   this.SimAdminService.simulationName + '/' +
                                   this.SimAdminService.simulationVersion).then(

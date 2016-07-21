@@ -22,8 +22,8 @@ module App {
         $inject = ['messageBusService'];
 
         constructor (private messageBusService) {
-            this.messageBusService.subscribe('project', (topic: string, project: SimProject) => {
-                if (topic === 'loaded') {
+            this.messageBusService.subscribe('project', (title: string, project: SimProject) => {
+                if (title === 'loaded') {
                     this.webserviceUrl = project.simAdmin.webserviceUrl;
                     this.simulationName = project.simAdmin.simulationName;
                     this.simulationVersion = project.simAdmin.simulationVersion;

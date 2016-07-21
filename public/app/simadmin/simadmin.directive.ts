@@ -62,22 +62,29 @@ module App {
             this.hideAdminForm = true;
             this.versionOptions = [];
             this.simulationOptions = [];
-            if (mapService.expertMode >= Expertise.Admin) {
-                this.enableExpertMode();
-            }
-
-            this.simulation = SimAdminService.simulationName;
-            this.version = SimAdminService.simulationVersion;
 
             // Subscribe to changes in admin status
             this.subscriptions = [];
-            this.subscriptions.push(this.messageBusService.subscribe('expertMode', (title: string, expertMode: Expertise) => {
-                if (title === 'newExpertise') {
+            this.subscriptions.push(this.messageBusService.subscribe('project', (title: string, data?: any): void => {
+                if (title === 'loaded') {
                     if (mapService.expertMode >= Expertise.Admin) {
                         this.enableExpertMode();
-                    } else {
-                        this.hideAdminForm = true;
                     }
+                    this.subscriptions.push(this.messageBusService.subscribe('expertMode', (title: string, expertMode: Expertise) => {
+                        if (title === 'newExpertise') {
+                            if (mapService.expertMode >= Expertise.Admin) {
+                                this.enableExpertMode();
+                            } else {
+                                this.hideAdminForm = true;
+                            }
+                        }
+                    }));
+                }
+            }));
+            this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
+                if (title === 'simulation-changed') {
+                    this.simulation = SimAdminService.simulationName;
+                    this.version = SimAdminService.simulationVersion;
                 }
             }));
         }

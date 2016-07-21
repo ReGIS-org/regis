@@ -1,6 +1,11 @@
 <div>
-    <div>
-        <label><input ng-model="searchText" placeholder="filter..."/></label>
+    <div style="margin-bottom: 5px; padding: 5px; overflow: auto;">
+        <div class="inner-addon left-addon" style="float: left">
+            <i class="fa fa-search"></i>
+            <input type="text" expand-to="200px" ng-model="searchText" style="width:100px;height:30px" />
+        </div>
+        <button class="btn btn-primary btn-sm pull-right" ng-click="vm.showCreateSimulationForm()">
+            <span class="fa fa-plus layer-action-icon"></span>Create Simulation</button>
     </div>
     <div>
         <table class="table table-condensed">
