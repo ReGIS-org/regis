@@ -39,7 +39,7 @@
         "id": "management",
         "name": "Simulation Management",
         "editMode": false,
-        "showMap": false,
+        "showMap": true,
         "showTimeline": false,
         "showLeftmenu": false,
         "showLegend": false,
