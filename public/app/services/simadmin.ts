@@ -25,7 +25,7 @@ module App {
         constructor (private messageBusService: csComp.Services.MessageBusService,
                      private $q: ng.IQService,
                      $log: ng.ILogService) {
-            this.deferredWebserviceUrl = $q.defer();
+            this.deferredWebserviceUrl = this.$q.defer();
             this.messageBusService.subscribe('project', (title: string, project: SimProject) => {
                 if (title === 'loaded') {
                     if (!project.hasOwnProperty('simAdmin')) {
@@ -45,8 +45,12 @@ module App {
             });
         }
 
-        public getWebserviceUrl(): ng.IPromise<string> {
-            return this.deferredWebserviceUrl.promise;
+        public getWebserviceUrl = (): ng.IPromise<string> => {
+            if (typeof this.webserviceUrl === 'undefined') {
+                return this.deferredWebserviceUrl.promise;
+            } else {
+                return this.$q.resolve(this.webserviceUrl);
+            }
         }
         /**
          * The simulation version has changed.
