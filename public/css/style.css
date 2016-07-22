@@ -1,0 +1,13 @@
+.leftpanel-content > .tab-content {
+    bottom: 5px;
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.leftpanel-content #sim-admin {
+    padding:5px;
+    margin-top: 10px;
+    margin-left:10px
+}

@@ -135,7 +135,13 @@
                         <div style="overflow-y: auto; overflow-x: hidden; padding:5px;" class="tab-pane active ng-isolate-scope scrolling leftpanel-scroll" id="simform">
                             <sim-list></sim-list>
                         </div>
-                        <project-settings class="tab-pane" id="settings"></project-settings>
+                        <div class="tab-pane" id="settings">
+                            <sim-admin></sim-admin>
+                            <fieldset>
+                                <legend>Project Settings</legend>
+                                    <project-settings></project-settings>
+                            </fieldset>
+                        </div>
                     </div>
                 </div>
             </div>

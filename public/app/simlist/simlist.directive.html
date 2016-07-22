@@ -6,13 +6,11 @@
                 <input type="text" ng-model="searchText" expand-to="200px" class="form-control" style="width:100px;height:30px"/>
             </div>
 
-            <button ng-show="vm.$mapService.isAdminExpert" class="layer-action" popover="{{'CREATESIMULATION' | translate}}" ng-click="vm.createSimulation()"
-                    popover-placement="bottom" popover-width="300" popover-trigger="mouseenter" popover-append-to-body="true">
+            <button ng-show="vm.$mapService.isAdminExpert" class="layer-action" ng-click="vm.createSimulation()">
                 <span class="fa fa-plus layer-action-icon"></span>new simulation
             </button>
-            <a ng-click="vm.openSettings()"><i class="fa fa-cog"></i></a>
         </div>
-
+    
         <div class="scrolling leftpanel-scroll">
             <table class="table table-condensed">
                 <thead>

@@ -36,7 +36,6 @@ module App {
                     private $log: ng.ILogService,
                     private SimTaskService: App.SimTaskService) {
 
-            this.updateView();
             this.subscriptions = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
             this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data: App.SimAdminMessage): void => {
@@ -46,7 +45,11 @@ module App {
                     this.updateView();
                 }
             }));
-            this.$interval(this.updateView, 100000);
+            this.subscriptions.push(this.messageBusService.subscribe('project', (title: string, data?: any): void => {
+                if (title === 'loaded') {
+                    this.$interval(this.updateView, 100000);
+                }
+            }));
             this.tasks = [];
         }
 
@@ -120,5 +123,9 @@ module App {
                     }
             });
         };
+
+        public showCreateSimulationForm() {
+            this.$log.warn('Showing form!');
+        }
     }
 }
