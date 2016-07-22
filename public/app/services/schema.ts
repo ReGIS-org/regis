@@ -52,7 +52,7 @@ module App {
                                   this.SimAdminService.simulationVersion).then(
                 (response: ng.IHttpPromiseCallbackArg<IJsonSchema>) => {
                     // Transform Resource object to JSON
-                    let newSchema: IJsonSchema = {
+                    var newSchema: IJsonSchema = {
                         type: 'object',
                         properties: response.data.properties
                     };
@@ -76,7 +76,7 @@ module App {
          * It is invoked recursively.
          */
         private applyRulesForItem(formItem: IAngularFormItem, schema: IJsonSchema, customTypeParsers: StringMap<ICustomTypeParser>) {
-            let formRules: StringMap<ICustomTypeParser> = {
+            var formRules: StringMap<ICustomTypeParser> = {
                 type: (formItem, schemaItem) => {
                     var paramType: string = formItem.type;
                     if (paramType in customTypeParsers) {
@@ -97,7 +97,7 @@ module App {
                 }
             };
 
-            let schemaRules: StringMap<ICustomTypeParser> = {
+            var schemaRules: StringMap<ICustomTypeParser> = {
                 minItems: (formItem, schemaItem) => {
                     var key = formItem.key;
                     var minimum = schemaItem.minItems;
@@ -132,7 +132,7 @@ module App {
                 name = formItem;
                 schemaItem = schema.properties[name];
             } else {
-                let formSpec = <IAngularFormSpec> formItem;
+                var formSpec = <IAngularFormSpec> formItem;
                 if ('key' in formSpec) {
                     name = formSpec.key;
                     schemaItem = schema.properties[name];
@@ -158,7 +158,7 @@ module App {
                 var typeAttribute = 'type';
                 // Perform type handlers last so they can use the other values
                 if (typeAttribute in formSpec) {
-                    let typeRule = formRules[typeAttribute];
+                    var typeRule = formRules[typeAttribute];
                     typeRule(formSpec, schemaItem);
                 }
             }
