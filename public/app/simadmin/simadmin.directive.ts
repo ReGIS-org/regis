@@ -10,6 +10,7 @@ module App {
                 templateUrl: 'app/simadmin/simadmin.directive.html',
                 restrict: 'E',
                 controller: SimAdminController,
+                scope: {},
                 controllerAs: 'vm',
                 bindToController: true
             };
@@ -79,8 +80,8 @@ module App {
             }));
             this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data: SimAdminMessage): void => {
                 if (title === 'simulation-changed') {
-                    this.simulation = data.simulationName;
-                    this.version = data.simulationVersion;
+                    this.simulation = data.simulation;
+                    this.version = data.version;
                 }
             }));
         }
