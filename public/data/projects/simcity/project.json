@@ -34,48 +34,6 @@
         "visibleLeftMenuItems": [
             "!lm-layers"
         ]
-    },
-    {
-        "id": "management",
-        "name": "Simulation Management",
-        "editMode": false,
-        "showMap": true,
-        "showTimeline": false,
-        "showLeftmenu": false,
-        "showLegend": false,
-        "showBackgroundImage": false,
-        "widgets": [
-            {
-                "id": "123456745214907982148970192734",
-                "directive": "sim-list",
-                "enabled": true,
-                "style": "simple",
-                "left": "25px",
-                "right": "",
-                "top": "90px",
-                "width": "300px"
-            },
-            {
-                "id": "432156745214907982148970192734",
-                "directive": "sim-admin",
-                "enabled": true,
-                "style": "simple",
-                "left": "350px",
-                "right": "",
-                "top": "90px",
-                "width": "300px"
-            },
-            {
-                "id": "243215674521490798970192734",
-                "directive": "sim-summary",
-                "enabled": true,
-                "style": "simple",
-                "left": "700px",
-                "right": "",
-                "top": "90px",
-                "width": "300px"
-            }
-        ]
     }
     ],
     "expertMode": 3,

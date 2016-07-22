@@ -40,7 +40,6 @@ module App {
                     private $log: ng.ILogService,
                     private SimTaskService: App.SimTaskService) {
 
-            this.updateView();
             this.subscriptions = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
             this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
@@ -48,7 +47,11 @@ module App {
                     this.updateView();
                 }
             }));
-            this.$interval(this.updateView, 100000);
+            this.subscriptions.push(this.messageBusService.subscribe('project', (title: string, data?: any): void => {
+                if (title === 'loaded') {
+                    this.$interval(this.updateView, 100000);
+                }
+            }));
             this.tasks = [];
         }
 
@@ -71,6 +74,12 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateView = (): ng.IPromise<void> => {
+            if (typeof this.SimAdminService.webserviceUrl === 'undefined' ||
+                typeof this.SimAdminService.simulationName === 'undefined' ||
+                typeof this.SimAdminService.simulationVersion === 'undefined') {
+                    this.$log.error('SchemaService: SimAdminService parameters not set!');
+                    return null;
+            }
             return this.SimWebService.list(this.SimAdminService.webserviceUrl,
                                            this.SimAdminService.simulationName,
                                            this.SimAdminService.simulationVersion)
@@ -124,5 +133,9 @@ module App {
                     }
             });
         };
+
+        public showCreateSimulationForm() {
+            this.$log.warn('Showing form!');
+        }
     }
 }
