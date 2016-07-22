@@ -47,20 +47,18 @@ module App {
              * Loads and populates the overview
              */
             public loadOverview = (): void => {
-                this.SimAdminService.getWebserviceUrl().then((webserviceUrl: string) => {
-                    this.SimWebService.summary(webserviceUrl)
-                        .then((data: ISimWebSummary) => {
-                            this.jobs = data.jobs;
-                            this.tasks = data.tasks;
-                            if (this.status) {
-                                this.status = '';
-                            }
-                        }, (msg: string) => {
-                            if (this.status) {
-                                this.status = msg;
-                            }
-                        });
-                });
+                this.SimWebService.summary()
+                    .then((data: ISimWebSummary) => {
+                        this.jobs = data.jobs;
+                        this.tasks = data.tasks;
+                        if (this.status) {
+                            this.status = '';
+                        }
+                    }, (msg: string) => {
+                        if (this.status) {
+                            this.status = msg;
+                        }
+                    });
             }
         }
 }

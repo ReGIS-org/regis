@@ -10,7 +10,6 @@ module App {
                 templateUrl: 'app/simtask/simtask.directive.html',
                 restrict: 'E',
                 scope: {
-                    webserviceUrl: '@simWebserviceUrl',
                     id: '@simId'
                 },
                 controller: SimTaskController,
@@ -26,9 +25,10 @@ module App {
         private status: string;
         private tab: string;
 
-        public static $inject = ['SimWebService', '$log', '$scope', 'layerService'];
+        public static $inject = ['SimWebService', 'SimAdminService', '$log', '$scope', 'layerService'];
 
         constructor(private SimWebService: App.SimWebService,
+                    private SimAdminService: App.SimAdminService,
                     private $log: ng.ILogService,
                     private $scope: ng.IScope,
                     private layerService : csComp.Services.LayerService) {
@@ -37,29 +37,20 @@ module App {
             if ($scope.$parent.hasOwnProperty('data')) {
                 parameters = $scope.$parent['data'];
             }
-            if (!this.webserviceUrl) {
-                if (parameters.hasOwnProperty('webserviceUrl')) {
-                    this.webserviceUrl = parameters.webserviceUrl;
-                } else {
-                    $log.error('SimCityDirective.SimTaskController: no webserviceURL provided');
-                    return;
-                }
-            }
 
+            if (!this.id && parameters.hasOwnProperty('id')) {
+                this.id = parameters.id;
+            }
             if (!this.id) {
-                if (parameters.hasOwnProperty('id')) {
-                    this.id = parameters.id;
-                } else {
-                    $log.error('SimCityDirective.SimTaskController: No id provided');
-                    return;
-                }
+                $log.error('SimCityDirective.SimTaskController: No id provided');
+                return;
             }
 
-            if (!this.tab) {
-                if (parameters.hasOwnProperty('tab')) {
-                    this.tab = parameters.tab;
-                }
+            if (!this.tab && parameters.hasOwnProperty('tab')) {
+                this.tab = parameters.tab;
             }
+
+            this.SimAdminService.getWebserviceUrl().then(webserviceUrl => this.webserviceUrl = webserviceUrl);
 
             this.status = 'Loading task...';
             this.task = null;
@@ -73,7 +64,7 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateTask = (): ng.IPromise<void> => {
-            return this.SimWebService.get(this.webserviceUrl, this.id)
+            return this.SimWebService.get(this.id)
                 .then((result: ng.IHttpPromiseCallbackArg<ITask>) => {
                     this.task = result.data;
                     if (this.status) {

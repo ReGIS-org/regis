@@ -31,7 +31,6 @@ module App {
                 templateUrl: 'app/simform/simform.directive.html',
                 restrict: 'E',
                 scope: {
-                    webserviceUrl: '@simWebserviceUrl',
                     simulation: '@simName',
                     version: '@simVersion',
                     layerGroup: '@layerGroup'
@@ -129,8 +128,7 @@ module App {
         public onSubmit(form: any) {
             // Check if the form is valid
             if (form.$valid) {
-                this.SimWebService.submit(this.SimAdminService.webserviceUrl,
-                                          this.SimAdminService.simulationName,
+                this.SimWebService.submit(this.SimAdminService.simulationName,
                                           this.SimAdminService.simulationVersion,
                                           this.model)
                     .then(() => {
