@@ -24,6 +24,7 @@ module App {
         private subscriptions: MessageBusHandle[];
         private simulation: string;
         private version: string;
+        private state: string;
 
         public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', '$interval', '$scope', '$log',
                                  'SimTaskService'];
@@ -36,6 +37,7 @@ module App {
                     private $log: ng.ILogService,
                     private SimTaskService: App.SimTaskService) {
 
+            this.state = 'list';
             this.subscriptions = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
             this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data: App.SimAdminMessage): void => {
@@ -48,6 +50,11 @@ module App {
             this.subscriptions.push(this.messageBusService.subscribe('project', (title: string, data?: any): void => {
                 if (title === 'loaded') {
                     this.$interval(this.updateView, 100000);
+                }
+            }));
+            this.subscriptions.push(this.messageBusService.subscribe('sim-task', (title: string, data?: any): void => {
+                if (title === 'submitted' || title === 'cancelled') {
+                    this.state = 'list';
                 }
             }));
             this.tasks = [];
@@ -124,8 +131,8 @@ module App {
             });
         };
 
-        public showCreateSimulationForm() {
-            this.$log.warn('Showing form!');
+        public createSimulation() {
+            this.state = 'newsimulation';
         }
     }
 }
