@@ -14,7 +14,8 @@ module App {
                 },
                 controller: SimListController,
                 controllerAs: 'vm',
-                bindToController: true
+                bindToController: true,
+                replace: true,    // Remove the directive from the DOM
             };
         }]);
 
