@@ -47,10 +47,11 @@ module App {
          * is taken as the type parameter of the schema and form items.
          */
         public getSchema(customTypeParsers: StringMap<ICustomTypeParser> = {}): ng.IPromise<{schema: IJsonSchema, form: IAngularForm}> {
-            return this.$http.get(this.SimAdminService.webserviceUrl + '/simulate/' +
+            return this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => this.$http.get(webserviceUrl + '/simulate/' +
                                   this.SimAdminService.simulationName + '/' +
-                                  this.SimAdminService.simulationVersion).then(
-                (response: ng.IHttpPromiseCallbackArg<IJsonSchema>) => {
+                                  this.SimAdminService.simulationVersion))
+                .then((response: ng.IHttpPromiseCallbackArg<IJsonSchema>) => {
                     // Transform Resource object to JSON
                     var newSchema: IJsonSchema = {
                         type: 'object',

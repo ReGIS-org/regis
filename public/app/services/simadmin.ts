@@ -15,7 +15,7 @@ module App {
     }
 
     export class SimAdminService {
-        public webserviceUrl;
+        private webserviceUrl;
         public simulationName;
         public simulationVersion;
         private deferredWebserviceUrl: ng.IDeferred<string>;
@@ -27,21 +27,28 @@ module App {
             this.messageBusService.subscribe('project', (topic: string, project: SimProject) => {
                 if (topic === 'loaded') {
                     this.webserviceUrl = project.simAdmin.webserviceUrl;
-                    this.simulationName = project.simAdmin.simulationName;
-                    this.simulationVersion = project.simAdmin.simulationVersion;
-
                     this.deferredWebserviceUrl.resolve(this.webserviceUrl);
-
-                    let simAdminMessage:SimAdminMessage =  {
-                        'simulation': this.simulationName, 'version': this.simulationVersion
-                    };
-                    this.messageBusService.publish('sim-admin', 'simulation-changed', simAdminMessage);
+                    this.setSimulationVersion(project.simAdmin.simulationName, project.simAdmin.simulationVersion);
                 }
             });
         }
 
         public getWebserviceUrl(): ng.IPromise<string> {
             return this.deferredWebserviceUrl.promise;
+        }
+        /**
+         * The simulation version has changed.
+         *
+         * Update the schema, form and model
+         */
+        public setSimulationVersion(simulation: string, version: string): void {
+            this.simulationName = simulation;
+            this.simulationVersion = version;
+
+            this.messageBusService.publish('sim-admin', 'simulation-changed', {
+                'simulation': this.simulationName,
+                'version': this.simulationVersion
+            });
         }
     }
 

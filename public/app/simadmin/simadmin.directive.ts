@@ -1,7 +1,6 @@
 module App {
     import Expertise = csComp.Services.Expertise;
     import MessageBusHandle = csComp.Services.MessageBusHandle;
-    import SimAdminMessage = App.SimAdminMessage;
 
     angular
         .module('csWebApp')
@@ -10,9 +9,6 @@ module App {
                 // templateUrl: currentScriptPath.replace('directive.js', 'directive.html'),  // Dev code
                 templateUrl: 'app/simadmin/simadmin.directive.html',
                 restrict: 'E',
-                scope: {
-                    webserviceUrl: '@simWebserviceUrl'
-                },
                 controller: SimAdminController,
                 controllerAs: 'vm',
                 bindToController: true
@@ -62,6 +58,7 @@ module App {
             this.hideAdminForm = true;
             this.versionOptions = [];
             this.simulationOptions = [];
+
             if (mapService.expertMode >= Expertise.Admin) {
                 this.enableExpertMode();
             }
@@ -71,15 +68,16 @@ module App {
 
             // Subscribe to changes in admin status
             this.subscriptions = [];
-            this.subscriptions.push(this.messageBusService.subscribe('expertMode', (title: string, expertMode: Expertise) => {
-                if (title === 'newExpertise') {
-                    if (mapService.expertMode >= Expertise.Admin) {
-                        this.enableExpertMode();
-                    } else {
-                        this.hideAdminForm = true;
+            this.subscriptions.push(
+                this.messageBusService.subscribe('expertMode', (title: string, expertMode: Expertise) => {
+                    if (title === 'newExpertise') {
+                        if (expertMode >= Expertise.Admin) {
+                            this.enableExpertMode();
+                        } else {
+                            this.hideAdminForm = true;
+                        }
                     }
-                }
-            }));
+                }));
         }
 
         /**
@@ -101,7 +99,7 @@ module App {
             this.hideAdminForm = false;
 
             if (this.simulationOptions.length === 0) {
-                this.SimWebService.simulations(this.SimAdminService.webserviceUrl)
+                this.SimWebService.simulations()
                     .then((data) => {
                         this.simulationOptions = Object.keys(data);
                         if (this.simulation && this.simulation in data) {
@@ -117,9 +115,10 @@ module App {
          * Populate the version select
          */
         public simulationChanged(): void {
-            this.SimWebService.simulations(this.SimAdminService.webserviceUrl).then(data => {
-                this.versionOptions = data[this.simulation].versions;
-            });
+            this.SimWebService.simulations()
+                .then(data => {
+                    this.versionOptions = data[this.simulation].versions;
+                });
         }
 
         /**
@@ -128,14 +127,7 @@ module App {
          * Update the schema, form and model
          */
         public simulationVersionChanged(): void {
-            this.SimAdminService.simulationName = this.simulation;
-            this.SimAdminService.simulationVersion = this.version;
-
-            let simAdminMessage:SimAdminMessage = {
-                'simulation': this.simulation, 'version': this.version
-            };
-
-            this.messageBusService.publish('sim-admin', 'simulation-changed', simAdminMessage);
+            this.SimAdminService.setSimulationVersion(this.simulation, this.version);
         }
     }
 }
