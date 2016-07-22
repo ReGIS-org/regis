@@ -1,7 +1,5 @@
 module App {
     import ITask = App.ITask;
-    import ProjectLayer = csComp.Services.ProjectLayer;
-    import ProjectGroup = csComp.Services.ProjectGroup;
 
     angular
         .module('csWebApp')
@@ -20,30 +18,23 @@ module App {
         }]);
 
     class SimTaskController {
-        private webserviceUrl: string;
         private id: string;
         private task: ITask;
         private status: string;
         private tab: string;
 
-        public static $inject = ['SimWebService', '$log', '$scope', 'layerService'];
+        public static $inject = ['SimWebService', 'SimAdminService', '$log', '$scope', 'layerService', 'messageBusService'];
 
         constructor(private SimWebService: App.SimWebService,
+                    private SimAdminService: App.SimAdminService,
                     private $log: ng.ILogService,
                     private $scope: ng.IScope,
-                    private layerService : csComp.Services.LayerService) {
+                    private layerService : csComp.Services.LayerService,
+                    private messageBusService: csComp.Services.MessageBusService) {
 
             var parameters: any = {};
             if ($scope.$parent.hasOwnProperty('data')) {
                 parameters = $scope.$parent['data'];
-            }
-            if (!this.webserviceUrl) {
-                if (parameters.hasOwnProperty('webserviceUrl')) {
-                    this.webserviceUrl = parameters.webserviceUrl;
-                } else {
-                    $log.error('SimCityDirective.SimTaskController: no webserviceURL provided');
-                    return;
-                }
             }
 
             if (!this.id) {
@@ -73,7 +64,7 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateTask = (): ng.IPromise<void> => {
-            return this.SimWebService.get(this.webserviceUrl, this.id)
+            return this.SimWebService.get(this.SimAdminService.webserviceUrl, this.id)
                 .then((result: ng.IHttpPromiseCallbackArg<ITask>) => {
                     this.task = result.data;
                     if (this.status) {
@@ -93,60 +84,7 @@ module App {
         };
 
         public visualize(name: string, attachment: Object, type: string) {
-            // Calculate the correct url to the result
-            let url;
-            if (type === 'attachment') {
-                url = this.webserviceUrl + '/simulation/' + this.task._id + '/' + name;
-            } else if (type === 'upload') {
-                url = attachment;
-            }
-
-            console.log('visualizing ' + name + ' at: ' + url);
-
-            // Make sure the layer group exists
-            let groupId = this.task.input.ensemble + '_' + this.task.input.simulation;
-            let group = this.layerService.findGroupById(groupId);
-            if (group === null) {
-                let newGroup = new ProjectGroup();
-                newGroup.id = groupId;
-                newGroup.languages = {
-                    'en': {
-                        'title': this.task.input.ensemble + ': ' + this.task.input.simulation,
-                        'description': 'Layers added manually for test purposes'
-                    }
-                };
-                newGroup.clustering = true;
-
-                group = ProjectGroup.deserialize(newGroup);
-
-                this.layerService.project.groups.push(group);
-                this.layerService.initGroup(group);
-            }
-
-            // Add the data as a layer
-            let layerId = this.task._id + '_' + name;
-            if (!this.layerService.findLayer(layerId)) {
-                let newLayer = new ProjectLayer();
-
-                newLayer.id = layerId;
-                newLayer.title = name;
-                newLayer.type = 'geojson';
-                newLayer.renderType = 'geojson';
-                newLayer.url = url;
-                newLayer.timeAware = false;
-                newLayer.opacity = 75;
-
-                if (this.task.hasOwnProperty('typeUrl')) {
-                    newLayer.typeUrl = this.task.typeUrl;
-                }
-                if (this.task.hasOwnProperty('defaultFeatureType')) {
-                    newLayer.defaultFeatureType = this.task.defaultFeatureType;
-                }
-
-
-                this.layerService.initLayer(group, newLayer);
-                group.layers.push(newLayer);
-            }
+            this.SimWebService.visualize(this.SimAdminService.webserviceUrl, this.task, name, attachment, type);
         }
     }
 }

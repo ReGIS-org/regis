@@ -174,7 +174,9 @@ gulp.task('clean', function(cb) {
     // NOTE Careful! Removes all generated javascript files and certain folders.
     del([
         'server.js',
-        'public/app/**/*.js'
+        'server.js.map',
+        'public/app/**/*.js',
+        'public/app/**/*.js.map'
     ], {
         force: true
     }, cb);

@@ -18,9 +18,6 @@
                     <li data-toggle="tab">
                         <a data-target="#sim-task-details" data-toggle="tab">Details</a>
                     </li>
-                    <li data-toggle="tab">
-                        <a data-target="#sim-task-debug" data-toggle="tab">Debug</a>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -51,13 +48,13 @@
                 </tr>
                 <tr ng-repeat="(name, attachment) in vm.task._attachments track by name">
                     <td ng-bind="name"></td><td ng-bind="attachment.length | formatBytes" class="text-right"></td><td>
-                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show" ng-click="vm.visualize(name, attachment, 'attachment')"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, attachment, 'attachment')"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}/{{name}}" title="download"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
                 <tr ng-repeat="(name, attachment) in vm.task.uploads track by name">
                     <td ng-bind="name"></td><td>&nbsp;</td><td>
-                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show" ng-click="vm.visualize(name, attachment, 'upload')"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, attachment, 'upload')"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a href="{{attachment}}" title="download"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
