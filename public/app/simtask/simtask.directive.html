@@ -48,14 +48,14 @@
                 </tr>
                 <tr ng-repeat="(name, attachment) in vm.task._attachments track by name">
                     <td ng-bind="name"></td><td ng-bind="attachment.length | formatBytes" class="text-right"></td><td>
-                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, 'attachment')"><span class="glyphicon glyphicon-eye-open"></span></a>
-                    <a ng-href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}/{{name}}" title="download"><span class="glyphicon glyphicon-download-alt"></span></a>
+                    <a href ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, 'attachment')"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a ng-href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}/{{name}}" title="download" download="{{vm.task._id}}_{{name}}" target="_self"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
                 <tr ng-repeat="(name, attachment) in vm.task.uploads track by name">
                     <td ng-bind="name"></td><td>&nbsp;</td><td>
-                    <a href="#" ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, 'upload')"><span class="glyphicon glyphicon-eye-open"></span></a>
-                    <a ng-href="{{attachment}}" title="download"><span class="glyphicon glyphicon-download-alt"></span></a>
+                    <a href ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, 'upload')"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a ng-href="{{attachment}}" title="download" download="{{vm.task._id}}_{{name}}" target="_self"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
             </table>
