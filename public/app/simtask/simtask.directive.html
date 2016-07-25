@@ -25,20 +25,13 @@
 
     <div class="tab-content" style="top:50px; overflow-y: auto; overflow-x: hidden; width: 100%" resize resize-y="150">
         <div class="tab-pane" ng-class="{active: vm.tab!=='files'}" id="sim-task-input">
-            <table class="table">
-                <tr>
-                    <th>Parameter</th>
-                    <th>Value</th>
-                </tr>
-                <tbody ng-repeat="(key, value) in vm.task.input track by key">
-                <tr ng-if="['number', 'string', 'boolean'].includes(typeof(value))">
-                    <td ng-bind="key"></td><td ng-bind="value"></td>
-                </tr>
-                <tr ng-if="!['number', 'string', 'boolean'].includes(typeof(value))">
-                    <td ng-bind="key"></td><td><pre ng-bind="value | json"></pre></td>
-                </tr>
-                </tbody>
-            </table>
+            <dl ng-repeat="(key, value) in vm.task.input track by key">
+                <dt ng-bind="key"></dt>
+                <dd ng-if="vm.isSimpleValue(value)" ng-bind="value"></dd>
+                <dd ng-if="!vm.isSimpleValue(value)">
+                    <pre ng-bind="value | json"></pre>
+                </dd>
+            </dl>
         </div>
 
         <div class="tab-pane" ng-class="{active: vm.tab==='files'}" id="sim-task-output"  ng-if="vm.task.uploads || vm.task._attachments">
