@@ -266,7 +266,7 @@ module App {
             this.resetForm();
             this.resetLayers();
             this.getForm();
-        }
+        };
 
         /**
          * Helper function to find the object index in the model of a feature
