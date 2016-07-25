@@ -88,6 +88,8 @@ module App {
                 this.layerGroup = 'SimCity';
             }
 
+            $scope.vm = this;
+
             // Initialize the simulation form
             this.schema = {};
             this.form = [];
@@ -104,6 +106,10 @@ module App {
                     this.simulationChanged();
                 }
             }));
+
+            $scope.$on('$destroy', () => {
+                this.stop();
+            });
 
             this.simulationChanged();
         }

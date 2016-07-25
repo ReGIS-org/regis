@@ -47,31 +47,8 @@
     },
     "accentColor": "Green",
     "baselayers": {},
-    "groups": [{
-        "languages": {
-            "en": {
-                "title": "Test layers",
-                "description": "Layers added manually for test purposes"
-            }
-        },
-        "clustering": true,
-        "layers": [{
-            "id": "Fire response",
-            "reference": "fireresponse",
-            "languages": {
-                "en": {
-                    "title": "Fire response",
-                    "description": "Emergency response time for each ward"
-                }
-            },
-            "type": "GeoJson",
-            "url": "/explore/simulation/mock_done_task_5/WardGeoResponse.json",
-            "typeUrl": "data/projects/simcity/resources/matsim.json",
-            "enabled": false,
-            "opacity": 50,
-            "defaultFeatureType": "Ward"
-        }]
-    }, {
+    "groups": [
+    {
         "id": "SimCity",
         "languages": {
             "en": {

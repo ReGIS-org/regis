@@ -1,4 +1,8 @@
 module App {
+    import ProjectLayer = csComp.Services.ProjectLayer;
+    import ProjectGroup = csComp.Services.ProjectGroup;
+    import NotifyType = csComp.Services.NotifyType;
+
     /** Specific simulation */
     export interface ISimWebSimulationVersion {
         name: string;
@@ -198,6 +202,71 @@ module App {
                 httpStatusMessage: httpStatusMsg,
                 formatted: msg + ' ' + httpStatusMsg
             };
+        }
+
+        public visualize(webserviceUrl: string, task: ITask, name: string, attachment: Object, type: string) {
+            // Calculate the correct url to the result
+            let url;
+            if (type === 'attachment') {
+                url = webserviceUrl + '/simulation/' + task._id + '/' + name;
+            } else if (type === 'upload') {
+                url = attachment;
+            }
+
+            console.log('visualizing ' + name + ' at: ' + url);
+
+            // Make sure the layer group exists
+            let groupId = task.input.ensemble + '_' + task.input.simulation;
+            let group = this.layerService.findGroupById(groupId);
+            if (group === null) {
+                let newGroup = new ProjectGroup();
+                newGroup.id = groupId;
+                newGroup.languages = {
+                    'en': {
+                        'title': task.input.ensemble + ': ' + task.input.simulation,
+                        'description': 'Layers added manually for test purposes'
+                    }
+                };
+                newGroup.clustering = true;
+
+                group = ProjectGroup.deserialize(newGroup);
+
+                this.layerService.project.groups.push(group);
+                this.layerService.initGroup(group);
+            }
+
+            // Add the data as a layer
+            let layerId = task._id + '_' + name;
+            if (!this.layerService.findLayer(layerId)) {
+                let newLayer = new ProjectLayer();
+
+                newLayer.id = layerId;
+                newLayer.title = name;
+                newLayer.type = 'geojson';
+                newLayer.renderType = 'geojson';
+                newLayer.url = url;
+                newLayer.timeAware = false;
+                newLayer.opacity = 75;
+
+                if (task.hasOwnProperty('typeUrl')) {
+                    newLayer.typeUrl = task.typeUrl;
+                }
+                if (task.hasOwnProperty('defaultFeatureType')) {
+                    newLayer.defaultFeatureType = task.defaultFeatureType;
+                }
+
+
+                this.layerService.initLayer(group, newLayer);
+                group.layers.push(newLayer);
+
+                this.messageBusService.notify('Result added', 'Results from file <b>' + name +
+                                              '</b> added to layer in layer group <b>' + group.title + '</b>',
+                                              undefined, NotifyType.Success);
+            } else {
+                this.messageBusService.notify('Result already available', 'Results from file <b>' +
+                                              name + '</b> are already available in layer group <b>' +
+                                              group.title + '</b>', undefined, NotifyType.Success);
+            }
         }
     }
 

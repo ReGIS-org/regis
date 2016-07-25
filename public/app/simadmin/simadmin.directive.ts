@@ -124,6 +124,7 @@ module App {
             this.SimWebService.simulations()
                 .then(data => {
                     this.versionOptions = data[this.simulation].versions;
+                    this.simulationVersionChanged();
                 });
         }
 

@@ -100,7 +100,19 @@ module App {
         };
 
         public viewTask(task: ITask, activeTab: string) {
-            this.SimTaskService.show(task, activeTab);
+            for (let key in task.uploads) {
+                let upload = task.uploads[key];
+                this.SimAdminService.getWebserviceUrl().then(webserviceUrl =>
+                    this.SimWebService.visualize(webserviceUrl, task, key, upload, 'upload')
+                );
+            }
+
+            for (let key in task._attachments) {
+                let attachment = task._attachments[key];
+                this.SimAdminService.getWebserviceUrl().then(webserviceUrl =>
+                    this.SimWebService.visualize(webserviceUrl, task, key, attachment, 'attachment')
+                );
+            }
         }
 
         /** Remove given task. */
