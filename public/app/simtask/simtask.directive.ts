@@ -79,10 +79,8 @@ module App {
                 });
         };
 
-        public visualize(name: string, attachment: Object, type: string) {
-            this.SimAdminService.getWebserviceUrl().then(webserviceUrl =>
-                this.SimWebService.visualize(webserviceUrl, this.task, name, attachment, type)
-            );
+        public visualize(name: string, type: string) {
+            this.SimWebService.visualize(this.task, name, type);
         }
     }
 }
