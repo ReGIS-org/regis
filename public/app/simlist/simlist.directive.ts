@@ -1,6 +1,7 @@
 module App {
     import NotifyType = csComp.Services.NotifyType;
     import MessageBusHandle = csComp.Services.MessageBusHandle;
+    import IWidget = csComp.Services.IWidget;
 
     angular
         .module('csWebApp')
@@ -9,8 +10,7 @@ module App {
                 templateUrl: 'app/simlist/simlist.directive.html',
                 restrict: 'E',
                 scope: {
-                    simulation: '@simName',
-                    version: '@simVersion'
+                    formId: '@formId'
                 },
                 controller: SimListController,
                 controllerAs: 'vm',
@@ -19,43 +19,47 @@ module App {
             };
         }]);
 
+    export interface SimListScope extends ng.IScope {
+        show: boolean;
+    }
+
     export class SimListController {
         private tasks: ITask[];
         private status: string;
         private subscriptions: MessageBusHandle[];
-        private simulation: string;
-        private version: string;
-        private state: string;
+        private widget: IWidget;
+        private formId: string;
 
-        public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', '$interval', '$scope', '$log',
+        public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', 'layerService', '$interval', '$scope', '$log',
                                  'SimTaskService'];
 
         constructor(private SimAdminService: App.SimAdminService,
                     private SimWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
+                    private layerService: csComp.Services.LayerService,
                     private $interval: ng.IIntervalService,
-                    private $scope: ng.IScope,
+                    private $scope: SimListScope,
                     private $log: ng.ILogService,
                     private SimTaskService: App.SimTaskService) {
 
-            this.state = 'list';
+            this.$scope.show = true;
+
             this.subscriptions = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
             this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data: App.SimAdminMessage): void => {
                 if (title === 'simulation-changed') {
-                    this.simulation = data.simulation;
-                    this.version = data.version;
                     this.updateView();
                 }
             }));
             this.subscriptions.push(this.messageBusService.subscribe('project', (title: string, data?: any): void => {
                 if (title === 'loaded') {
                     this.$interval(this.updateView, 100000);
+                    this.widget = this.layerService.findWidgetById(this.formId);
                 }
             }));
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', (title: string, data?: any): void => {
                 if (title === 'submitted' || title === 'cancelled') {
-                    this.state = 'list';
+                    this.$scope.show = true;
                 }
             }));
             this.tasks = [];
@@ -80,7 +84,7 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateView = (): ng.IPromise<void> => {
-            return this.SimWebService.list(this.simulation, this.version)
+            return this.SimWebService.list(this.SimAdminService.simulationName, this.SimAdminService.simulationVersion)
                 .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<ITask>>) => {
                     this.tasks = response.data.rows.map(el => el.value);
                     if (this.status) {
@@ -136,10 +140,13 @@ module App {
                                 });
                     }
             });
-        };
+        }
 
-        public createSimulation() {
-            this.state = 'newsimulation';
+        public toggleSimulationForm() {
+            this.$scope.show = !this.$scope.show;
+            if (this.widget) {
+                this.widget.collapse = !this.widget.collapse;
+            }
         }
     }
 }

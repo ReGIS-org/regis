@@ -6,8 +6,8 @@
                 <input type="text" ng-model="searchText" expand-to="200px" class="form-control" style="width:100px;height:30px" />
             </div>
 
-            <button class="layer-action" ng-click="vm.createSimulation()">
-                <span class="fa fa-plus layer-action-icon"></span>new simulation
+            <button class="layer-action" ng-click="vm.toggleSimulationForm()">
+                <span class="fa fa-plus layer-action-icon"></span>{{show ? 'Show' : 'Hide'}} Simulation Form
             </button>
         </div>
 
@@ -47,10 +47,6 @@
                     </tr>
                 </tbody>
             </table>
-
-            <div ng-show="vm.state === 'newsimulation'" class="layers-create-form" style="background:white">
-                <sim-form layer-group="SimCity"></sim-form>
-            </div>
         </div>
     </div>
 </div>
