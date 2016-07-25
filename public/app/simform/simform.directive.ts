@@ -105,6 +105,10 @@ module App {
                 }
             }));
 
+            $scope.$on('$destroy', () => {
+                this.stop();
+            });
+
             this.simulationChanged();
         }
 
