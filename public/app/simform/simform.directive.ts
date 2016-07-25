@@ -31,9 +31,6 @@ module App {
                 templateUrl: 'app/simform/simform.directive.html',
                 restrict: 'E',
                 scope: {
-                    webserviceUrl: '@simWebserviceUrl',
-                    simulation: '@simName',
-                    version: '@simVersion',
                     layerGroup: '@layerGroup'
                 },
                 controller: SimFormController,
@@ -91,13 +88,11 @@ module App {
                 this.layerGroup = 'SimCity';
             }
 
-            // Add this controller to the angular scope
-            this.$scope.vm = this;
-
             // Initialize the simulation form
             this.schema = {};
             this.form = [];
             this.model = {};
+            this.featureSubscriptions = [];
 
             // Initialize custom type mapping BEFORE getting
             // the simulation form
@@ -109,6 +104,8 @@ module App {
                     this.simulationChanged();
                 }
             }));
+
+            this.simulationChanged();
         }
 
         /**
@@ -129,8 +126,7 @@ module App {
         public onSubmit(form: any) {
             // Check if the form is valid
             if (form.$valid) {
-                this.SimWebService.submit(this.SimAdminService.webserviceUrl,
-                                          this.SimAdminService.simulationName,
+                this.SimWebService.submit(this.SimAdminService.simulationName,
                                           this.SimAdminService.simulationVersion,
                                           this.model)
                     .then(() => {
@@ -145,6 +141,13 @@ module App {
                 this.messageBusService.notify('New simulation', 'Form invalid! It has not been submitted!',
                     undefined, NotifyType.Error);
             }
+        }
+
+        /**
+         * Cancel the form.
+         */
+        public cancel() {
+            this.messageBusService.publish('sim-task', 'cancelled');
         }
 
         /**
@@ -164,20 +167,20 @@ module App {
          * Get the simulation form from the webservice.
          */
         private getForm(): void {
-            this.SchemaService.getSchema(this.customTypeParsers).then(
-                    (data) => {
-                        if (data != null) {
-                            this.schema = data.schema;
-                            this.form = data.form;
+            this.SchemaService.getSchema(this.customTypeParsers)
+                .then((data) => {
+                    if (data != null) {
+                        this.schema = data.schema;
+                        this.form = data.form;
 
-                            this.$scope.$broadcast('schemaFormValidate');
-                        } else {
-                            this.resetForm();
-                            this.messageBusService.notifyError('No valid form', 'The webservice did not return a valid form for this simulation: ' +
-                                                                this.SimAdminService.simulationName + '@' +
-                                                                this.SimAdminService.simulationVersion);
-                        }
-                    });
+                        this.$scope.$broadcast('schemaFormValidate');
+                    } else {
+                        this.resetForm();
+                        this.messageBusService.notifyError('No valid form', 'The webservice did not return a valid form for this simulation: ' +
+                                                            this.SimAdminService.simulationName + '@' +
+                                                            this.SimAdminService.simulationVersion);
+                    }
+                });
         }
 
         /**
@@ -186,7 +189,6 @@ module App {
          * These handlers are used called when a schema is parsed
          */
         private initializeCustomTypes(): void {
-            this.featureSubscriptions = [];
             this.customTypeParsers = {
                 point2d: (formItem, _schemaItem): void => {
                     // A point2d is a cartesian coordinate point on the map
@@ -276,18 +278,14 @@ module App {
 
         private resetLayers() {
             let group = this.layerService.findGroupById(this.layerGroup);
-            group.layers.forEach((layer) => {
+            group.layers.forEach((layer: csComp.Services.IProjectLayer) => {
                 // unfortunately there is no reset layer function
-                layer.data.features.forEach(function (f) {
-                    layer.layerSource.service.removeFeature(f);
-                });
+                layer.data.features.forEach(f => layer.layerSource.service.removeFeature(f));
             });
         }
 
         /**
          * Check if the specified layer exists, and if it doesn't, create it.
-         *
-         *
          */
         private checkAndCreateLayer(layerId: string) {
             if (!this.layerService.findLayer(layerId)) {

@@ -1,6 +1,6 @@
-<div>
+<div style="padding: 5px;">
     <fieldset class="schema-form-fieldset">
-        <legend>Simulation Parameters</legend>
+        <legend>New simulation</legend>
         <form name="simulationForm"
               data-ng-hide="!vm.schema"
               sf-schema="vm.schema"
@@ -8,6 +8,9 @@
               sf-model="vm.model"
               sf-options="">
         </form>
+        <button data-ng-click="vm.cancel()"
+                class="btn btn-secondary">Cancel
+        </button>
         <button data-ng-hide="!vm.schema"
                 data-ng-click="vm.onSubmit(simulationForm)"
                 class="btn btn-success"
@@ -15,4 +18,3 @@
         </button>
     </fieldset>
 </div>
-

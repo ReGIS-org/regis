@@ -8,7 +8,6 @@ module App {
                 templateUrl: 'app/simtask/simtask.directive.html',
                 restrict: 'E',
                 scope: {
-                    webserviceUrl: '@simWebserviceUrl',
                     id: '@simId'
                 },
                 controller: SimTaskController,
@@ -37,19 +36,16 @@ module App {
                 parameters = $scope.$parent['data'];
             }
 
+            if (!this.id && parameters.hasOwnProperty('id')) {
+                this.id = parameters.id;
+            }
             if (!this.id) {
-                if (parameters.hasOwnProperty('id')) {
-                    this.id = parameters.id;
-                } else {
-                    $log.error('SimCityDirective.SimTaskController: No id provided');
-                    return;
-                }
+                $log.error('SimCityDirective.SimTaskController: No id provided');
+                return;
             }
 
-            if (!this.tab) {
-                if (parameters.hasOwnProperty('tab')) {
-                    this.tab = parameters.tab;
-                }
+            if (!this.tab && parameters.hasOwnProperty('tab')) {
+                this.tab = parameters.tab;
             }
 
             this.status = 'Loading task...';
@@ -64,7 +60,7 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateTask = (): ng.IPromise<void> => {
-            return this.SimWebService.get(this.SimAdminService.webserviceUrl, this.id)
+            return this.SimWebService.get(this.id)
                 .then((result: ng.IHttpPromiseCallbackArg<ITask>) => {
                     this.task = result.data;
                     if (this.status) {
@@ -84,7 +80,9 @@ module App {
         };
 
         public visualize(name: string, attachment: Object, type: string) {
-            this.SimWebService.visualize(this.SimAdminService.webserviceUrl, this.task, name, attachment, type);
+            this.SimAdminService.getWebserviceUrl().then(webserviceUrl =>
+                this.SimWebService.visualize(webserviceUrl, this.task, name, attachment, type)
+            );
         }
     }
 }

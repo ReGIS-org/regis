@@ -70,30 +70,36 @@ module App {
      * All methods take a webservice base URL.
      */
     export class SimWebService {
-        public static $inject = ['layerService', 'messageBusService', '$http', '$q'];
+        public static $inject = ['SimAdminService', 'layerService', 'messageBusService', '$http', '$q'];
 
-        private simulationsCache: StringMap<ISimWebSimulations>;
+        private simulationsCache: ng.IPromise<ISimWebSimulations>;
 
-        constructor(private layerService: csComp.Services.LayerService,
+        constructor(private SimAdminService: App.SimAdminService,
+                    private layerService: csComp.Services.LayerService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private $http: ng.IHttpService,
                     private $q: ng.IQService) {
-            this.simulationsCache = {};
+            this.simulationsCache = this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => this.$http.get(webserviceUrl + '/simulate'))
+                .then(response => response.data);
         }
 
         /** List all tasks from a given simulator of a given version. */
-        public list(webserviceUrl: string, simulation: string, version: string): ng.IHttpPromise<ISimWebList<ITask>> {
-            return this.$http.get(webserviceUrl + '/view/simulations/' + simulation + '/' + version);
+        public list(simulation: string, version: string): ng.IHttpPromise<ISimWebList<ITask>> {
+            return this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => this.$http.get(webserviceUrl + '/view/simulations/' + simulation + '/' + version));
         }
 
         /** Get a detailed task view of a single task. */
-        public get(webserviceUrl: string, id: string): ng.IHttpPromise<ITask> {
-            return this.$http.get(webserviceUrl + '/simulation/' + id);
+        public get(id: string): ng.IHttpPromise<ITask> {
+            return this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => this.$http.get(webserviceUrl + '/simulation/' + id));
         }
 
         /** Start a job on the infrastructure. */
-        public startJob(webserviceUrl: string, host: string = null): ng.IPromise<any> {
-            return this.$http.post(host ? webserviceUrl + '/job/' + host : webserviceUrl + '/job', null)
+        public startJob(host: string = null): ng.IPromise<any> {
+            return this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => this.$http.post(host ? webserviceUrl + '/job/' + host : webserviceUrl + '/job', null))
                 .then(null, response => {
                     if (response.status === 503) {
                         response.message = 'Already enough jobs running';
@@ -106,25 +112,20 @@ module App {
         }
 
         /** List possible simulators. */
-        public simulations(webserviceUrl: string): ng.IPromise<ISimWebSimulations>  {
-            if (this.simulationsCache[webserviceUrl]) {
-                return this.$q.resolve(this.simulationsCache[webserviceUrl]);
-            } else {
-                return this.$http.get(webserviceUrl + '/simulate')
-                    .then(response => {
-                        this.simulationsCache[webserviceUrl] = <ISimWebSimulations> response.data;
-                        return this.simulationsCache[webserviceUrl];
-                    });
-            }
+        public simulations(): ng.IPromise<ISimWebSimulations>  {
+            return this.simulationsCache;
         }
 
         /** Submit a new task to the webservice, where the parameters adhere to the JSON Schema of the simulator. */
-        public submit(webserviceUrl: string, simulation: string, version: string, params: any): ng.IPromise<{name: string, url: string}> {
-            var url = webserviceUrl + '/simulate/' + simulation;
-            if (version) {
-                url += '/' + version;
-            }
-            return this.$http.post(url, params)
+        public submit(simulation: string, version: string, params: any): ng.IPromise<{name: string, url: string}> {
+            return this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => {
+                    var url = webserviceUrl + '/simulate/' + simulation;
+                    if (version) {
+                        url += '/' + version;
+                    }
+                    return this.$http.post(url, params);
+                })
                 .then(result => {
                     let returnUrl = result.headers('Location');
                     return {
@@ -146,13 +147,15 @@ module App {
         }
 
         /** Delete a task. If the task is currently active, it may re-appear. */
-        public delete(webserviceUrl: string, id: string, rev: string): ng.IHttpPromise<void> {
-            return this.http('DELETE', webserviceUrl + '/simulation/' + id, {rev: rev});
+        public delete(id: string, rev: string): ng.IHttpPromise<void> {
+            return this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => this.http('DELETE', webserviceUrl + '/simulation/' + id, {rev: rev}));
         }
 
         /** Summary of the infrastructure that the webservice is currently using. */
-        public summary(webserviceUrl: string): ng.IPromise<ISimWebSummary> {
-            return this.$http.get(webserviceUrl + '/view/totals')
+        public summary(): ng.IPromise<ISimWebSummary> {
+            return this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => this.$http.get(webserviceUrl + '/view/totals'))
                 .then(response => {
                     let data = <any> response.data;
                     return {

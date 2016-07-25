@@ -65,6 +65,7 @@
     <script src="app/simadmin/simadmin.directive.js"></script>
     <script src="app/simform/simform.directive.js"></script>
     <script src="app/simlist/simlist.directive.js"></script>
+    <script src="app/simsummary/simsummary.directive.js"></script>
     <script src="app/simtask/simtask.directive.js"></script>
     <!--<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
@@ -131,10 +132,8 @@
                         <filter-list ng-hide="vm.$layerService.noFilters" class="tab-pane" id="filters"></filter-list>
                         <style-list class="tab-pane" id="styles"></style-list>
                         <dashboard-selection class="tab-pane" id="dashboardselection"></dashboard-selection>
-                        <div style="overflow-y: auto; overflow-x: hidden; padding:5px;" class="tab-pane active ng-isolate-scope scrolling leftpanel-scroll" id="simform">
-                            <sim-list></sim-list>
-                        </div>
-                        <div  class="tab-pane" id="settings">
+                        <sim-list class="tab-pane active" id="simform"></sim-list>
+                        <div class="tab-pane" id="settings">
                             <sim-admin></sim-admin>
                             <fieldset>
                                 <legend>Project Settings</legend>

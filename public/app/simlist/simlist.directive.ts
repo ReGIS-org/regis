@@ -9,28 +9,26 @@ module App {
                 templateUrl: 'app/simlist/simlist.directive.html',
                 restrict: 'E',
                 scope: {
-                    webserviceUrl: '@simWebserviceUrl',
                     simulation: '@simName',
                     version: '@simVersion'
                 },
                 controller: SimListController,
                 controllerAs: 'vm',
-                bindToController: true
+                bindToController: true,
+                replace: true,    // Remove the directive from the DOM
             };
         }]);
-
-    export interface ISimListParameters {
-        webserviceUrl: string;
-        simulation: string;
-        version: string;
-    }
 
     export class SimListController {
         private tasks: ITask[];
         private status: string;
         private subscriptions: MessageBusHandle[];
+        private simulation: string;
+        private version: string;
+        private state: string;
 
-        public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', '$interval', '$scope', '$log', 'SimTaskService'];
+        public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', '$interval', '$scope', '$log',
+                                 'SimTaskService'];
 
         constructor(private SimAdminService: App.SimAdminService,
                     private SimWebService: App.SimWebService,
@@ -40,16 +38,24 @@ module App {
                     private $log: ng.ILogService,
                     private SimTaskService: App.SimTaskService) {
 
+            this.state = 'list';
             this.subscriptions = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
-            this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
+            this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data: App.SimAdminMessage): void => {
                 if (title === 'simulation-changed') {
+                    this.simulation = data.simulation;
+                    this.version = data.version;
                     this.updateView();
                 }
             }));
             this.subscriptions.push(this.messageBusService.subscribe('project', (title: string, data?: any): void => {
                 if (title === 'loaded') {
                     this.$interval(this.updateView, 100000);
+                }
+            }));
+            this.subscriptions.push(this.messageBusService.subscribe('sim-task', (title: string, data?: any): void => {
+                if (title === 'submitted' || title === 'cancelled') {
+                    this.state = 'list';
                 }
             }));
             this.tasks = [];
@@ -74,15 +80,7 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateView = (): ng.IPromise<void> => {
-            if (typeof this.SimAdminService.webserviceUrl === 'undefined' ||
-                typeof this.SimAdminService.simulationName === 'undefined' ||
-                typeof this.SimAdminService.simulationVersion === 'undefined') {
-                    this.$log.error('SchemaService: SimAdminService parameters not set!');
-                    return null;
-            }
-            return this.SimWebService.list(this.SimAdminService.webserviceUrl,
-                                           this.SimAdminService.simulationName,
-                                           this.SimAdminService.simulationVersion)
+            return this.SimWebService.list(this.simulation, this.version)
                 .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<ITask>>) => {
                     this.tasks = response.data.rows.map(el => el.value);
                     if (this.status) {
@@ -104,12 +102,16 @@ module App {
         public viewTask(task: ITask, activeTab: string) {
             for (let key in task.uploads) {
                 let upload = task.uploads[key];
-                this.SimWebService.visualize(this.SimAdminService.webserviceUrl, task, key, upload, 'upload');
+                this.SimAdminService.getWebserviceUrl().then(webserviceUrl =>
+                    this.SimWebService.visualize(webserviceUrl, task, key, upload, 'upload')
+                );
             }
 
             for (let key in task._attachments) {
                 let attachment = task._attachments[key];
-                this.SimWebService.visualize(this.SimAdminService.webserviceUrl, task, key, attachment, 'attachment');
+                this.SimAdminService.getWebserviceUrl().then(webserviceUrl =>
+                    this.SimWebService.visualize(webserviceUrl, task, key, attachment, 'attachment')
+                );
             }
         }
 
@@ -121,7 +123,7 @@ module App {
                 ' (with id "' + task._id + '" from ensemble ' + task.input.ensemble + ')',
                 (confirmed: boolean) => {
                     if (confirmed) {
-                        this.SimWebService.delete(this.SimAdminService.webserviceUrl, task._id, task._rev)
+                        this.SimWebService.delete(task._id, task._rev)
                             .then(() => {
                                     this.messageBusService.publish('sim-task', 'removed');
                                     this.messageBusService.notify('Simulation', 'Removed simulation.',
@@ -142,8 +144,8 @@ module App {
             });
         };
 
-        public showCreateSimulationForm() {
-            this.$log.warn('Showing form!');
+        public createSimulation() {
+            this.state = 'newsimulation';
         }
     }
 }

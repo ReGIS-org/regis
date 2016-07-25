@@ -15,24 +15,55 @@ module App {
     }
 
     export class SimAdminService {
-        public webserviceUrl;
+        private webserviceUrl;
         public simulationName;
         public simulationVersion;
+        private deferredWebserviceUrl: ng.IDeferred<string>;
 
-        $inject = ['messageBusService'];
+        $inject = ['messageBusService', '$q', '$log'];
 
-        constructor (private messageBusService) {
+        constructor (private messageBusService: csComp.Services.MessageBusService,
+                     private $q: ng.IQService,
+                     $log: ng.ILogService) {
+            this.deferredWebserviceUrl = this.$q.defer();
             this.messageBusService.subscribe('project', (title: string, project: SimProject) => {
                 if (title === 'loaded') {
-                    this.webserviceUrl = project.simAdmin.webserviceUrl;
-                    this.simulationName = project.simAdmin.simulationName;
-                    this.simulationVersion = project.simAdmin.simulationVersion;
-
-                    let simAdminMessage:SimAdminMessage =  {
-                        'simulation': this.simulationName, 'version': this.simulationVersion
-                    };
-                    this.messageBusService.publish('sim-admin', 'simulation-changed', simAdminMessage);
+                    if (!project.hasOwnProperty('simAdmin')) {
+                        $log.error('simAdmin not set in project.json');
+                        this.deferredWebserviceUrl.reject();
+                    } else if (!project.simAdmin.hasOwnProperty('webserviceUrl') ||
+                               !project.simAdmin.hasOwnProperty('simulationName') ||
+                               !project.simAdmin.hasOwnProperty('simulationVersion')) {
+                        $log.error('Not all properties set in simAdmin in project.json');
+                        this.deferredWebserviceUrl.reject();
+                    } else {
+                        this.webserviceUrl = project.simAdmin.webserviceUrl;
+                        this.deferredWebserviceUrl.resolve(this.webserviceUrl);
+                        this.setSimulationVersion(project.simAdmin.simulationName, project.simAdmin.simulationVersion);
+                    }
                 }
+            });
+        }
+
+        public getWebserviceUrl = (): ng.IPromise<string> => {
+            if (typeof this.webserviceUrl === 'undefined') {
+                return this.deferredWebserviceUrl.promise;
+            } else {
+                return this.$q.resolve(this.webserviceUrl);
+            }
+        }
+        /**
+         * The simulation version has changed.
+         *
+         * Update the schema, form and model
+         */
+        public setSimulationVersion(simulation: string, version: string): void {
+            this.simulationName = simulation;
+            this.simulationVersion = version;
+
+            this.messageBusService.publish('sim-admin', 'simulation-changed', {
+                'simulation': this.simulationName,
+                'version': this.simulationVersion
             });
         }
     }
