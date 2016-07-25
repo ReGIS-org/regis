@@ -99,20 +99,14 @@ module App {
                 });
         };
 
-        public viewTask(task: ITask, activeTab: string) {
-            for (let key in task.uploads) {
-                let upload = task.uploads[key];
-                this.SimAdminService.getWebserviceUrl().then(webserviceUrl =>
-                    this.SimWebService.visualize(webserviceUrl, task, key, upload, 'upload')
-                );
-            }
+        public addAttachmentLayers(task: ITask) {
+            this.viewTask(task, 'files');
+            Object.keys(task.uploads).forEach(name => this.SimWebService.visualize(task, name, 'upload'));
+            Object.keys(task._attachments).forEach(name => this.SimWebService.visualize(task, name, 'attachment'));
+        }
 
-            for (let key in task._attachments) {
-                let attachment = task._attachments[key];
-                this.SimAdminService.getWebserviceUrl().then(webserviceUrl =>
-                    this.SimWebService.visualize(webserviceUrl, task, key, attachment, 'attachment')
-                );
-            }
+        public viewTask(task: ITask, activeTab: string) {
+            this.SimTaskService.show(task, activeTab);
         }
 
         /** Remove given task. */

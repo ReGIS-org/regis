@@ -32,7 +32,7 @@
                         <td ng-switch="task.done">
                             <span ng-switch-when="-1" title="simulation error" class="glyphicon glyphicon-warning-sign"></span>
                             <span ng-switch-when="0" title="no output" class="glyphicon glyphicon-eye-close"></span>
-                            <a ng-switch-default href="#" ng-click="vm.viewTask(task, 'files')" title="Show Output">
+                            <a ng-switch-default href="#" ng-click="vm.addAttachmentLayers(task)" title="Show Output">
                                 <span title="show output" class="glyphicon glyphicon-eye-open"></span>
                             </a>
                         </td>
