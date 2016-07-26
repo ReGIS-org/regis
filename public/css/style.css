@@ -15,3 +15,12 @@
 .rightpanel-content #sim-task-output td > a {
     margin-left: 5px;
 }
+
+div#sim-form {
+    overflow: auto;
+    height: 100%;
+}
+
+div#sim-form .schema-form-fieldset {
+    margin: 15px 0px;
+}

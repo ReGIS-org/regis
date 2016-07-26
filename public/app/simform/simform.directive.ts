@@ -8,6 +8,7 @@ module App {
     import ICustomTypeParser = App.ICustomTypeParser;
     import StringMap = App.StringMap;
     import ProjectLayer = csComp.Services.ProjectLayer;
+    import IWidget = csComp.Services.IWidget;
 
     /**
      * Define sim-form directive.
@@ -31,7 +32,8 @@ module App {
                 templateUrl: 'app/simform/simform.directive.html',
                 restrict: 'E',
                 scope: {
-                    layerGroup: '@layerGroup'
+                    layerGroup: '@layerGroup',
+                    formId: '@formId'
                 },
                 controller: SimFormController,
                 controllerAs: 'vm',
@@ -57,6 +59,8 @@ module App {
          */
         private subscriptions: MessageBusHandle[];
         private layerGroup: string;
+        private formLayers: string[];
+        private widget: IWidget;
 
         /**
          * The schema, and form for simulation submision
@@ -83,24 +87,42 @@ module App {
                     private messageBusService: csComp.Services.MessageBusService,
                     private layerService: csComp.Services.LayerService) {
 
-            if (!this.layerGroup) {
-                $log.warn('SimCityDirective.FormController: No layerGroup defined using SimCity');
-                this.layerGroup = 'SimCity';
-            }
+            var parameters: any = {};
+            if ($scope.$parent.hasOwnProperty('widget')) {
+                if ($scope.$parent['widget'].hasOwnProperty('data')) {
+                    parameters = $scope.$parent['widget']['data'];
+                }
 
-            $scope.vm = this;
+                // If we are embedded as a widget, this is set.
+                this.widget = $scope.$parent['widget'];
+            }
+            if (!this.layerGroup) {
+                if (parameters.hasOwnProperty('layerGroup')) {
+                    this.layerGroup = parameters.layerGroup;
+                } else {
+                    $log.warn('SimCityDirective.FormController: No layerGroup defined using SimCity');
+                    this.layerGroup = 'SimCity';
+                }
+            }
 
             // Initialize the simulation form
             this.schema = {};
             this.form = [];
             this.model = {};
             this.featureSubscriptions = [];
+            this.formLayers = [];
 
             // Initialize custom type mapping BEFORE getting
             // the simulation form
             this.initializeCustomTypes();
 
             this.subscriptions = [];
+            this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
+                if (title === 'simulation-changed') {
+                    this.simulationChanged();
+                }
+            }));
+
             this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
                 if (title === 'simulation-changed') {
                     this.simulationChanged();
@@ -139,6 +161,7 @@ module App {
                             this.messageBusService.publish('sim-task', 'submitted');
                             this.messageBusService.notify('New simulation', 'Submitted simulation',
                                 undefined, NotifyType.Success);
+                            this.toggleWidget();
                         }, message => {
                             this.messageBusService.notify('New simulation', 'Failed to submit simulation: '
                                 + message.message, undefined, NotifyType.Error);
@@ -153,7 +176,14 @@ module App {
          * Cancel the form.
          */
         public cancel() {
+            this.toggleWidget();
             this.messageBusService.publish('sim-task', 'cancelled');
+        }
+
+        public toggleWidget() {
+            if (this.widget) {
+                this.widget.collapse = !this.widget.collapse;
+            }
         }
 
         /**
@@ -172,8 +202,8 @@ module App {
         /**
          * Get the simulation form from the webservice.
          */
-        private getForm(): void {
-            this.SchemaService.getSchema(this.customTypeParsers)
+        private getForm(): ng.IPromise<void> {
+            return this.SchemaService.getSchema(this.customTypeParsers)
                 .then((data) => {
                     if (data != null) {
                         this.schema = data.schema;
@@ -271,7 +301,9 @@ module App {
         public simulationChanged = (): void => {
             this.resetForm();
             this.resetLayers();
-            this.getForm();
+            this.getForm().then(() => {
+                this.removeExcessLayers();
+            });
         };
 
         /**
@@ -288,48 +320,48 @@ module App {
                 // unfortunately there is no reset layer function
                 layer.data.features.forEach(f => layer.layerSource.service.removeFeature(f));
             });
+            this.formLayers = [];
         }
 
         /**
          * Check if the specified layer exists, and if it doesn't, create it.
          */
         private checkAndCreateLayer(layerId: string) {
-            if (!this.layerService.findLayer(layerId)) {
-                let newLayer = new ProjectLayer();
+            let layer = this.layerService.findLayer(layerId);
+            if (!layer) {
+                layer = new ProjectLayer();
                 let group = this.layerService.findGroupById(this.layerGroup);
 
-                newLayer.id = layerId;
-                newLayer.type = 'editablegeojson';
-                newLayer.renderType = 'geojson';
-                newLayer.typeUrl = '/explore/resource/matsim';
+                layer.id = layerId;
+                layer.type = 'editablegeojson';
+                layer.renderType = 'geojson';
+                layer.typeUrl = '/explore/resource/matsim';
                 // For some reason using .timeAware gives an error when compiling
-                newLayer.timeAware = false;
-                newLayer.data = {
+                layer.timeAware = false;
+                layer.data = {
                     'type': 'FeatureCollection',
                     'properties': {},
                     'features': []
                 };
 
-                this.layerService.initLayer(group, newLayer);
-                group.layers.push(newLayer);
+                this.layerService.initLayer(group, layer);
+                group.layers.push(layer);
+
+                this.messageBusService.publish('layer', 'created', layer);
             }
-            /*
-            {
-            "id": "matsim",
-            "title": "matsim",
-            "type": "editablegeojson",
-            "renderType": "geojson",
-            "heatmapItems": null,
-            "data": {
-                "type": "FeatureCollection",
-                "properties": {},
-                "features": []
-            },
-            "typeUrl": "/explore/resource/matsim",
-            "opacity": 100,
-            "timeaware": false
+            // remember that we need this layer
+            this.formLayers.push(layer.id);
+        }
+
+        private removeExcessLayers() {
+            let group = this.layerService.findGroupById(this.layerGroup);
+            if (group) {
+                group.layers.forEach((layer: ProjectLayer) => {
+                    if (this.formLayers.indexOf(layer.id) === -1) {
+                        this.layerService.removeLayer(layer, true);
+                    }
+                });
             }
-            */
         }
     }
 }
