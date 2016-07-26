@@ -22,6 +22,7 @@ module App {
         private task: ITask;
         private status: string;
         private tab: string;
+        private hasAttachments: boolean;
 
         public static $inject = ['SimWebService', 'SimAdminService', '$log', '$scope', 'layerService', 'messageBusService'];
 
@@ -51,6 +52,7 @@ module App {
 
             this.status = 'Loading task...';
             this.task = null;
+            this.hasAttachments = true;
             this.updateTask();
         }
 
@@ -64,6 +66,8 @@ module App {
             return this.SimWebService.get(this.id)
                 .then((result: ng.IHttpPromiseCallbackArg<ITask>) => {
                     this.task = result.data;
+                    this.hasAttachments = ((this.task._attachments && !angular.equals(this.task._attachments, {})) ||
+                                           (this.task.uploads && !angular.equals(this.task.uploads, {})));
                     if (this.status) {
                         delete this.status;
                     }

@@ -16,10 +16,10 @@
         -->
         <div class="row">
             <ul class="nav nav-tabs" id="taskTabs" style="margin-left:10px">
-                <li data-toggle="tab" ng-class="::{active: vm.tab!=='files'}">
+                <li data-toggle="tab" ng-class="::{active: vm.tab!=='files' || !vm.hasAttachments}">
                     <a data-target="#sim-task-input" data-toggle="tab"><span class="fa fa-info"></span></a>
                 </li>
-                <li data-toggle="tab" ng-if="::vm.task.uploads || vm.task._attachments" ng-class="::{active: vm.tab==='files'}">
+                <li data-toggle="tab" ng-if="::vm.hasAttachments" ng-class="::{active: vm.tab==='files'}">
                     <a data-target="#sim-task-output" data-toggle="tab"><span class="fa fa-files-o"></span></a>
                 </li>
                 <li data-toggle="tab" ng-if="::vm.task.error.length">
@@ -37,7 +37,7 @@
         vm.status is not set, so vm.task and vm.webserviceUrl are now known and will not change.
         We can use one-time binding throughout this div.
         -->
-        <div class="tab-pane" ng-class="::{active: vm.tab!=='files'}" id="sim-task-input" style="padding: 5px;">
+        <div class="tab-pane" ng-class="::{active: vm.tab!=='files' || !vm.hasAttachments}" id="sim-task-input" style="padding: 5px;">
             <dl ng-repeat="(key, value) in ::vm.task.input track by key">
                 <dt ng-bind="::key"></dt>
                 <dd ng-if="::vm.isSimpleValue(value)" ng-bind="::value"></dd>
@@ -47,7 +47,7 @@
             </dl>
         </div>
 
-        <div class="tab-pane" ng-class="::{active: vm.tab==='files'}" id="sim-task-output"  ng-if="::vm.task.uploads || vm.task._attachments">
+        <div class="tab-pane" ng-class="::{active: vm.tab==='files'}" id="sim-task-output"  ng-if="::vm.hasAttachments">
             <table class="table">
                 <tr>
                     <th>File</th><th>Size</th><td>&nbsp;</td>
@@ -91,7 +91,7 @@
                     <td>command</td><td ng-bind="::vm.task.command"></td>
                 </tr>
                 <tr ng-if="::vm.task.arguments">
-                    <td>arguments</td><td ng-bind="::vm.task.arguments"></td>
+                    <td>arguments</td><td ng-if="::vm.task.arguments.length > 0">["{{::vm.task.arguments.join('", "')}}"]</td><td ng-if="::vm.task.arguments.length == 0">[]</td>
                 </tr>
                 <tr>
                     <td>host</td><td ng-bind="::vm.task.hostname"></td>
