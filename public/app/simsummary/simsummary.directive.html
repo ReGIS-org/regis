@@ -1,17 +1,16 @@
-<table class="table table-condensed small">
-    <tr ng-show="vm.status">
-        <th colspan="2" ng-bind="vm.status"></th>
-    </tr>
-    <tr ng-hide="vm.status">
+<i ng-if="vm.status" ng-bind="vm.status"></i>
+
+<table class="table table-condensed small" ng-if="!vm.status">
+    <tr>
         <th colspan="2">Tasks</th>
     </tr>
-    <tr ng-hide="vm.status" ng-repeat="task in vm.tasks">
+    <tr ng-repeat="task in vm.tasks">
         <td ng-bind="task.name"></td><td ng-bind="task.value"></td>
     </tr>
-    <tr ng-hide="vm.status">
+    <tr>
         <th colspan="2">Jobs</th>
     </tr>
-    <tr ng-hide="vm.status" ng-repeat="job in vm.jobs">
+    <tr ng-repeat="job in vm.jobs">
         <td ng-bind="job.name"></td><td ng-bind="job.value"></td>
     </tr>
 </table>
