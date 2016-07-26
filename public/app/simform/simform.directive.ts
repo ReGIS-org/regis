@@ -229,8 +229,14 @@ module App {
                 point2d: (formItem, _schemaItem): void => {
                     // A point2d is a cartesian coordinate point on the map
                     formItem.type = 'template';
+                    formItem.selectFeature = (featureId) => {
+                        let feature = this.layerService.findFeatureById(featureId);
+                        if (feature) {
+                            this.layerService.selectFeature(feature, false, true);
+                        }
+                    };
                     formItem.template =
-                        '<div ng-if="item.id">{{item.id}}</div>' +
+                        '<div ng-if="item.id" ng-click="form.selectFeature(item.id)">{{::item.name}}: {{::item.id}}</div>' +
                         '<div ng-if="!item.id">({{item.x}}, {{item.y}})</div>';
                 },
                 layer: (formItem, _schemaItem) => {
@@ -254,7 +260,8 @@ module App {
                         if (feature && layerId === feature.layerId && featureId === feature.properties['featureTypeId']
                             && supportedOps.indexOf(title) >= 0) {
                             let value = {
-                                id: feature.properties['Name'],
+                                id: feature.id,
+                                name: feature.properties['Name'],
                                 x: feature.geometry.coordinates[0],
                                 y: feature.geometry.coordinates[1]
                             };
