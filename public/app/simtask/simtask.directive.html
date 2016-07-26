@@ -1,30 +1,29 @@
 <div data-ng-cloak class="rightpanel-content" id="simtask-content">
-    <h4 class="rightpanel-header" ng-if="vm.status" ng-bind="vm.status"></h4>
-    <h4 class="rightpanel-header" ng-hide="vm.status" ng-bind-template="Simulation '{{vm.task.ensemble}} ({{vm.task._id}})'"></h4>
+    <h4 class="rightpanel-header" style="padding-left: 5px" ng-if="vm.status" ng-bind="vm.status" uib-popover="{{vm.status}}" popover-placement="bottom" popover-trigger="mouseenter" popover-append-to-body="true"></h4>
+    <h4 class="rightpanel-header" style="padding-left: 5px" ng-if="!vm.status && vm.task._id.length + vm.task.input.ensemble.length > 24" ng-bind-template="{{vm.task._id}} ({{vm.task.input.ensemble}})" ng-bind="vm.status" uib-popover="{{vm.task._id}} ({{vm.task.input.ensemble}})" popover-placement="bottom" popover-trigger="mouseenter" popover-append-to-body="true"></h4>
+    <h4 class="rightpanel-header" style="padding-left: 5px" ng-if="!vm.status && vm.task._id.length + vm.task.input.ensemble.length <= 24" ng-bind-template="{{vm.task._id}} ({{vm.task.input.ensemble}})" ng-bind="vm.status"></h4>
 
-    <div class="container-fluid rightpanel-tabs" ng-hide="vm.status">
-        <div class="container-fluid rightpanel-tabs" style="position: relative;height:45px">
-            <div class="row">
-                <ul class="nav nav-tabs" id="taskTabs" style="margin-left:10px">
-                    <li data-toggle="tab" ng-class="{active: vm.tab!=='files'}">
-                        <a data-target="#sim-task-input" data-toggle="tab"><span class="fa fa-info"></span></a>
-                    </li>
-                    <li data-toggle="tab" ng-if="vm.task.uploads || vm.task._attachments" ng-class="{active: vm.tab==='files'}">
-                        <a data-target="#sim-task-output" data-toggle="tab"><span class="fa fa-files-o"></span></a>
-                    </li>
-                    <li data-toggle="tab" ng-if="vm.task.error.length">
-                        <a data-target="#sim-task-error" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span></a>
-                    </li>
-                    <li data-toggle="tab">
-                        <a data-target="#sim-task-details" data-toggle="tab">Details</a>
-                    </li>
-                </ul>
-            </div>
+    <div class="container-fluid rightpanel-tabs" ng-hide="vm.status" style="position: relative;height:45px">
+        <div class="row">
+            <ul class="nav nav-tabs" id="taskTabs" style="margin-left:10px">
+                <li data-toggle="tab" ng-class="{active: vm.tab!=='files'}">
+                    <a data-target="#sim-task-input" data-toggle="tab"><span class="fa fa-info"></span></a>
+                </li>
+                <li data-toggle="tab" ng-if="vm.task.uploads || vm.task._attachments" ng-class="{active: vm.tab==='files'}">
+                    <a data-target="#sim-task-output" data-toggle="tab"><span class="fa fa-files-o"></span></a>
+                </li>
+                <li data-toggle="tab" ng-if="vm.task.error.length">
+                    <a data-target="#sim-task-error" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span></a>
+                </li>
+                <li data-toggle="tab">
+                    <a data-target="#sim-task-details" data-toggle="tab">Details</a>
+                </li>
+            </ul>
         </div>
     </div>
 
-    <div class="tab-content" style="top:50px; overflow-y: auto; overflow-x: hidden; width: 100%" resize resize-y="150">
-        <div class="tab-pane" ng-class="{active: vm.tab!=='files'}" id="sim-task-input">
+    <div class="tab-content" style="top:50px; overflow-y: auto; overflow-x: hidden; width: 100%;" resize resize-y="130">
+        <div class="tab-pane" ng-class="{active: vm.tab!=='files'}" id="sim-task-input" style="padding: 5px;">
             <dl ng-repeat="(key, value) in vm.task.input track by key">
                 <dt ng-bind="key"></dt>
                 <dd ng-if="vm.isSimpleValue(value)" ng-bind="value"></dd>

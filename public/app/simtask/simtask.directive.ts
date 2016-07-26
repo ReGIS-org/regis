@@ -12,7 +12,8 @@ module App {
                 },
                 controller: SimTaskController,
                 controllerAs: 'vm',
-                bindToController: true
+                bindToController: true,
+                replace: true  // Remove the directive from the DOM
             };
         }]);
 
