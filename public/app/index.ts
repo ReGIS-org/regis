@@ -13,8 +13,7 @@ module App {
         'pascalprecht.translate',
         'ngCookies',
         'angularSpectrumColorpicker',
-        'wiz.markdown',
-        'ngAnimate'])
+        'wiz.markdown'])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
         })

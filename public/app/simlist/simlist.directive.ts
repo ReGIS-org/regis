@@ -105,8 +105,12 @@ module App {
 
         public addAttachmentLayers(task: ITask) {
             this.viewTask(task, 'files');
-            Object.keys(task.uploads).forEach(name => this.SimWebService.visualize(task, name, 'upload'));
-            Object.keys(task._attachments).forEach(name => this.SimWebService.visualize(task, name, 'attachment'));
+            if (task.uploads) {
+                Object.keys(task.uploads).forEach(name => this.SimWebService.visualize(task, name, 'upload'));
+            }
+            if (task._attachments) {
+                Object.keys(task._attachments).forEach(name => this.SimWebService.visualize(task, name, 'attachment'));
+            }
         }
 
         public viewTask(task: ITask, activeTab: string) {
