@@ -12,7 +12,8 @@ module App {
                 },
                 controller: SimTaskController,
                 controllerAs: 'vm',
-                bindToController: true
+                bindToController: true,
+                replace: true  // Remove the directive from the DOM
             };
         }]);
 
@@ -81,6 +82,10 @@ module App {
 
         public visualize(name: string, type: string) {
             this.SimWebService.visualize(this.task, name, type);
+        }
+
+        public isSimpleValue(value): Boolean {
+            return ['string', 'number', 'boolean'].indexOf(typeof(value)) !== -1;
         }
     }
 }
