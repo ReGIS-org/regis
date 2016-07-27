@@ -227,14 +227,15 @@ module App {
                 let group = this.layerService.findGroupById(groupId);
                 if (group === null) {
                     let newGroup = new ProjectGroup();
+                    let title = task.input.ensemble + ': ' + task.input.simulation;
                     newGroup.id = groupId;
                     newGroup.languages = {
                         'en': {
-                            'title': task.input.ensemble + ': ' + task.input.simulation,
-                            'description': 'Layers added manually for test purposes'
+                            'title': title,
+                            'description': 'Layers added for ' + title
                         }
                     };
-                    newGroup.clustering = true;
+                    newGroup.clustering = false;
 
                     group = ProjectGroup.deserialize(newGroup);
 
