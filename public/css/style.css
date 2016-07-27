@@ -24,3 +24,16 @@ div#sim-form {
 div#sim-form .schema-form-fieldset {
     margin: 15px 0px;
 }
+
+.label-parent {
+    position: relative;
+}
+
+.label-parent .label.label-layers {
+    position: absolute;
+    top: -10px;
+    font-size: 45%;
+    margin: auto;
+    width: 46px;
+    left: 5px;
+}
