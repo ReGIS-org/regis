@@ -9,6 +9,7 @@ module App {
         showMenuRight:boolean;
         featureSelected:boolean;
         layersLoading:number;
+        newLayers: number;
     }
 
     // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.)
@@ -48,6 +49,7 @@ module App {
             this.$scope.showMenuRight = false;
             this.$scope.featureSelected = false;
             this.$scope.layersLoading = 0;
+            this.$scope.newLayers = 0;
 
             this.$messageBusService.subscribe('project', (action:string) => {
                 if (action === 'loaded') {
@@ -101,6 +103,8 @@ module App {
                     break;
                 case 'deactivate':
                     break;
+                case 'initialized':
+                    this.$scope.newLayers += 1;
             }
 
             var $contextMenu = $('#contextMenu');
@@ -152,6 +156,10 @@ module App {
 
         public isActive(viewLocation: string): boolean {
             return viewLocation === this.$location.path();
+        }
+
+        public layersTabClicked():void {
+            this.$scope.newLayers = 0;
         }
     }
 

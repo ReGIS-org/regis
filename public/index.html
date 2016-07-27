@@ -103,7 +103,8 @@
                         <li class="lp-tab " data-target="#basestyles" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate">
                             <i class="fa fa-map" aria-hidden="true"></i>
                         </li>
-                        <li class="lp-tab" data-target="#layers" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate">
+                        <li class="lp-tab label-parent" data-target="#layers" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate" ng-click="vm.layersTabClicked()">
+                            <div ng-if="newLayers>0" class="label label-layers label-success">{{newLayers}}</div>
                             <i class="fa fae-layers" aria-hidden="true"></i>
                         </li>
                         <li class="lp-tab" data-target="#styles" data-toggle="tab">

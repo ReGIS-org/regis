@@ -267,6 +267,7 @@ module App {
                     this.layerService.initLayer(group, newLayer);
                     group.layers.push(newLayer);
 
+                    this.messageBusService.publish('layer', 'initialized', newLayer);
                     this.messageBusService.notify('Result added', 'Results from file <b>' + name +
                         '</b> added to layer in layer group <b>' + group.title + '</b>',
                         undefined, NotifyType.Success);
