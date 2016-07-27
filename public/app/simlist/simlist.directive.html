@@ -11,24 +11,22 @@
             </button>
         </div>
 
-        <div class="scrolling leftpanel-scroll">
+        <i ng-if="vm.status" ng-bind="vm.status"></i>
+        <div class="scrolling leftpanel-scroll" ng-if="!vm.status">
             <table class="table table-condensed">
                 <thead>
-                    <tr ng-show="vm.status">
-                        <th ng-bind="vm.status"></th>
-                        <tr>
-                            <tr ng-hide="vm.status">
-                                <th>ensemble</th>
-                                <th>name</th>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                                <td>&nbsp;</td>
-                            </tr>
+                    <tr>
+                        <th>ensemble</th>
+                        <th>name</th>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
                 </thead>
-                <tbody ng-hide="vm.status">
+                <tbody>
                     <tr ng-repeat="task in vm.tasks | orderBy:['input.ensemble', 'input.simulation'] | filter:searchText track by task._id">
-                        <td ng-bind="task.input.ensemble"></td>
-                        <td ng-bind="task.input.simulation"></td>
+                        <td ng-bind="::task.input.ensemble"></td>
+                        <td ng-bind="::task.input.simulation"></td>
                         <td ng-switch="task.done">
                             <span ng-switch-when="-1" title="simulation error" class="glyphicon glyphicon-warning-sign"></span>
                             <span ng-switch-when="0" title="no output" class="glyphicon glyphicon-eye-close"></span>

@@ -1,18 +1,28 @@
 <div data-ng-cloak class="rightpanel-content" id="simtask-content">
-    <h4 class="rightpanel-header" style="padding-left: 5px" ng-if="vm.status" ng-bind="vm.status" uib-popover="{{vm.status}}" popover-placement="bottom" popover-trigger="mouseenter" popover-append-to-body="true"></h4>
-    <h4 class="rightpanel-header" style="padding-left: 5px" ng-if="!vm.status && vm.task._id.length + vm.task.input.ensemble.length > 24" ng-bind-template="{{vm.task._id}} ({{vm.task.input.ensemble}})" ng-bind="vm.status" uib-popover="{{vm.task._id}} ({{vm.task.input.ensemble}})" popover-placement="bottom" popover-trigger="mouseenter" popover-append-to-body="true"></h4>
-    <h4 class="rightpanel-header" style="padding-left: 5px" ng-if="!vm.status && vm.task._id.length + vm.task.input.ensemble.length <= 24" ng-bind-template="{{vm.task._id}} ({{vm.task.input.ensemble}})" ng-bind="vm.status"></h4>
+    <!--
+    vm.status will change according to our request. This is dynamic. All other variables will be fixed once the request
+    has finished, so then we can use one-time binding (::)
+    -->
+    <h4 class="rightpanel-header" ng-if="vm.status" style="padding-left: 5px" ng-if="vm.status" ng-bind="vm.status" uib-popover="{{vm.status}}" popover-placement="bottom" popover-trigger="mouseenter" popover-append-to-body="true"></h4>
+    <h4 class="rightpanel-header" ng-if="!vm.status">
+        <div style="padding-left: 5px" ng-if="::vm.task._id.length + vm.task.input.ensemble.length > 24" ng-bind-template="{{::vm.task._id}} ({{::vm.task.input.ensemble}})" uib-popover="{{::vm.task._id}} ({{::vm.task.input.ensemble}})" popover-placement="bottom" popover-trigger="mouseenter" popover-append-to-body="true"></div>
+        <div style="padding-left: 5px" ng-if="::vm.task._id.length + vm.task.input.ensemble.length <= 24" ng-bind-template="{{::vm.task._id}} ({{::vm.task.input.ensemble}})"></div>
+    </h4>
 
     <div class="container-fluid rightpanel-tabs" ng-if="!vm.status" style="position: relative;height:45px">
+        <!--
+        vm.status is not set, so vm.task and vm.webserviceUrl are now known and will not change.
+        We can use one-time binding throughout this div.
+        -->
         <div class="row">
             <ul class="nav nav-tabs" id="taskTabs" style="margin-left:10px">
                 <li data-toggle="tab" ng-class="::{active: vm.tab!=='files' || !vm.hasAttachments}">
                     <a data-target="#sim-task-input" data-toggle="tab"><span class="fa fa-info"></span></a>
                 </li>
-                <li data-toggle="tab" ng-if="::vm.hasAttachments" ng-class="{active: vm.tab==='files'}">
+                <li data-toggle="tab" ng-if="::vm.hasAttachments" ng-class="::{active: vm.tab==='files'}">
                     <a data-target="#sim-task-output" data-toggle="tab"><span class="fa fa-files-o"></span></a>
                 </li>
-                <li data-toggle="tab" ng-if="vm.task.error.length">
+                <li data-toggle="tab" ng-if="::vm.task.error.length">
                     <a data-target="#sim-task-error" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span></a>
                 </li>
                 <li data-toggle="tab">
@@ -22,44 +32,48 @@
         </div>
     </div>
 
-    <div class="tab-content" style="top:50px; overflow-y: auto; overflow-x: hidden; width: 100%;" resize resize-y="130">
+    <div ng-if="!vm.status" class="tab-content" style="top:50px; overflow-y: auto; overflow-x: hidden; width: 100%;" resize resize-y="130">
+        <!--
+        vm.status is not set, so vm.task and vm.webserviceUrl are now known and will not change.
+        We can use one-time binding throughout this div.
+        -->
         <div class="tab-pane" ng-class="::{active: vm.tab!=='files' || !vm.hasAttachments}" id="sim-task-input" style="padding: 5px;">
-            <dl ng-repeat="(key, value) in vm.task.input track by key">
-                <dt ng-bind="key"></dt>
-                <dd ng-if="vm.isSimpleValue(value)" ng-bind="value"></dd>
-                <dd ng-if="!vm.isSimpleValue(value)">
-                    <pre ng-bind="value | json"></pre>
+            <dl ng-repeat="(key, value) in ::vm.task.input track by key">
+                <dt ng-bind="::key"></dt>
+                <dd ng-if="::vm.isSimpleValue(value)" ng-bind="::value"></dd>
+                <dd ng-if="::!vm.isSimpleValue(value)">
+                    <pre ng-bind="::value | json"></pre>
                 </dd>
             </dl>
         </div>
 
-        <div class="tab-pane" ng-class="{active: vm.tab==='files'}" id="sim-task-output" ng-if="::vm.hasAttachments">
+        <div class="tab-pane" ng-class="::{active: vm.tab==='files'}" id="sim-task-output"  ng-if="::vm.hasAttachments">
             <table class="table">
                 <tr>
                     <th>File</th><th>Size</th><td>&nbsp;</td>
                 </tr>
-                <tr ng-repeat="(name, attachment) in vm.task._attachments track by name">
-                    <td ng-bind="name"></td><td ng-bind="attachment.length | formatBytes" class="text-right"></td><td>
-                    <a href ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, 'attachment')"><span class="glyphicon glyphicon-eye-open"></span></a>
-                    <a ng-href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}/{{name}}" title="download" download="{{vm.task._id}}_{{name}}" target="_self"><span class="glyphicon glyphicon-download-alt"></span></a>
+                <tr ng-repeat="(name, attachment) in ::vm.task._attachments track by name">
+                    <td ng-bind="::name"></td><td ng-bind="::attachment.length | formatBytes" class="text-right"></td><td>
+                    <a href ng-if="::name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, 'attachment')"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a ng-href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}/{{name}}" title="download" download="{{::vm.task._id}}_{{::name}}" target="_self"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
-                <tr ng-repeat="(name, attachment) in vm.task.uploads track by name">
-                    <td ng-bind="name"></td><td>&nbsp;</td><td>
-                    <a href ng-if="name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, 'upload')"><span class="glyphicon glyphicon-eye-open"></span></a>
-                    <a ng-href="{{attachment}}" title="download" download="{{vm.task._id}}_{{name}}" target="_self"><span class="glyphicon glyphicon-download-alt"></span></a>
+                <tr ng-repeat="(name, attachment) in ::vm.task.uploads track by name">
+                    <td ng-bind="::name"></td><td>&nbsp;</td><td>
+                    <a href ng-if="::name.indexOf('.json', name.length - 5) !== -1" title="Show on map" ng-click="vm.visualize(name, 'upload')"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a ng-href="::{{attachment}}" title="download" download="{{vm.task._id}}_{{name}}" target="_self"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>
             </table>
         </div>
 
-        <div class="tab-pane" id="sim-task-error" ng-if="vm.task.error.length">
+        <div class="tab-pane" id="sim-task-error" ng-if="::vm.task.error.length">
             <table class="table">
                 <tr>
                     <th>Time</th><th>Message</th><th>Details</th>
                 </tr>
-                <tr ng-repeat="error in vm.task.error">
-                    <td ng-bind="error.time | formatSeconds"></td><td ng-bind="error.message"></td><td ng-bind="error.exception || ''"></td>
+                <tr ng-repeat="error in ::vm.task.error">
+                    <td ng-bind="::error.time | formatSeconds"></td><td ng-bind="::error.message"></td><td ng-bind="::error.exception || ''"></td>
                 </tr>
             </table>
         </div>
@@ -71,30 +85,30 @@
                     <th>Value</th>
                 </tr>
                 <tr>
-                    <td>ID</td><td ng-bind="vm.task._id"></td>
+                    <td>ID</td><td ng-bind="::vm.task._id"></td>
                 </tr>
                 <tr>
-                    <td>command</td><td ng-bind="vm.task.command"></td>
+                    <td>command</td><td ng-bind="::vm.task.command"></td>
                 </tr>
-                <tr ng-if="vm.task.arguments">
-                    <td>arguments</td><td ng-if="vm.task.arguments.length > 0">["{{::vm.task.arguments.join('", "')}}"]</td><td ng-if="vm.task.arguments.length == 0">[]</td>
-                </tr>
-                <tr>
-                    <td>host</td><td ng-bind="vm.task.hostname"></td>
+                <tr ng-if="::vm.task.arguments">
+                    <td>arguments</td><td ng-if="::vm.task.arguments.length > 0">["{{::vm.task.arguments.join('", "')}}"]</td><td ng-if="::vm.task.arguments.length == 0">[]</td>
                 </tr>
                 <tr>
-                    <td>URL</td><td><a href="{{vm.webserviceUrl}}/simulation/{{vm.task._id}}" target="_blank" title="raw JSON output">{{vm.webserviceUrl}}/simulation/{{vm.task._id}}</a></td>
+                    <td>host</td><td ng-bind="::vm.task.hostname"></td>
                 </tr>
                 <tr>
-                    <td>started processing</td><td ng-bind="vm.task.lock | formatSeconds: 'not processing'"></td>
+                    <td>URL</td><td><a ng-href="{{::vm.webserviceUrl}}/simulation/{{::vm.task._id}}" target="_blank" title="raw JSON output">{{::vm.webserviceUrl}}/simulation/{{::vm.task._id}}</a></td>
                 </tr>
                 <tr>
-                    <td>done processing</td><td ng-bind="vm.task.done | formatSeconds: 'not done'"></td>
+                    <td>started processing</td><td ng-bind="::vm.task.lock | formatSeconds: 'not processing'"></td>
                 </tr>
                 <tr>
-                    <td>revision</td><td ng-bind="vm.task._rev"></td>
+                    <td>done processing</td><td ng-bind="::vm.task.done | formatSeconds: 'not done'"></td>
+                </tr>
+                <tr>
+                    <td>revision</td><td ng-bind="::vm.task._rev"></td>
                 </tr>
             </table>
         </div>
     </div>
-</div><!-- /.modal -->
+</div>
