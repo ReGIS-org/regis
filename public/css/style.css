@@ -12,7 +12,7 @@
     margin-left:10px
 }
 
-.rightpanel-content #sim-task-output td > a {
+.rightpanel-content #sim-task-output a.file-output {
     margin-left: 5px;
 }
 
@@ -47,4 +47,9 @@ div#sim-form .schema-form-fieldset {
   margin-right: 8px;
   color: black;
   min-height: 46px;
+}
+
+/* Override csWeb control-label */
+.schema-form-fieldset .control-label {
+    width: initial;
 }
