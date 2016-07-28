@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <div ng-if="!vm.status" class="tab-content" style="top:50px; bottom: 0px; overflow-y: auto; overflow-x: hidden; width: 100%;">
+    <div ng-if="!vm.status" class="tab-content" style="position: absolute; top: 70px; bottom: 0px; overflow-y: auto; overflow-x: hidden; width: 100%;">
         <!--
         vm.status is not set, so vm.task and vm.webserviceUrl are now known and will not change.
         We can use one-time binding throughout this div.
@@ -91,7 +91,7 @@
                     <td>command</td><td ng-bind="::vm.task.command"></td>
                 </tr>
                 <tr ng-if="::vm.task.arguments">
-                    <td>arguments</td><td ng-if="::vm.task.arguments.length > 0">["{{::vm.task.arguments.join('", "')}}"]</td><td ng-if="::vm.task.arguments.length == 0">[]</td>
+                    <td>arguments</td><td ng-if="::vm.task.arguments.length > 0">["{{::vm.task.arguments.join('", "')}}"]</td><td ng-if="::vm.task.arguments.length == 0">[ ]</td>
                 </tr>
                 <tr>
                     <td>host</td><td ng-bind="::vm.task.hostname"></td>
