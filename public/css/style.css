@@ -41,12 +41,15 @@ div#sim-form .schema-form-fieldset {
 .form-container {
   background: rgba(255, 255, 255, 0.77);
   box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
-  cursor: pointer;
   font-size: 20px;
   margin-top: 5px;
   margin-right: 8px;
   color: black;
   min-height: 46px;
+}
+
+.form-container h2 {
+    display: inline-block;
 }
 
 /* Override csWeb control-label */

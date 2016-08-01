@@ -49,6 +49,39 @@
         "visibleLeftMenuItems": [
             "!lm-layers"
         ]
+    },
+    {
+        "id": "monitor",
+        "name": "Job Monitor",
+        "editMode": false,
+        "showMap": false,
+        "showTimeline": false,
+        "showLeftmenu": false,
+        "showLegend": false,
+        "showBackgroundImage": true,
+        "visiblelayers": [
+        ],
+        "widgets": [{
+            "id": "9086ec94-4c54-4d84-dc04-9d3673df6d35",
+            "directive": "sim-summary",
+            "enabled": true,
+            "style": "transparent",
+            "left": "50px",
+            "right": "",
+            "top": "82px",
+            "width": "300px"
+        },
+        {
+            "id": "cb86ec94-4c54-4d84-dc04-9d3673df6d35",
+            "directive": "sim-job",
+            "enabled": true,
+            "style": "transparent",
+            "left": "375px",
+            "right": "",
+            "top": "82px"
+        }
+        ],
+        "visibleLeftMenuItems": []
     }
     ],
     "expertMode": 3,

@@ -64,10 +64,10 @@ module App {
          */
         public updateTask = (): ng.IPromise<void> => {
             return this.SimWebService.get(this.id)
-                .then((result: ng.IHttpPromiseCallbackArg<ITask>) => {
-                    this.task = result.data;
+                .then((task: ITask) => {
+                    this.task = task;
                     this.hasAttachments = ((this.task._attachments && !angular.equals(this.task._attachments, {})) ||
-                                           (this.task.uploads && !angular.equals(this.task.uploads, {})));
+                                           (this.task.files && !angular.equals(this.task.files, {})));
                     if (this.status) {
                         delete this.status;
                     }
@@ -84,8 +84,8 @@ module App {
                 });
         };
 
-        public visualize(name: string, type: string) {
-            this.SimWebService.visualize(this.task, name, type);
+        public visualize(name: string) {
+            this.SimWebService.visualize(this.task, name);
         }
 
         public isSimpleValue(value): Boolean {

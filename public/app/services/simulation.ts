@@ -50,8 +50,8 @@ module App {
             [key: string]: any;
         };
         output?: any; // output values
-        uploads?: { [key: string]: string }; // filename: urls of uploaded files
-        _attachments?: { [key: string]: any }; // CouchDB attachments
+        files?: { [name: string]: GeoJsonFileDescription }; // filename: urls of uploaded files
+        _attachments?: { [name: string]: GeoJsonFileDescription }; // CouchDB attachments
         typeUrl?: string; // url of the feature type
         defaultFeatureType: string; // name of the default feature type if any
         hostname?: string; // hostname the task was last processed on
@@ -62,6 +62,19 @@ module App {
         version?: string; // simulation engine version
         command?: string; // simulation engine command
         arguments?: string[]; // simulation engine arguments
+        filelist? : { [name: string]: GeoJsonFileDescription };
+    }
+
+    export interface GeoJsonFileDescription {
+        length: number;
+        content_type: string;
+        url?: string;
+        digest?: string;
+    }
+
+    /** Job data. */
+    export interface IJob {
+
     }
 
     /**
@@ -92,9 +105,24 @@ module App {
         }
 
         /** Get a detailed task view of a single task. */
-        public get(id: string): ng.IHttpPromise<ITask> {
+        public get(id: string): ng.IPromise<ITask> {
             return this.SimAdminService.getWebserviceUrl()
-                .then(webserviceUrl => this.$http.get(webserviceUrl + '/simulation/' + id));
+                .then((webserviceUrl : string) : ng.IHttpPromise<ITask>  => this.$http.get(webserviceUrl + '/simulation/' + id))
+                .then((result : ng.IHttpPromiseCallbackArg<ITask>) : ITask => {
+                    let task: ITask = result.data;
+                    task.filelist = {};
+                    if (task._attachments) {
+                        Object.keys(task._attachments).forEach((name : string) => {
+                            task.filelist[name] = task._attachments[name];
+                        });
+                    }
+                    if (task.files) {
+                        Object.keys(task.files).forEach((name : string) => {
+                            task.filelist[name] = task.files[name];
+                        });
+                    }
+                    return task;
+                });
         }
 
         /** Start a job on the infrastructure. */
@@ -110,6 +138,11 @@ module App {
                             response.statusText, 'error starting job'));
                     }
                 });
+        }
+
+        public listJobs() : ng.IHttpPromise<ISimWebList<IJob>> {
+            return this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => this.$http.get(webserviceUrl + '/view/jobs/'));
         }
 
         /** List possible simulators. */
@@ -161,15 +194,15 @@ module App {
                     let data = <any> response.data;
                     return {
                         tasks: [
-                            {name: 'queued', value: <number> data.todo},
-                            {name: 'processing', value: <number> data.locked},
-                            {name: 'done', value: <number> data.done},
-                            {name: 'with error', value: <number> data.error}
+                            {name: 'Pending', value: <number> data.pending},
+                            {name: 'Processing', value: <number> data.in_progress},
+                            {name: 'Done', value: <number> data.done},
+                            {name: 'With error', value: <number> data.error}
                         ],
                         jobs: [
-                            {name: 'active', value: <number> data.active_jobs},
-                            {name: 'pending', value: <number> data.pending_jobs},
-                            {name: 'finished', value: <number> data.finished_jobs}
+                            {name: 'Running', value: <number> data.running_jobs},
+                            {name: 'Pending', value: <number> data.pending_jobs},
+                            {name: 'Finished', value: <number> data.finished_jobs}
                         ]
                     };
                 }, response => {
@@ -205,21 +238,15 @@ module App {
             };
         }
 
-        public getAttachmentUrl(task: ITask, name: string, type: string): ng.IPromise<string> {
+        public getAttachmentUrl(task: ITask, name: string): ng.IPromise<string> {
             return this.SimAdminService.getWebserviceUrl().then(webserviceUrl => {
-                if (type === 'attachment') {
-                    return webserviceUrl + '/simulation/' + task._id + '/' + name;
-                } else if (type === 'upload') {
-                    return task.uploads[name];
-                } else {
-                    return this.$q.reject('Attachment type ' + type + ' not recognized');
-                }
+                return webserviceUrl + '/simulation/' + task._id + '/' + name;
             });
         }
 
-        public visualize(task: ITask, name: string, type: string) {
+        public visualize(task: ITask, name: string) {
             // Calculate the correct url to the result
-            return this.getAttachmentUrl(task, name, type).then(url => {
+            return this.getAttachmentUrl(task, name).then(url => {
                 this.$log.info('visualizing ' + name + ' at: ' + url);
 
                 // Make sure the layer group exists
