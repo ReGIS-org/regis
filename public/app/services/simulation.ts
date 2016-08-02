@@ -83,11 +83,12 @@ module App {
      * All methods take a webservice base URL.
      */
     export class SimWebService {
-        public static $inject = ['SimAdminService', 'layerService', 'messageBusService', '$http', '$q', '$log'];
+        public static $inject = ['SimAdminService', 'SchemaService', 'layerService', 'messageBusService', '$http', '$q', '$log'];
 
         private simulationsCache: ng.IPromise<ISimWebSimulations>;
 
         constructor(private SimAdminService: App.SimAdminService,
+                    private SimSchemaService: App.SchemaService,
                     private layerService: csComp.Services.LayerService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private $http: ng.IHttpService,
@@ -253,46 +254,13 @@ module App {
                 let groupId = task.input.ensemble + '_' + task.input.simulation;
                 let group = this.layerService.findGroupById(groupId);
                 if (group === null) {
-                    let newGroup = new ProjectGroup();
-                    let title = task.input.ensemble + ': ' + task.input.simulation;
-                    newGroup.id = groupId;
-                    newGroup.languages = {
-                        'en': {
-                            'title': title,
-                            'description': 'Layers added for ' + title
-                        }
-                    };
-                    newGroup.clustering = false;
-
-                    group = ProjectGroup.deserialize(newGroup);
-
-                    this.layerService.project.groups.push(group);
-                    this.layerService.initGroup(group);
+                    group = this.createGroup(groupId, task);
                 }
 
                 // Add the data as a layer
                 let layerId = task._id + '_' + name;
                 if (!this.layerService.findLayer(layerId)) {
-                    let newLayer = new ProjectLayer();
-
-                    newLayer.id = layerId;
-                    newLayer.title = name;
-                    newLayer.type = 'geojson';
-                    newLayer.renderType = 'geojson';
-                    newLayer.url = url;
-                    newLayer.timeAware = false;
-                    newLayer.opacity = 75;
-
-                    if (task.hasOwnProperty('typeUrl')) {
-                        newLayer.typeUrl = task.typeUrl;
-                    }
-                    if (task.hasOwnProperty('defaultFeatureType')) {
-                        newLayer.defaultFeatureType = task.defaultFeatureType;
-                    }
-
-
-                    this.layerService.initLayer(group, newLayer);
-                    group.layers.push(newLayer);
+                    let newLayer = this.createLayer(layerId, task, group, name, url);
 
                     this.messageBusService.publish('layer', 'initialized', newLayer);
                     this.messageBusService.notify('Result added', 'Results from file <b>' + name +
@@ -304,6 +272,100 @@ module App {
                         group.title + '</b>', undefined, NotifyType.Success);
                 }
             });
+        }
+
+        public createGroup(groupId, task) : ProjectGroup {
+            let newGroup = new ProjectGroup();
+            let title = task.input.ensemble + ': ' + task.input.simulation;
+            newGroup.id = groupId;
+            newGroup.languages = {
+                'en': {
+                    'title': title,
+                    'description': 'Layers added for ' + title
+                }
+            };
+            newGroup.clustering = false;
+
+            let group = ProjectGroup.deserialize(newGroup);
+
+            this.layerService.project.groups.push(group);
+            this.layerService.initGroup(group);
+
+            return group;
+        }
+
+        public createLayer(layerId: string, task: ITask, group: ProjectGroup, name: string, url?: string): ProjectLayer {
+            let newLayer = new ProjectLayer();
+
+            newLayer.id = layerId;
+            newLayer.title = name;
+            newLayer.type = 'geojson';
+            newLayer.renderType = 'geojson';
+            if (url) {
+                newLayer.url = url;
+            }
+            newLayer.timeAware = false;
+            newLayer.opacity = 75;
+
+            if (task.hasOwnProperty('typeUrl')) {
+                newLayer.typeUrl = task.typeUrl;
+            }
+            if (task.hasOwnProperty('defaultFeatureType')) {
+                newLayer.defaultFeatureType = task.defaultFeatureType;
+            }
+
+
+            this.layerService.initLayer(group, newLayer);
+            group.layers.push(newLayer);
+
+            return newLayer;
+        }
+
+        public visualizeInput(task: ITask) {
+            this.SimSchemaService.getSchema({
+                layer: (formItem, _schemaItem, schema) => {
+                    let featureId = formItem.featureId;
+                    let key = formItem.key;
+                    let layerId = 'input-' + task._id + '-' + key;
+
+                    let groupId = task.input.ensemble + '_' + task.input.simulation;
+                    let group = this.layerService.findGroupById(groupId);
+                    if (group === null) {
+                        group = this.createGroup(groupId, task);
+                    }
+
+                    if (task.input.hasOwnProperty(key)) {
+                        let layer = this.layerService.findLayer(layerId);
+                        if (!layer) {
+                            layer = this.createLayer(layerId, task, group, layerId);
+                        }
+                        layer.data = {
+                            type: 'featureCollection',
+                            features: [],
+                        };
+                        layer.typeUrl = schema.resourceTypeUrl;
+                        task.input[key].forEach(feature => {
+                            let f = {
+                                type: 'Feature',
+                                id: feature.id,
+                                geometry: {
+                                    type: 'Point',
+                                    coordinates: [
+                                        feature.x, feature.y
+                                    ]
+                                },
+                                properties: {
+                                    Name: feature.name,
+                                    featureTypeId: featureId
+                                }
+                            };
+
+                            layer.data.features.push(f);
+                        });
+                    }
+                }
+            });
+
         }
     }
 

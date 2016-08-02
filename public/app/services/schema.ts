@@ -22,7 +22,7 @@ module App {
     }
     /** Parsing function for forms and schemas that modifies the form items and schemas in place. */
     export interface ICustomTypeParser {
-        (IAngularFormSpec, IJsonSchema): void;
+        (IAngularFormSpec, IJsonSchema, IJSonSchema?): void;
     }
     /** Simple map of given type. */
     export interface StringMap<ValueType> {
@@ -55,7 +55,8 @@ module App {
                     // Transform Resource object to JSON
                     var newSchema: IJsonSchema = {
                         type: 'object',
-                        properties: response.data.properties
+                        properties: response.data.properties,
+                        resourceTypeUrl: response.data['resourceTypeUrl']
                     };
 
                     if (response.data.hasOwnProperty('form')) {
@@ -81,7 +82,7 @@ module App {
                 type: (formItem, schemaItem) => {
                     var paramType: string = formItem.type;
                     if (paramType in customTypeParsers) {
-                        customTypeParsers[paramType](formItem, schemaItem);
+                        customTypeParsers[paramType](formItem, schemaItem, schema);
                     } else {
                         this.$log.debug('SchemaService: no mapping known for type: ' + paramType);
                         schema.type = paramType;

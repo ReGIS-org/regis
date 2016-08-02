@@ -1,0 +1,24 @@
+<div class="s3d form-container">
+    <h2>Overview</h2>
+    <i ng-if="vm.status" ng-bind="vm.status"></i>
+    <table class="table table-condensed small" ng-if="!vm.status">
+        <tr>
+            <th colspan="4">Jobs</th>
+        </tr>
+        <tr>
+            <th>JobId</th>
+            <th>Running</th>
+            <th>Hostname</th>
+            <th>Method</th>
+        </tr>
+
+        <tr ng-repeat="(key, job) in vm.jobs">
+            <td ng-bind="::key"></td>
+            <td class="text-center">
+                <span ng-if="job.start > 0" class="glyphicon glyphicon-check"></span>&nbsp;
+            </td>
+            <td ng-bind="::job.hostname"></td>
+            <td ng-bind="::job.method"></td>
+        </tr>
+    </table>
+</div>

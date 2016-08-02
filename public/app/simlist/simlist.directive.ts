@@ -106,11 +106,20 @@ module App {
         public addAttachmentLayers(task: ITask) {
             this.viewTask(task, 'files');
             if (task.files) {
-                Object.keys(task.files).forEach(name => this.SimWebService.visualize(task, name));
+                Object.keys(task.files).forEach(name => {
+                    if (task.files[name].content_type === 'application/json') {
+                        this.SimWebService.visualize(task, name);
+                    }
+                });
             }
             if (task._attachments) {
-                Object.keys(task._attachments).forEach(name => this.SimWebService.visualize(task, name));
+                Object.keys(task._attachments).forEach(name => {
+                    if (task._attachments[name].content_type === 'application/json') {
+                        this.SimWebService.visualize(task, name);
+                    }
+                });
             }
+            this.SimWebService.visualizeInput(task);
         }
 
         public viewTask(task: ITask, activeTab: string) {
