@@ -97,6 +97,33 @@
     "baselayers": {},
     "groups": [
     {
+        "id": "Testlayer",
+        "languages": {
+            "en": {
+                "title": "Test Layer",
+                "description": "SimCity layers manipulation buttons"
+            }
+        },
+        "layers": [
+            {
+                 "id": "FirePaths",
+                 "reference": "firepaths",
+                 "languages": {
+                     "en": {
+                         "title": "Fire Paths",
+                         "description": "Emergency response time for each ward"
+                     }
+                 },
+                 "type": "GeoJson",
+                 "url": "data/projects/simcity/resources/Firepaths.json",
+                 "typeUrl": "data/projects/simcity/resources/matsim.json",
+                 "enabled": false,
+                 "opacity": 50
+
+            }
+        ]
+    },
+    {
         "id": "SimCity",
         "languages": {
             "en": {
