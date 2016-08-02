@@ -108,6 +108,17 @@
     }, {
         "languages": {
             "en": {
+                "title": "Bhuvan layers (dynamic)",
+                "description": "Bhuvan layers from OWS"
+            }
+        },
+        "clustering": true,
+        "layers": [],
+        "owsurl": "/bhuvan/gwc/service/wms?service=wms&request=getCapabilities",
+        "owsgeojson": false
+    }, {
+        "languages": {
+            "en": {
                 "title": "Vector layers (dynamic)",
                 "description": "SimCity vector layers from OWS"
             }
