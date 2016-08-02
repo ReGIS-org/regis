@@ -23,6 +23,7 @@ module App {
         private status: string;
         private tab: string;
         private hasAttachments: boolean;
+        private webserviceUrl: string;
 
         public static $inject = ['SimWebService', 'SimAdminService', '$log', '$scope', 'layerService', 'messageBusService'];
 
@@ -49,6 +50,8 @@ module App {
             if (!this.tab && parameters.hasOwnProperty('tab')) {
                 this.tab = parameters.tab;
             }
+
+            this.SimAdminService.getWebserviceUrl().then(webserviceUrl => this.webserviceUrl = webserviceUrl);
 
             this.status = 'Loading task...';
             this.task = null;
