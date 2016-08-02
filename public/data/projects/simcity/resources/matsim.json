@@ -46,6 +46,15 @@
             },
             "propertyTypeKeys": "ward_name;ward_no;cmc_mc_nm;tot_p;first_responder;second_responder",
             "u": "bower_components/csweb/dist-bower/images/marker.png"
+        },
+        "FirePath": {
+            "id": "SimCity#FirePath",
+            "name": "FirePath",
+            "propertyTypeKeys": "departure;arrival;responsetime;finish;return",
+            "style": {
+                "drawingMode": "Line"
+            },
+            "u": "bower_components/csweb/dist-bower/images/marker.png"
         }
     },
     "propertyTypeData": {
@@ -96,6 +105,46 @@
             "label": "tot_p",
             "type": "number",
             "title": "Total Population",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "departure": {
+            "label": "departure",
+            "type": "number",
+            "title": "Departure",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "arrival":{
+            "label": "arrival",
+            "type": "number",
+            "title": "Arrival",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "responsetime":{
+            "label": "responsetime",
+            "type": "number",
+            "title": "Response Time",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "finish": {
+            "label": "finsh",
+            "type": "number",
+            "title": "Finish",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "return": {
+            "label": "return",
+            "type": "number",
+            "title": "Return",
             "canEdit": false,
             "isSearchable": true,
             "visibleInCallOut": true
