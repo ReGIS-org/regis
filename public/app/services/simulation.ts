@@ -95,6 +95,14 @@ module App {
         startDate?: Date;
     }
 
+    export interface IHost {
+        default: boolean;
+    }
+
+    export interface ISimWebObject<RowContent> {
+        [key: string] : RowContent;
+    }
+
     /**
      * Interface to the SIM-CITY webservice
      *
@@ -147,7 +155,7 @@ module App {
         /** Start a job on the infrastructure. */
         public startJob(host: string = null): ng.IPromise<any> {
             return this.SimAdminService.getWebserviceUrl()
-                .then(webserviceUrl => this.$http.post(host ? webserviceUrl + '/job/' + host : webserviceUrl + '/job', null))
+                .then(webserviceUrl => this.$http.post(host ? webserviceUrl + '/job?host=' + host : webserviceUrl + '/job', null))
                 .then(null, response => {
                     if (response.status === 503) {
                         response.message = 'Already enough jobs running';
@@ -159,9 +167,14 @@ module App {
                 });
         }
 
-        public listJobs() : ng.IHttpPromise<ISimWebList<IJob>> {
+        public jobs() : ng.IHttpPromise<ISimWebList<IJob>> {
             return this.SimAdminService.getWebserviceUrl()
                 .then(webserviceUrl => this.$http.get(webserviceUrl + '/view/jobs/'));
+        }
+
+        public hosts() : ng.IHttpPromise<ISimWebObject<IHost>> {
+            return this.SimAdminService.getWebserviceUrl()
+                .then(webserviceUrl => this.$http.get(webserviceUrl + '/hosts/'));
         }
 
         /** List possible simulators. */

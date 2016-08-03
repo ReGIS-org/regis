@@ -1,5 +1,7 @@
 module App {
     import MessageBusHandle = csComp.Services.MessageBusHandle;
+    import ISimWebObject = App.ISimWebObject;
+    import IHost = App.IHost;
 
     angular
         .module('csWebApp')
@@ -22,6 +24,9 @@ module App {
         private status: string;
         private subscriptions: MessageBusHandle[];
 
+        private hosts: string[];
+        private selectedHost: string;
+
         public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', 'layerService', '$interval', '$scope', '$log',
                                  'SimTaskService'];
 
@@ -34,12 +39,24 @@ module App {
                     private $log: ng.ILogService,
                     private SimTaskService: App.SimTaskService) {
             this.subscriptions = [];
+            this.hosts = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
             this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data: App.SimAdminMessage): void => {
                 if (title === 'simulation-changed') {
                     this.updateView();
                 }
             }));
+
+            this.selectedHost = null;
+            this.SimWebService.hosts().then(result => {
+                let hostList : ISimWebObject<IHost> = result.data;
+                Object.keys(hostList).forEach(hostname => {
+                    this.hosts.push(hostname);
+                    if (hostList[hostname].default) {
+                        this.selectedHost = hostname;
+                    }
+                });
+            });
             this.$interval(this.updateView, 10000);
             this.jobs = {};
             this.updateView();
@@ -57,6 +74,11 @@ module App {
             this.subscriptions = [];
         }
 
+        public startJob() {
+            this.SimWebService.startJob(this.selectedHost)
+            .then(() => this.updateView());
+        }
+
         /**
          * Callback function for when the view may be updated.
          * @see http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript
@@ -64,7 +86,7 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateView = (): ng.IPromise<void> => {
-            return this.SimWebService.listJobs()
+            return this.SimWebService.jobs()
                 .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<IJob>>) => {
                     this.jobs = {};
                     response.data.rows.forEach(el => {

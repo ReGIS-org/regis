@@ -1,5 +1,17 @@
 <div class="s3d form-container">
     <h2>Jobs</h2>
+    <div id="jobSubmitForm" class="inline-form pull-right">
+        <div>
+            <button class="btn btn-primary" ng-click="vm.updateView()">Refresh</button>
+            <label for="hostSelect">Start job on:</label>
+            <select name="hostSelect"
+                class="btn btn-default"
+                data-ng-model="vm.selectedHost"
+                data-ng-options="item for item in vm.hosts">
+            </select>
+            <button class="btn btn-primary" ng-click="vm.startJob()">Start</button>
+        </div>
+    </div>
     <i ng-if="vm.status" ng-bind="vm.status"></i>
     <table class="table table-condensed small" ng-if="!vm.status">
         <tr>
@@ -17,7 +29,7 @@
             </td>
             <td ng-bind="::job.hostname"></td>
             <td ng-bind="::job.method"></td>
-            <td><time am-time-ago="job.startDate"></time></td>
+            <td><time ng-if="job.start > 0" am-time-ago="job.startDate"></time></td>
         </tr>
     </table>
 </div>
