@@ -1,15 +1,13 @@
 <div class="s3d form-container">
-    <h2>Overview</h2>
+    <h2>Jobs</h2>
     <i ng-if="vm.status" ng-bind="vm.status"></i>
     <table class="table table-condensed small" ng-if="!vm.status">
-        <tr>
-            <th colspan="4">Jobs</th>
-        </tr>
         <tr>
             <th>JobId</th>
             <th>Running</th>
             <th>Hostname</th>
             <th>Method</th>
+            <th>Started</th>
         </tr>
 
         <tr ng-repeat="(key, job) in vm.jobs">
@@ -19,6 +17,7 @@
             </td>
             <td ng-bind="::job.hostname"></td>
             <td ng-bind="::job.method"></td>
+            <td><time am-time-ago="job.startDate"></time></td>
         </tr>
     </table>
 </div>

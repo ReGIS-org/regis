@@ -40,7 +40,7 @@ module App {
                     this.updateView();
                 }
             }));
-            this.$interval(this.updateView, 100000);
+            this.$interval(this.updateView, 10000);
             this.jobs = {};
             this.updateView();
         }
@@ -69,6 +69,8 @@ module App {
                     this.jobs = {};
                     response.data.rows.forEach(el => {
                         this.jobs[el.key] = el.value;
+                        this.jobs[el.key].startDate = new Date();
+                        this.jobs[el.key].startDate.setTime(el.value.start * 1000);
                     });
                     if (this.status) {
                         delete this.status;

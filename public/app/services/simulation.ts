@@ -32,6 +32,19 @@ module App {
         rows: {id: string, key: string, value: RowContent}[];
     }
 
+    /** Project Layer Subset needed for creation */
+    export interface ILayerDescription {
+        id: string;
+        title: string;
+        type: 'geojson' | 'editablegeojson';
+        url?: string;
+        timeAware?: boolean;
+        opacity?: number;
+        typeUrl?: string;
+        defaultFeatureType?: string;
+        data?: {[key: string] : any};
+    }
+
     /** Task data. */
     export interface ITask {
         _id: string;  // ID
@@ -74,7 +87,12 @@ module App {
 
     /** Job data. */
     export interface IJob {
-
+        queue: number;
+        start: number;
+        done: number;
+        hostname: string;
+        method: string;
+        startDate?: Date;
     }
 
     /**
@@ -254,13 +272,28 @@ module App {
                 let groupId = task.input.ensemble + '_' + task.input.simulation;
                 let group = this.layerService.findGroupById(groupId);
                 if (group === null) {
-                    group = this.createGroup(groupId, task);
+                    let title = task.input.ensemble + ': ' + task.input.simulation;
+                    group = this.createGroup(groupId, title);
                 }
 
                 // Add the data as a layer
                 let layerId = task._id + '_' + name;
                 if (!this.layerService.findLayer(layerId)) {
-                    let newLayer = this.createLayer(layerId, task, group, name, url);
+                    let layerDescription: ILayerDescription = {
+                        id: layerId,
+                        title: name,
+                        type: 'geojson',
+                        url: url,
+                        timeAware: false,
+                        opacity: 75,
+                    };
+                    if (task.typeUrl) {
+                        layerDescription.typeUrl = task.typeUrl;
+                    }
+                    if (task.defaultFeatureType) {
+                        layerDescription.defaultFeatureType = task.defaultFeatureType;
+                    }
+                    let newLayer = this.createLayer(layerDescription, group);
 
                     this.messageBusService.publish('layer', 'initialized', newLayer);
                     this.messageBusService.notify('Result added', 'Results from file <b>' + name +
@@ -274,9 +307,8 @@ module App {
             });
         }
 
-        public createGroup(groupId, task) : ProjectGroup {
+        public createGroup(groupId: string, title: string) : ProjectGroup {
             let newGroup = new ProjectGroup();
-            let title = task.input.ensemble + ': ' + task.input.simulation;
             newGroup.id = groupId;
             newGroup.languages = {
                 'en': {
@@ -294,29 +326,13 @@ module App {
             return group;
         }
 
-        public createLayer(layerId: string, task: ITask, group: ProjectGroup, name: string, url?: string): ProjectLayer {
-            let newLayer = new ProjectLayer();
-
-            newLayer.id = layerId;
-            newLayer.title = name;
-            newLayer.type = 'geojson';
-            newLayer.renderType = 'geojson';
-            if (url) {
-                newLayer.url = url;
-            }
-            newLayer.timeAware = false;
-            newLayer.opacity = 75;
-
-            if (task.hasOwnProperty('typeUrl')) {
-                newLayer.typeUrl = task.typeUrl;
-            }
-            if (task.hasOwnProperty('defaultFeatureType')) {
-                newLayer.defaultFeatureType = task.defaultFeatureType;
-            }
-
+        public createLayer(layerDescription: ILayerDescription, group: ProjectGroup): ProjectLayer {
+            let newLayer : ProjectLayer = $.extend(new ProjectLayer(), layerDescription);
 
             this.layerService.initLayer(group, newLayer);
             group.layers.push(newLayer);
+
+            this.messageBusService.publish('layer', 'created', newLayer);
 
             return newLayer;
         }
@@ -331,13 +347,23 @@ module App {
                     let groupId = task.input.ensemble + '_' + task.input.simulation;
                     let group = this.layerService.findGroupById(groupId);
                     if (group === null) {
-                        group = this.createGroup(groupId, task);
+                        let title = task.input.ensemble + ': ' + task.input.simulation;
+                        group = this.createGroup(groupId, title);
                     }
 
                     if (task.input.hasOwnProperty(key)) {
                         let layer = this.layerService.findLayer(layerId);
                         if (!layer) {
-                            layer = this.createLayer(layerId, task, group, layerId);
+                            let layerDescription : ILayerDescription = {
+                                id: layerId,
+                                title: layerId,
+                                type: 'geojson',
+                                typeUrl: task.typeUrl,
+                                defaultFeatureType: task.defaultFeatureType,
+                                timeAware: false,
+                                opacity: 75,
+                            };
+                            layer = this.createLayer(layerDescription, group);
                         }
                         layer.data = {
                             type: 'featureCollection',
