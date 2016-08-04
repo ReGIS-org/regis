@@ -25,8 +25,8 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="task in vm.tasks | orderBy:['input.ensemble', 'input.simulation'] | filter:searchText track by task._id">
-                        <td ng-bind="::task.input.ensemble"></td>
-                        <td ng-bind="::task.input.simulation"></td>
+                        <td ng-bind-template="{{::task.input.ensemble | limitTo:15}}{{::task.input.ensemble.length>15 ? '&hellip;' : ''}}"></td>
+                        <td ng-bind-template="{{::task.input.simulation | limitTo:15}}{{::task.input.simulation.length>15 ? '&hellip;' : ''}}"></td>
                         <td ng-switch="task.done">
                             <span ng-switch-when="-1" title="simulation error" class="glyphicon glyphicon-warning-sign"></span>
                             <span ng-switch-when="0" title="no output" class="glyphicon glyphicon-eye-close"></span>
