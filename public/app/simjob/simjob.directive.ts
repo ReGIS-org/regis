@@ -19,15 +19,20 @@ module App {
             };
         }]);
 
+    export interface SimJobScope extends ng.IScope {
+        loading: boolean;
+    }
+
     export class SimJobController {
         private jobs: { [key:string]:IJob };
         private status: string;
         private subscriptions: MessageBusHandle[];
+        private update: ng.IPromise<void>;
 
         private hosts: string[];
         private selectedHost: string;
 
-        public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', 'layerService', '$interval', '$scope', '$log',
+        public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', 'layerService', '$interval', '$timeout', '$q', '$scope', '$log',
                                  'SimTaskService'];
 
         constructor(private SimAdminService: App.SimAdminService,
@@ -35,7 +40,9 @@ module App {
                     private messageBusService: csComp.Services.MessageBusService,
                     private layerService: csComp.Services.LayerService,
                     private $interval: ng.IIntervalService,
-                    private $scope: ng.IScope,
+                    private $timeout: ng.ITimeoutService,
+                    private $q: ng.IQService,
+                    private $scope: SimJobScope,
                     private $log: ng.ILogService,
                     private SimTaskService: App.SimTaskService) {
             this.subscriptions = [];
@@ -57,7 +64,7 @@ module App {
                     }
                 });
             });
-            this.$interval(this.updateView, 10000);
+            this.update = this.$interval(this.updateView, 10000);
             this.jobs = {};
             this.updateView();
         }
@@ -72,11 +79,14 @@ module App {
                 this.messageBusService.unsubscribe(handle);
             });
             this.subscriptions = [];
+            this.$interval.cancel(this.update);
         }
 
         public startJob() {
             this.SimWebService.startJob(this.selectedHost)
-            .then(() => this.updateView());
+            .then(() => this.updateView(), (response) => {
+                this.messageBusService.notifyError('Failed to start job', response.message);
+            });
         }
 
         /**
@@ -85,29 +95,35 @@ module App {
          * @see http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
-        public updateView = (): ng.IPromise<void> => {
-            return this.SimWebService.jobs()
-                .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<IJob>>) => {
-                    this.jobs = {};
-                    response.data.rows.forEach(el => {
-                        this.jobs[el.key] = el.value;
-                        this.jobs[el.key].startDate = new Date();
-                        this.jobs[el.key].startDate.setTime(el.value.start * 1000);
-                    });
-                    if (this.status) {
-                        delete this.status;
-                    }
-                }, response => {
-                    if (this.status) {
-                        var status;
-                        if (response.status === 0) {
-                            status = '';
-                        } else {
-                            status = '(code ' + response.status + ')';
+        public updateView = () => {
+            if (!this.$scope.loading) {
+                this.$scope.loading = true;
+                this.$q.all([
+                    this.$timeout(1000),
+                    this.SimWebService.jobs()
+                    .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<IJob>>) => {
+                        this.jobs = {};
+                        response.data.rows.forEach(el => {
+                            this.jobs[el.key] = el.value;
+                            this.jobs[el.key].startDate = new Date();
+                            this.jobs[el.key].startDate.setTime(el.value.start * 1000);
+                        });
+                        if (this.status) {
+                            delete this.status;
                         }
-                        this.status = 'Cannot load job overview ' + status;
-                    }
-                });
-        };
+                    }, response => {
+                        if (this.status) {
+                            var status;
+                            if (response.status === 0) {
+                                status = '';
+                            } else {
+                                status = '(code ' + response.status + ')';
+                            }
+                            this.status = 'Cannot load job overview ' + status;
+                        }
+                    })])
+                    .finally(() => this.$scope.loading = false);
+            };
+        }
     }
 }

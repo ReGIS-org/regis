@@ -29,6 +29,7 @@ module App {
         private subscriptions: MessageBusHandle[];
         private widget: IWidget;
         private formId: string;
+        private update: ng.IPromise<void>;
 
         public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', 'layerService', '$interval', '$scope', '$log',
                                  'SimTaskService'];
@@ -53,7 +54,7 @@ module App {
             }));
             this.subscriptions.push(this.messageBusService.subscribe('project', (title: string, data?: any): void => {
                 if (title === 'loaded') {
-                    this.$interval(this.updateView, 100000);
+                    this.update = this.$interval(this.updateView, 100000);
                     this.widget = this.layerService.findWidgetById(this.formId);
                 }
             }));
@@ -75,6 +76,7 @@ module App {
                 this.messageBusService.unsubscribe(handle);
             });
             this.subscriptions = [];
+            this.$interval.cancel(this.update);
         }
 
         /**
