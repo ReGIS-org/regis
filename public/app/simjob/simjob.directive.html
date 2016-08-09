@@ -1,15 +1,34 @@
 <div class="s3d form-container">
-    <h2>Overview</h2>
+    <h2>Jobs</h2>
+    <div id="jobSubmitForm" class="inline-form pull-right">
+        <div>
+            <button class="btn btn-primary" ng-click="vm.updateView()">
+                <span data-ng-class="{isLoading: loading}">Refresh</span>
+                <div data-ng-show="loading" id="jobspinner">
+                    <div class="spinner" style="top: 25px;margin-left: 12px;">
+                        <div class="bounce1" style="background-color: white;"></div>
+                        <div class="bounce2" style="background-color: white;"></div>
+                        <div class="bounce3" style="background-color: white;"></div>
+                    </div>
+                </div>
+            </button>
+            <label for="hostSelect">Start job on:</label>
+            <select name="hostSelect"
+                class="btn btn-default"
+                data-ng-model="vm.selectedHost"
+                data-ng-options="item for item in vm.hosts">
+            </select>
+            <button class="btn btn-primary" ng-click="vm.startJob()">Start</button>
+        </div>
+    </div>
     <i ng-if="vm.status" ng-bind="vm.status"></i>
     <table class="table table-condensed small" ng-if="!vm.status">
-        <tr>
-            <th colspan="4">Jobs</th>
-        </tr>
         <tr>
             <th>JobId</th>
             <th>Running</th>
             <th>Hostname</th>
             <th>Method</th>
+            <th>Started</th>
         </tr>
 
         <tr ng-repeat="(key, job) in vm.jobs">
@@ -17,8 +36,9 @@
             <td class="text-center">
                 <span ng-if="job.start > 0" class="glyphicon glyphicon-check"></span>&nbsp;
             </td>
-            <td ng-bind="::job.hostname"></td>
+            <td ng-bind="job.hostname"></td>
             <td ng-bind="::job.method"></td>
+            <td><time ng-if="job.start > 0" am-time-ago="job.startDate"></time></td>
         </tr>
     </table>
 </div>

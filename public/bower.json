@@ -33,6 +33,7 @@
     "angularUtils-pagination": "angular-utils-pagination#^0.11.1",
     "font-awesome": "^4.6.3",
     "bootstrap": "^3.3.6",
-    "font-awesome-extension": "*"
+    "font-awesome-extension": "*",
+    "angular-moment": "^0.10.3"
   }
 }

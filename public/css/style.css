@@ -56,3 +56,21 @@ div#sim-form .schema-form-fieldset {
 .schema-form-fieldset .control-label {
     width: initial;
 }
+
+#jobSubmitForm {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+#jobSubmitForm .btn-primary span.isLoading {
+    color: #337ab7;
+    text-shadow: none;
+}
+
+#jobSubmitForm .btn-primary:hover span.isLoading,
+#jobSubmitForm .btn-primary:active span.isLoading,
+#jobSubmitForm .btn-primary:focus span.isLoading,
+#jobSubmitForm .btn-primary:visited span.isLoading {
+    color: #286090;
+}

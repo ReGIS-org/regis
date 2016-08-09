@@ -239,7 +239,7 @@ module App {
                         '<div ng-if="item.id" ng-click="form.selectFeature(item.id)">{{::item.name}}: {{::item.id}}</div>' +
                         '<div ng-if="!item.id">({{item.x}}, {{item.y}})</div>';
                 },
-                layer: (formItem, _schemaItem) => {
+                layer: (formItem, _schemaItem, schema) => {
                     // A layer schema element means the parameter requires
                     // specific features from the map (typically a point2d)
                     formItem.type = 'array';
@@ -249,7 +249,7 @@ module App {
                     let key = formItem.key;
 
                     // Check if layer exists, and if not create it.
-                   this.checkAndCreateLayer(layerId);
+                   this.checkAndCreateLayer(layerId, schema.resourceTypeUrl);
 
                     // Subscribe to feature update messages
                     let subscription = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
@@ -323,38 +323,41 @@ module App {
 
         private resetLayers() {
             let group = this.layerService.findGroupById(this.layerGroup);
-            group.layers.forEach((layer: csComp.Services.IProjectLayer) => {
-                // unfortunately there is no reset layer function
-                layer.data.features.forEach(f => layer.layerSource.service.removeFeature(f));
-            });
+            if (group && group.layers) {
+                group.layers.forEach((layer: csComp.Services.IProjectLayer) => {
+                    // unfortunately there is no reset layer function
+                    layer.data.features.forEach(f => layer.layerSource.service.removeFeature(f));
+                });
+            }
             this.formLayers = [];
         }
 
         /**
          * Check if the specified layer exists, and if it doesn't, create it.
          */
-        private checkAndCreateLayer(layerId: string) {
+        private checkAndCreateLayer(layerId: string, typeUrl: string) {
             let layer = this.layerService.findLayer(layerId);
             if (!layer) {
-                layer = new ProjectLayer();
                 let group = this.layerService.findGroupById(this.layerGroup);
+                if (!group) {
+                    group = this.SimWebService.createGroup(this.layerGroup, this.layerGroup);
+                }
 
-                layer.id = layerId;
-                layer.type = 'editablegeojson';
-                layer.renderType = 'geojson';
-                layer.typeUrl = '/explore/resource/matsim';
-                // For some reason using .timeAware gives an error when compiling
-                layer.timeAware = false;
-                layer.data = {
-                    'type': 'FeatureCollection',
-                    'properties': {},
-                    'features': []
+                let layerDescription : ILayerDescription = {
+                    id: layerId,
+                    title: layerId,
+                    type: 'editablegeojson',
+                    typeUrl: typeUrl,
+                    timeAware: false,
+                    opacity: 75,
+                    data: {
+                        'type': 'FeatureCollection',
+                        'properties': {},
+                        'features': []
+                    }
                 };
 
-                this.layerService.initLayer(group, layer);
-                group.layers.push(layer);
-
-                this.messageBusService.publish('layer', 'created', layer);
+                layer = this.SimWebService.createLayer(layerDescription, group);
             }
             // remember that we need this layer
             this.formLayers.push(layer.id);

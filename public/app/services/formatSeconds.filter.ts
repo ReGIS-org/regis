@@ -1,12 +1,12 @@
 module App {
 
     angular.module('csWebApp')
-        .filter('formatSeconds', formatSeconds);
+        .filter('formatSeconds', ['$filter', formatSeconds]);
 
-    function formatSeconds() {
+    function formatSeconds($filter) {
         return (seconds: number, defaultString: string): string => {
             if (seconds > 0) {
-                return new Date(seconds * 1000).toString();
+                return $filter('amDateFormat')(new Date(seconds * 1000), 'YYYY-MM-DD HH:mm:ss');
             } else {
                 return defaultString || '';
             }

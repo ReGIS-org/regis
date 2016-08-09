@@ -21,6 +21,7 @@
         "public/app/services/simulation.ts",
         "public/app/simadmin/simadmin.directive.ts",
         "public/app/simform/simform.directive.ts",
+        "public/app/simjob/simjob.directive.ts",
         "public/app/simlist/simlist.directive.ts",
         "public/app/simsummary/simsummary.directive.ts",
         "public/app/simtask/simtask.directive.ts",

@@ -17,10 +17,11 @@ module App {
             private status: string;
             private tasks: any[];
             private subscriptions: csComp.Services.MessageBusHandle[];
+            private update: ng.IPromise<void>;
 
             public static $inject = ['$interval', 'messageBusService', 'SimAdminService', 'SimWebService'];
             constructor(
-                $interval: ng.IIntervalService,
+                private $interval: ng.IIntervalService,
                 private messageBusService: csComp.Services.MessageBusService,
                 private SimAdminService: App.SimAdminService,
                 private SimWebService: App.SimWebService) {
@@ -31,7 +32,7 @@ module App {
                 this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.loadOverview));
 
                 //Put in interval, first trigger after 10 seconds
-                $interval(this.loadOverview, 10000);
+                this.update = this.$interval(this.loadOverview, 10000);
                 //invoke initialy
                 this.loadOverview();
             }
@@ -41,6 +42,7 @@ module App {
                     this.messageBusService.unsubscribe(handle);
                 });
                 this.subscriptions = [];
+                this.$interval.cancel(this.update);
             }
 
             /**
