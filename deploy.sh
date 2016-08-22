@@ -41,9 +41,9 @@ STAGING=/srv/staging/app/$NAME
 RELEASE=/srv/https/app/$RELEASENAME
 
 confirm "Upload to $STAGING and release to $RELEASE?" &&
-echo "==== RUNNING GULP  ====" && gulp clean && gulp && cd public &&
-echo "==== COMPRESSING   ====" && tar cHjf $FILE * .[^.]* &&
-echo "==== COPYING FILE  ====" && ssh sim-city "mkdir $STAGING" && scp $FILE sim-city:$STAGING &&
+echo "==== RUNNING GULP  ====" && gulp clean init && cd public &&
+echo "==== COMPRESSING   ====" && tar cLjf "../$FILE" $(ls -A) &&
+echo "==== COPYING FILE  ====" && ssh sim-city "mkdir $STAGING" && scp "../$FILE" sim-city:$STAGING &&
 echo "==== RELEASING     ====" && ssh sim-city "cd $STAGING && tar xjf $FILE && rm $FILE && ln -s $STAGING ../$RELEASENAME && mv -T ../$RELEASENAME $RELEASE" &&
-rm $FILE
+rm "../$FILE"
 
