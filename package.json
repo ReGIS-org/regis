@@ -16,7 +16,7 @@
   "dependencies": {
     "csweb": "~0.2.16-rc1",
     "winston": "~2.2.0",
-    "chokidar": "~1.4.3"
+    "chokidar": "~1.6.0"
   },
   "devDependencies": {
     "csweb-offline-search": "~0.1.0",

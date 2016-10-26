@@ -191,11 +191,12 @@ gulp.task('deploy-githubpages', function() {
         }));
 });
 
-gulp.task('serve', function() {
+gulp.task('serve', ['init'], function() {
     nodemon({
         script: 'server.js'
       , verbose: false
-      , ext: 'js html'
+      , legacyWatch: true
+      , ext: 'ts js html'
       , env: { 'NODE_ENV': 'development' }
     })
 });

@@ -53,7 +53,7 @@
                 </tr>
                 <tr ng-repeat="(name, attachment) in ::vm.task.filelist track by name">
                     <td ng-bind="::name"></td><td ng-bind="::attachment.length | formatBytes" class="text-right"></td><td>
-                    <a href ng-if="::attachment.content_type === 'application/json'" title="Show on map" ng-click="vm.visualize(name)" class="file-output"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a href ng-if="attachment.content_type === 'application/json' || attachment.content_type === 'application/vnd.geo+json'" title="Show on map" ng-click="vm.visualize(name)" class="file-output"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a ng-href="{{::vm.webserviceUrl}}/simulation/{{::vm.task._id}}/{{::name}}" title="download" download="{{::vm.task._id}}_{{::name}}" target="_self" class="file-output"><span class="glyphicon glyphicon-download-alt"></span></a>
                 </td>
                 </tr>

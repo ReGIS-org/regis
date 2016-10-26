@@ -1,6 +1,6 @@
 {
-    "title": "SimCity",
-    "description": "Description for SimCity",
+    "title": "Kumbh Mela",
+    "description": "Description for Kumbh Mela",
     "url": "https://github.com/NLeSC/sim-city-cs",
     "connected": true,
     "isDynamic": false,
@@ -157,9 +157,9 @@
             "timeaware": false
         }]
     }],
-    "simulationEngines": [{
-        "name": "MatSim",
-        "launcher": "/explore/simulate/matsim/0.5",
-        "results": "/couchdb/simcity/_design/matsim_0.5/_view/all_docs"
-    }]
+    "simAdmin": {
+        "webserviceUrl": "/explore",
+        "simulationName": "",
+        "simulationVersion": ""
+    }
 }

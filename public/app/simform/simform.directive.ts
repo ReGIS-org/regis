@@ -123,12 +123,6 @@ module App {
                 }
             }));
 
-            this.subscriptions.push(this.messageBusService.subscribe('sim-admin', (title: string, data?: any): void => {
-                if (title === 'simulation-changed') {
-                    this.simulationChanged();
-                }
-            }));
-
             $scope.$on('$destroy', () => {
                 this.stop();
             });

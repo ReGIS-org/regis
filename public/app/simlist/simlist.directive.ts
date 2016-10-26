@@ -109,14 +109,16 @@ module App {
             this.viewTask(task, 'files');
             if (task.files) {
                 Object.keys(task.files).forEach(name => {
-                    if (task.files[name].content_type === 'application/json') {
+                    if (task.files[name].content_type === 'application/json'
+                        || task.files[name].content_type === 'application/vnd.geo+json') {
                         this.SimWebService.visualize(task, name);
                     }
                 });
             }
             if (task._attachments) {
                 Object.keys(task._attachments).forEach(name => {
-                    if (task._attachments[name].content_type === 'application/json') {
+                    if (task._attachments[name].content_type === 'application/json'
+                        || task.files[name].content_type === 'application/vnd.geo+json') {
                         this.SimWebService.visualize(task, name);
                     }
                 });
