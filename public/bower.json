@@ -35,5 +35,8 @@
     "bootstrap": "^3.3.6",
     "font-awesome-extension": "*",
     "angular-moment": "~1.0.0-beta.6"
+  },
+  "resolutions": {
+    "angular": "1.6.0"
   }
 }
