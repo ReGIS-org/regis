@@ -243,7 +243,7 @@ module App {
                     let key = formItem.key;
 
                     // Check if layer exists, and if not create it.
-                   this.checkAndCreateLayer(layerId, schema.resourceTypeUrl);
+                    this.checkAndCreateLayer(layerId, schema.resourceTypeUrl);
 
                     // Subscribe to feature update messages
                     let subscription = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {

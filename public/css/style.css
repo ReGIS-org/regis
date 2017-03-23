@@ -52,6 +52,26 @@ div#sim-form .schema-form-fieldset {
     display: inline-block;
 }
 
+.ensemble-list h4 {
+    margin-bottom: 0px;
+    text-transform: capitalize;
+}
+
+.ensemble-list .toggle-bar {
+    cursor: pointer;
+}
+
+.ensemble-list .toggle {
+    float: left;
+    margin-left: 10px;
+    margin-top: 3px;
+    margin-right:5px;
+}
+
+.ensemble-list .ensemble-tasks {
+    margin-left: 20px;
+}
+
 /* Override csWeb control-label */
 .schema-form-fieldset .control-label {
     width: initial;

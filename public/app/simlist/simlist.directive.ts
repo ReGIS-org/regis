@@ -23,8 +23,13 @@ module App {
         show: boolean;
     }
 
+    export interface TaskEnsemble {
+        [key: string]: ITask[];
+    }
+
     export class SimListController {
         private tasks: ITask[];
+        private tasksByEnsemble: TaskEnsemble;
         private status: string;
         private subscriptions: MessageBusHandle[];
         private widget: IWidget;
@@ -64,6 +69,7 @@ module App {
                 }
             }));
             this.tasks = [];
+            this.tasksByEnsemble = {};
         }
 
         /**
@@ -89,6 +95,14 @@ module App {
             return this.SimWebService.list(this.SimAdminService.simulationName, this.SimAdminService.simulationVersion)
                 .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<ITask>>) => {
                     this.tasks = response.data.rows.map(el => el.value);
+                    var start: TaskEnsemble = {};
+                    this.tasksByEnsemble = response.data.rows.reduce(function (ensembles, cur, index): TaskEnsemble {
+                        if (!ensembles.hasOwnProperty(cur.value['input']['ensemble'])) {
+                            ensembles[cur.value['input']['ensemble']] = [];
+                        }
+                        ensembles[cur.value['input']['ensemble']].push(cur.value);
+                        return ensembles;
+                    }, start);
                     if (this.status) {
                         delete this.status;
                     }

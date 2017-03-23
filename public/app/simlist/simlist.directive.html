@@ -13,38 +13,49 @@
 
         <i ng-if="vm.status" ng-bind="vm.status"></i>
         <div class="scrolling leftpanel-scroll" ng-if="!vm.status">
-            <table class="table table-condensed">
-                <thead>
-                    <tr>
-                        <th>ensemble</th>
-                        <th>name</th>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="task in vm.tasks | orderBy:['input.ensemble', 'input.simulation'] | filter:searchText track by task._id">
-                        <td ng-bind-template="{{::task.input.ensemble | limitTo:15}}{{::task.input.ensemble.length>15 ? '&hellip;' : ''}}"></td>
-                        <td ng-bind-template="{{::task.input.simulation | limitTo:15}}{{::task.input.simulation.length>15 ? '&hellip;' : ''}}"></td>
-                        <td ng-switch="task.done">
-                            <span ng-switch-when="-1" title="simulation error" class="glyphicon glyphicon-warning-sign"></span>
-                            <span ng-switch-when="0" title="no output" class="glyphicon glyphicon-eye-close"></span>
-                            <a ng-switch-default ng-click="vm.addAttachmentLayers(task)" title="Show Output">
-                                <span title="show output" class="glyphicon glyphicon-eye-open"></span>
-                            </a>
-                        </td>
-                        <td>
-                            <a ng-click="vm.viewTask(task)" title="Show data">
-                                <span class="glyphicon glyphicon-info-sign"></span></a>
-                        </td>
-                        <td>
-                            <a ng-click="vm.remove(task)" class="text-danger" title="Remove simulation">
-                                <span class="glyphicon glyphicon-remove-circle"></span></a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="ensemble-list" ng-repeat="(name, ensemble) in vm.tasksByEnsemble">
+                <div class="toggle-bar" data-toggle="collapse" data-target="#ensemble-{{::name}}">
+                    <div class="toggle">
+                        <i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i>
+                        <i class="fa fa-chevron-right togglebutton toggle-arrow-up"></i>
+                    </div>
+                    <h4 class="group-title">{{::name | limitTo:15}}{{::name.length>15 ? '&hellip;' : ''}}</h4>
+                </div>
+                <div class="ensemble-tasks collapse in" id="ensemble-{{::name}}">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>name</th>
+                                <th>&nbsp;</th>
+                                <th>&nbsp;</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="task in ensemble | orderBy: input.simulation  | filter:searchText track by task._id">
+                                <td ng-bind-template="{{::task.input.simulation | limitTo:15}}{{::task.input.simulation.length>15 ? '&hellip;' : ''}}"></td>
+                                <td ng-switch="task.done">
+                                    <span ng-switch-when="-1" title="simulation error" class="glyphicon glyphicon-warning-sign"></span>
+                                    <span ng-switch-when="0" title="no output" class="glyphicon glyphicon-eye-close"></span>
+                                    <a ng-switch-default ng-click="vm.addAttachmentLayers(task)" title="Show Output">
+                                        <span title="show output" class="glyphicon glyphicon-eye-open"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a ng-click="vm.viewTask(task)" title="Show data">
+                                        <span class="glyphicon glyphicon-info-sign"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a ng-click="vm.remove(task)" class="text-danger" title="Remove simulation">
+                                        <span class="glyphicon glyphicon-remove-circle"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

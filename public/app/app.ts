@@ -1,14 +1,16 @@
 module App {
+    import IFeature = csComp.Services.IFeature;
+
     export interface IAppLocationService extends ng.ILocationService {
-        $$search:{ layers:string };
+        $$search: { layers: string };
     }
 
     export interface IAppScope extends ng.IScope {
-        vm:AppCtrl;
-        title:string;
-        showMenuRight:boolean;
-        featureSelected:boolean;
-        layersLoading:number;
+        vm: AppCtrl;
+        title: string;
+        showMenuRight: boolean;
+        featureSelected: boolean;
+        layersLoading: number;
         newLayers: number;
     }
 
@@ -45,13 +47,13 @@ module App {
                     private geoService: csComp.Services.GeoService) {
             sffjs.setCulture('nl-NL');
 
-            this.$scope.vm = this;
-            this.$scope.showMenuRight = false;
-            this.$scope.featureSelected = false;
-            this.$scope.layersLoading = 0;
-            this.$scope.newLayers = 0;
+            $scope.vm = this;
+            $scope.showMenuRight = false;
+            $scope.featureSelected = false;
+            $scope.layersLoading = 0;
+            $scope.newLayers = 0;
 
-            this.$messageBusService.subscribe('project', (action:string) => {
+            $messageBusService.subscribe('project', (action: string) => {
                 if (action === 'loaded') {
                     this.areaFilter = new AreaFilter.AreaFilterModel();
                     this.$layerService.addActionService(this.areaFilter);
@@ -64,8 +66,8 @@ module App {
                 }
             });
 
-            this.$messageBusService.subscribe('feature', this.featureMessageReceived);
-            this.$messageBusService.subscribe('layer', this.layerMessageReceived);
+            $messageBusService.subscribe('feature', this.featureMessageReceived);
+            $messageBusService.subscribe('layer', this.layerMessageReceived);
 
             this.$layerService.visual.rightPanelVisible = false; // otherwise, the rightpanel briefly flashes open before closing.
 
@@ -127,15 +129,9 @@ module App {
             if (this.$scope.$root.$$phase !== '$apply' && this.$scope.$root.$$phase !== '$digest') {
                 this.$scope.$apply();
             }
-        };
+        }
 
-        /**
-         * Callback function for when a feature action is performed
-         * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
-         * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
-         * @todo {notice the strange syntax, which is to preserve the this reference!}
-         */
-        private featureMessageReceived = (title: string) => {
+        private featureMessageReceived = (title: string): void => {
             switch (title) {
                 case 'onFeatureSelect':
                     this.$scope.featureSelected = true;
@@ -144,12 +140,35 @@ module App {
                     this.$scope.featureSelected = false;
                     break;
             }
-        };
-        public toggleMenu():void {
+
+        }
+
+        /**
+         * Callback function
+         * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
+         * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
+         * @todo {notice the strange syntax, which is to preserve the this reference!}
+         */
+        private sidebarMessageReceived = (title: string): void => {
+            switch (title) {
+                case 'toggle':
+                    this.$scope.showMenuRight = !this.$scope.showMenuRight;
+                    break;
+                case 'show':
+                    this.$scope.showMenuRight = true;
+                    break;
+                case 'hide':
+                    this.$scope.showMenuRight = false;
+                    break;
+                default:
+            }
+        }
+
+        public toggleMenu(): void {
             this.$mapService.invalidate();
         }
 
-        public toggleSidebar():void {
+        public toggleSidebar(): void {
             this.$messageBusService.publish('sidebar', 'toggle');
             window.console.log('Publish toggle sidebar');
         }

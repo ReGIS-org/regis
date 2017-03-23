@@ -25,6 +25,9 @@
 
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="bower_components/font-awesome-extension/font-awesome-extension.min.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap-tokenfield/dist/css/bootstrap-tokenfield.min.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap-tokenfield/dist/css/tokenfield-typeahead.min.css" />
+    <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.min.css" />
 
     <!-- build:css css/csWeb.css -->
     <link rel="stylesheet" href="bower_components/csweb/dist-bower/csWeb-dep.css" />
@@ -54,6 +57,8 @@
 
     <script src="bower_components/angularUtils-pagination/dirPagination.js"></script>
     <script src="bower_components/csweb/dist-bower/csComp.js"></script>
+    <script src="translations/locale-nl.js"></script>
+    <script src="translations/locale-en.js"></script>
     <script src="app/index.js"></script>
     <script src="app/app.js"></script>
     <script src="app/services/simadmin.js"></script>
@@ -72,15 +77,23 @@
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script src="bower_components/csweb/dist-bower/csTemplates.js"></script>
 
-    <!--<script src="bower_components/jquery/dist/jquery.min.js"></script>-->
-    <!--<script src="bower_components/angular/angular.min.js"></script>-->
     <script src="bower_components/tv4/tv4.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="bower_components/angular-ui-select/dist/select.min.js"></script>
+    <script src="bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
     <script src="bower_components/objectpath/lib/ObjectPath.js"></script>
     <script src="bower_components/angular-schema-form/dist/schema-form.min.js"></script>
     <script src="bower_components/angular-schema-form-bootstrap/bootstrap-decorator.min.js"></script>
     <script src="bower_components/moment/moment.js"></script>
     <script src="bower_components/angular-moment/angular-moment.js"></script>
+    <script src="bower_components/angular-translate/angular-translate.min.js"></script>
+    <script src="bower_components/spectrum/spectrum.js"></script>
+    <script src="bower_components/angular-spectrum-colorpicker/dist/angular-spectrum-colorpicker.min.js"></script>
+    <script src="bower_components/wiz-markdown/wizMarkdown/wizMarkdown.min.js"></script>
+    <script src="bower_components/bootstrap-tokenfield/dist/bootstrap-tokenfield.min.js"></script>
+    <script src="bower_components/angular-schema-form-tokenfield/dist/angular-schema-form-tokenfield.js"></script>
+    <script src="bower_components/pnotify/dist/pnotify.js"></script>
+    <script src="bower_components/angular-pnotify/src/angular-pnotify.js"></script>
     <!-- endbuild -->
 
     <div class="body" style="top:0">
@@ -98,7 +111,7 @@
                     <!-- Nav tabs -->
                     <ul class="nav nav-pills">
                         <!--<li class="lp-tab" data-target="#navigate" data-toggle="tab">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 64 64">
                                     <path d="M61.3 51.2l-16.1-16c1.7-3.3 2.6-7 2.6-10.8 0-6.4-2.5-12.4-7-16.9C36.3 3 30.3.5 23.9.5 17.5.5 11.5 3 7 7.5 2.5 12 0 18 0 24.4c0 6.4 2.5 12.4 7 16.9 4.5 4.5 10.5 7 16.9 7 3.8 0 7.5-.9 10.8-2.6l16 16.1c1.5 1.5 3.4 2.2 5.3 2.2s3.8-.7 5.3-2.2c2.9-3 2.9-7.7 0-10.6zm-48-16.3c-2.8-2.8-4.4-6.6-4.4-10.6s1.6-7.8 4.4-10.6c2.8-2.8 6.6-4.4 10.6-4.4s7.8 1.6 10.6 4.4c2.8 2.8 4.4 6.6 4.4 10.6s-1.6 7.8-4.4 10.6c-2.8 2.8-6.6 4.4-10.6 4.4s-7.7-1.6-10.6-4.4zm0 0"
                                     />
                                 </svg>

@@ -323,6 +323,7 @@ module App {
         public createGroup(groupId: string, title: string) : ProjectGroup {
             let newGroup = new ProjectGroup();
             newGroup.id = groupId;
+            newGroup.title = title;
             newGroup.languages = {
                 'en': {
                     'title': title,

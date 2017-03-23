@@ -27,6 +27,7 @@ var nodemon       = require('gulp-nodemon');
 /** Destination of the client/server distribution */
 var dest = 'dist/';
 var path2csWeb = '../csWeb/';
+var path2dist = './';
 // Gulp task upstream...
 // Configure gulp scripts
 // Output application name
@@ -124,7 +125,7 @@ gulp.task('tsconfig', function () {
                 preserveConstEnums: true,
                 noLib: false,
                 outDir: '.',
-                sourceMap: true,
+                sourceMap: true
             },
             filesGlob: globPattern
         }
@@ -161,18 +162,26 @@ gulp.task('install', function(cb) {
 });
 
 /** Initialiaze the project */
-gulp.task('init', function() {
-  runSequence(
+gulp.task('init', function(cb) {
+  return runSequence(
     'typings',
     'tsconfig',
-    'ts-lint',
-    'tsc'
+    'compile',
+    cb
   );
+});
+
+gulp.task('compile', function(cb) {
+    return runSequence(
+        'ts-lint',
+        'tsc',
+        cb
+    );
 });
 
 gulp.task('clean', function(cb) {
     // NOTE Careful! Removes all generated javascript files and certain folders.
-    del([
+    return del([
         'server.js',
         'server.js.map',
         'public/app/**/*.js',
@@ -191,21 +200,31 @@ gulp.task('deploy-githubpages', function() {
         }));
 });
 
-gulp.task('serve', ['init'], function() {
-    nodemon({
+gulp.task('serve', function(cb) {
+    return nodemon({
         script: 'server.js'
       , verbose: false
       , legacyWatch: true
-      , ext: 'ts js html'
+      , delayTime: 2
+      , ext: 'js html css'
+      , watch: [
+          'public/js/**',
+          'public/index.html',
+          'public/css/*.css'
+      ]
       , env: { 'NODE_ENV': 'development' }
     })
+    .on('start', ['watch'])
+    .on('change', ['watch'])
+    .on('restart', function () {
+      console.log('restarted!');
+    }, cb);
 });
 
-gulp.task('watch', function() {
-    var allSources = sources.concat(definitions);
-    return gulp.watch(allSources, ['init'])
+gulp.task('watch', function(cb) {
+    return gulp.watch(['public/**/*.ts', 'public/**/*.html'], ['compile'], cb)
 });
 
 gulp.task('deploy', ['dist_client', 'deploy-githubpages']);
 
-gulp.task('default', ['init']);
+gulp.task('default', ['compile']);
