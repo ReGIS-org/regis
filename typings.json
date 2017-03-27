@@ -16,7 +16,6 @@
     "chroma-js": "registry:dt/chroma-js#1.1.1+20160815215350",
     "cors": "registry:dt/cors#0.0.0+20160708202709",
     "crossfilter": "registry:dt/crossfilter#0.0.0+20160317120654",
-    "csweb": "file:./public/bower_components/csweb/dist-bower/csComp.d.ts",
     "d3": "github:rinzeb/DefinitelyTyped/d3/d3.d.ts#3de292f2aab5566a0030af48b9cd7bcae6392696",
     "dc": "github:rinzeb/DefinitelyTyped/dcjs/dc.d.ts#3de292f2aab5566a0030af48b9cd7bcae6392696",
     "express": "registry:dt/express#4.0.0+20160708185218",

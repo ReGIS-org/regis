@@ -23,6 +23,8 @@ var OfflineSearch = require('csweb-offline-search');
 var sourcemaps    = require('gulp-sourcemaps');
 var debug         = require('gulp-debug');
 var nodemon       = require('gulp-nodemon');
+var gulpIgnore    = require('gulp-ignore');
+var print         = require('gulp-print');
 
 /** Destination of the client/server distribution */
 var dest = 'dist/';
@@ -108,6 +110,7 @@ function buildTsconfig(config, globPattern, basedir) {
 // This task updates the typescript dependencies on tsconfig file
 gulp.task('tsconfig', function () {
     var globPattern = [
+        "./public/bower_components/csweb/dist-bower/csComp.d.ts",
         "typings/index.d.ts",
         "server.ts",
         "public/app/**/*.ts",
@@ -136,6 +139,7 @@ gulp.task('tsconfig', function () {
 gulp.task('ts-lint', function () {
     var tsProject = ts.createProject('tsconfig.json');
     return tsProject.src()
+        .pipe(gulpIgnore.exclude('*.d.ts'))
         .pipe(tslint())
         .pipe(tslint.report('prose', {
           emitError: false
@@ -146,7 +150,8 @@ gulp.task('tsc', function() {
     var tsProject = ts.createProject('tsconfig.json');
     return tsProject.src()
         .pipe(sourcemaps.init())
-        .pipe(ts(tsProject))
+        .pipe(print())
+        .pipe(tsProject())
         .pipe(sourcemaps.write('.'))
         .pipe(debug({title: 'compiled:'}))
         .pipe(gulp.dest('.'));

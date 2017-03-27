@@ -3,12 +3,20 @@
     margin-bottom: 0;
 }
 
+.ng-hide-add {
+    transition: 1s linear all;
+}
+
 .leftpanel-content > .tab-content {
     bottom: 5px;
     position: absolute;
     top: 0px;
     width: 100%;
     overflow-y: auto;
+}
+
+.leftpanel-content > .tab-content > .tab-pane {
+    width: auto;
 }
 
 .leftpanel-content #sim-admin {
