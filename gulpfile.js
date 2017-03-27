@@ -116,9 +116,9 @@ gulp.task('tsconfig', function () {
     var config = {
         tsOrder: ['**/*.ts'],
         tsConfig: {
-            version: '1.8.9',
+            version: '2.2.1',
             compilerOptions: {
-                target: 'es5',
+                target: 'es6',
                 module: 'commonjs',
                 noImplicitAny: false,
                 removeComments: false,
