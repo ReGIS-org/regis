@@ -238,12 +238,32 @@ module App {
                     // specific features from the map (typically a point2d)
                     formItem.type = 'array';
 
-                    let layerId = formItem.layer;
-                    let featureId = formItem.featureId;
-                    let key = formItem.key;
+                    let layerId, layerTitle, featureId, key;
+
+                    if (formItem.layer) {
+                        layerId = formItem.layer;
+                    } else {
+                        layerId = csComp.Helpers.getGuid();
+                    }
+                    if (formItem.layerTitle) {
+                        layerTitle = formItem.layerTitle;
+                    } else {
+                        layerTitle = layerId;
+                    }
+                    if (!formItem.featureId) {
+                        console.error('Could not find a feature id for layer' + layerTitle + ' aborting.');
+                        return;
+                    }
+                    if (!formItem.key) {
+                        console.error('Could not find the key for layer' + layerTitle + ' aborting.');
+                        return;
+                    }
+
+                    featureId = formItem.featureId;
+                    key = formItem.key;
 
                     // Check if layer exists, and if not create it.
-                    this.checkAndCreateLayer(layerId, schema.resourceTypeUrl);
+                    this.checkAndCreateLayer(layerId, layerTitle, schema.resourceTypeUrl);
 
                     // Subscribe to feature update messages
                     let subscription = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
@@ -329,7 +349,7 @@ module App {
         /**
          * Check if the specified layer exists, and if it doesn't, create it.
          */
-        private checkAndCreateLayer(layerId: string, typeUrl: string) {
+        private checkAndCreateLayer(layerId: string, layerTitle: string, typeUrl: string) {
             let layer = this.layerService.findLayer(layerId);
             if (!layer) {
                 let group = this.layerService.findGroupById(this.layerGroup);
@@ -339,7 +359,7 @@ module App {
 
                 let layerDescription : ILayerDescription = {
                     id: layerId,
-                    title: layerId,
+                    title: layerTitle,
                     type: 'editablegeojson',
                     typeUrl: typeUrl,
                     timeAware: false,

@@ -15,7 +15,8 @@ module App {
         'angularSpectrumColorpicker',
         'wiz.markdown',
 	    'ngAnimate',
-        'angularMoment'
+        'angularMoment',
+        'ngRoute'
     ])
 	.config(($compileProvider) => {
             $compileProvider.preAssignBindingsEnabled(true);
