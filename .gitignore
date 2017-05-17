@@ -5,7 +5,8 @@ typings/
 public/data/templates/
 public/data/api/
 
-public/**/*.js
+public/app/**/*.js
+public/js/appTemplates.js
 public/**/*.js.map
 public/**/*.d.ts
 
