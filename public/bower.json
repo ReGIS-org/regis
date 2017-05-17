@@ -33,5 +33,9 @@
     "angular-ui-select": "^0.19.6",
     "angular-moment": "^1.0.1",
     "angular-route": "^1.6.4"
+  },
+  "resolutions": {
+    "jquery": "^3.1.1",
+    "bootstrap": "^3.3.7"
   }
 }
