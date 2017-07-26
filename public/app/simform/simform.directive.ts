@@ -76,11 +76,12 @@ module App {
         private featureSubscriptions: MessageBusHandle[];
         private customTypeParsers: StringMap<ICustomTypeParser>;
 
-        public static $inject = ['$scope', '$log', '$q', 'SimAdminService', 'SchemaService', 'SimWebService', 'messageBusService', 'layerService'];
+        public static $inject = ['$scope', '$log', '$q', '$http', 'SimAdminService', 'SchemaService', 'SimWebService', 'messageBusService', 'layerService'];
 
         constructor(private $scope: ISimFormScope,
                     private $log: ng.ILogService,
                     private $q: ng.IQService,
+                    private $http: ng.IHttpService,
                     private SimAdminService: App.SimAdminService,
                     private SchemaService: App.SchemaService,
                     private SimWebService: App.SimWebService,
@@ -308,6 +309,45 @@ module App {
                         }
                     });
                     this.featureSubscriptions.push(subscription);
+                },
+                dataLayer: (formItem, _schemaItem, schema) => {
+                  let key = formItem.key;
+                  var g = this.layerService.findGroupById(_schemaItem.layerGroup);
+                  formItem.type = 'template';
+                  formItem.selectFeature = (item) => {
+                      let layerUrl = this.model[item.key[0]]; // selected
+
+                      this.$http({
+                        method: 'get',
+                        url: layerUrl,
+                        cache: true
+                      }).then(resp => {
+                        var columns = new Set();
+                        L.geoJson(resp.data, {
+                          onEachFeature: (feature, layer) => {
+                            for(var prop in feature.properties) {
+                              columns.add(prop);
+                            }
+                          }
+                        });
+                        console.log("We want to load layer: " + layerUrl);
+                        console.log("  layer has these columns: ");
+                        console.log(columns);
+                        console.log("  we should choose one of these columns.");
+                      });
+                  };
+                  this.model[key] = '';
+
+                  let options = '';
+                  formItem.layerURLs = {};
+                  g.layers.forEach(layer => {
+                      options += '<option value="' + layer.url + '">' + layer.title + '</option>';
+                      formItem.layerURLs[layer.id] = layer.url;
+                  });
+                  formItem.type = 'template';
+
+                  formItem.template = '<select ng-model="model[\'' + key + '\']" ng-change="form.selectFeature(form)">' + options + '</select>';
+                  formItem.template += '<br><b>Add to form: column on layer</b>';
                 }
             };
         }
