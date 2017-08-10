@@ -69,6 +69,7 @@ module App {
         private schema: IJsonSchema;
         private form: IAngularForm;
         private model: any;
+        private legend: string;
 
         /**
          * Custom type handlers
@@ -112,6 +113,7 @@ module App {
             this.model = {};
             this.featureSubscriptions = [];
             this.formLayers = [];
+            this.legend = "";
 
             // Initialize custom type mapping BEFORE getting
             // the simulation form
@@ -192,6 +194,7 @@ module App {
             this.form = [];
             this.schema = {};
             this.model = {};
+            this.legend = "";
         }
 
         /**
@@ -203,6 +206,7 @@ module App {
                     if (data != null) {
                         this.schema = data.schema;
                         this.form = data.form;
+                        this.legend = data.schema.title;
 
                         this.$scope.$broadcast('schemaFormValidate');
                     } else {
@@ -231,8 +235,7 @@ module App {
                         }
                     };
                     formItem.template =
-                        '<div ng-if="item.id" ng-click="form.selectFeature(item.id)">{{::item.name}}: {{::item.id}}</div>' +
-                        '<div ng-if="!item.id">({{item.x}}, {{item.y}})</div>';
+                        '<div>{{::item.name}}: ({{item.x | number:2}}, {{item.y | number:2}})</div>';
                 },
                 layer: (formItem, _schemaItem, schema) => {
                     // A layer schema element means the parameter requires
