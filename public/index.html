@@ -125,7 +125,7 @@
                                 </svg>
                             </li>-->
                         <li class="lp-tab " data-target="#basestyles" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate">
-                            <i class="fa fa-map" aria-hidden="true"></i>
+                            <i class="glyphicon glyphicon-globe" aria-hidden="true"></i>
                         </li>
                         <li class="lp-tab label-parent" data-target="#layers" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate" ng-click="vm.layersTabClicked()">
                             <div ng-if="newLayers>0" class="label label-layers label-success">{{newLayers}}</div>
@@ -139,8 +139,9 @@
                             <i class="fa fa-filter" aria-hidden="true"></i>
                         </li>
 
-                        <li class="lp-tab active" data-target="#simlist" data-toggle="tab">
-                            <i class="fa fa-flask" aria-hidden="true"></i>
+                        <li class="active lp-tab fa-stack" style="line-height: normal" data-target="#simlist" data-toggle="tab">
+                              <i class="fa fae-layers fa-stack-1x" style="padding: 5px 0px 0px 0px"></i>
+                              <i class="fa fa-plus fa-stack-1x" style="padding: 0px 0px 0px 30px;font-size: medium;"></i>
                         </li>
 
                         <li class="lp-tab" data-target="#settings" data-toggle="tab">
