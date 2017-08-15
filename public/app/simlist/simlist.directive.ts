@@ -97,10 +97,11 @@ module App {
                     this.tasks = response.data.rows.map(el => el.value);
                     var start: TaskEnsemble = {};
                     this.tasksByEnsemble = response.data.rows.reduce(function (ensembles, cur, index): TaskEnsemble {
-                        if (!ensembles.hasOwnProperty(cur.value['input']['ensemble'])) {
-                            ensembles[cur.value['input']['ensemble']] = [];
+                        var taskName = cur.value.input.ensemble || cur.value.input.name;
+                        if (!ensembles.hasOwnProperty(taskName)) {
+                            ensembles[taskName] = [];
                         }
-                        ensembles[cur.value['input']['ensemble']].push(cur.value);
+                        ensembles[taskName].push(cur.value);
                         return ensembles;
                     }, start);
                     if (this.status) {
