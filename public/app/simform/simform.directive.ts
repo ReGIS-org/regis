@@ -108,12 +108,8 @@ module App {
             }
 
             // Initialize the simulation form
-            this.schema = {};
-            this.form = [];
-            this.model = {};
-            this.featureSubscriptions = [];
+            this.resetForm();
             this.formLayers = [];
-            this.legend = "";
 
             // Initialize custom type mapping BEFORE getting
             // the simulation form
@@ -187,9 +183,11 @@ module App {
          * Reset the simulation form
          */
         private resetForm(): void {
-            this.featureSubscriptions.forEach(handle => {
-                this.messageBusService.unsubscribe(handle);
-            });
+            try {
+              this.featureSubscriptions.forEach(handle => {
+                  this.messageBusService.unsubscribe(handle);
+              });
+            } catch(e) { }
             this.featureSubscriptions = [];
             this.form = [];
             this.schema = {};
@@ -207,6 +205,13 @@ module App {
                         this.schema = data.schema;
                         this.form = data.form;
                         this.legend = data.schema.title;
+
+                        this.form.unshift('name'); // Push at the beginning
+                        this.schema.properties['name'] = {
+                          "type": "string",
+                          "default": this.SimAdminService.simulationName,
+                          "title": "Identifier"
+                        };
 
                         this.$scope.$broadcast('schemaFormValidate');
                     } else {

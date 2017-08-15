@@ -282,7 +282,10 @@ module App {
                 this.$log.info('visualizing ' + name + ' at: ' + url);
 
                 // Make sure the layer group exists
-                let groupId = task.input.ensemble + '_' + task.input.simulation;
+                let ensamble = task.input.ensamble || 'dynamic';
+                let simulation = task.input.simulation || 'simulation';
+                let groupId = ensamble + '_' + simulation;
+
                 let group = this.layerService.findGroupById(groupId);
                 if (group === null) {
                     let title = task.input.ensemble + ': ' + task.input.simulation;
@@ -358,7 +361,10 @@ module App {
                     let key = formItem.key;
                     let layerId = 'input-' + task._id + '-' + key;
 
-                    let groupId = task.input.ensemble + '_' + task.input.simulation;
+                    let ensamble = task.input.ensamble || 'dynamic';
+                    let simulation = task.input.simulation || 'simulation';
+                    let groupId = ensamble + '_' + simulation;
+
                     let group = this.layerService.findGroupById(groupId);
                     if (group === null) {
                         let title = task.input.ensemble + ': ' + task.input.simulation;
