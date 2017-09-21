@@ -1,5 +1,5 @@
 module App {
-    // var scripts = document.getElementsByTagName("script")
+    // var scripts = document.getElementsByTagName('script')
     // var currentScriptPath = scripts[scripts.length-1].src;
 
     import NotifyType = csComp.Services.NotifyType;
@@ -102,8 +102,8 @@ module App {
                 if (parameters.hasOwnProperty('layerGroup')) {
                     this.layerGroup = parameters.layerGroup;
                 } else {
-                    $log.warn('SimCityDirective.FormController: No layerGroup defined using SimCity');
-                    this.layerGroup = 'SimCity';
+                    $log.warn('SimFormDirective.FormController: No layerGroup defined using ReGIS');
+                    this.layerGroup = 'ReGIS';
                 }
             }
 
@@ -113,7 +113,7 @@ module App {
             this.model = {};
             this.featureSubscriptions = [];
             this.formLayers = [];
-            this.legend = "";
+            this.legend = '';
 
             // Initialize custom type mapping BEFORE getting
             // the simulation form
@@ -194,7 +194,7 @@ module App {
             this.form = [];
             this.schema = {};
             this.model = {};
-            this.legend = "";
+            this.legend = '';
         }
 
         /**
@@ -328,15 +328,15 @@ module App {
                         var columns = new Set();
                         L.geoJson(resp.data, {
                           onEachFeature: (feature, layer) => {
-                            for(var prop in feature.properties) {
+                            for (var prop in feature.properties) {
                               columns.add(prop);
                             }
                           }
                         });
-                        console.log("We want to load layer: " + layerUrl);
-                        console.log("  layer has these columns: ");
+                        console.log('We want to load layer: ' + layerUrl);
+                        console.log('  layer has these columns: ');
                         console.log(columns);
-                        console.log("  we should choose one of these columns.");
+                        console.log('  we should choose one of these columns.');
                       });
                   };
                   this.model[key] = '';

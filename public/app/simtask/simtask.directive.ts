@@ -43,7 +43,7 @@ module App {
                 this.id = parameters.id;
             }
             if (!this.id) {
-                $log.error('SimCityDirective.SimTaskController: No id provided');
+                $log.error('SimTaskDirective.SimTaskController: No id provided');
                 return;
             }
 

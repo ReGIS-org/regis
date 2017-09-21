@@ -1,5 +1,5 @@
 {
-    "version": "2.2.1",
+    "version": "2.5.1",
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
@@ -8,7 +8,8 @@
         "preserveConstEnums": true,
         "noLib": false,
         "outDir": ".",
-        "sourceMap": true
+        "sourceMap": true,
+        "typeRoots": ["node_modules/@types"]
     },
     "filesGlob": ["./public/bower_components/csweb/dist-bower/csComp.d.ts",
         "typings/index.d.ts", "server.ts", "public/app/**/*.ts",

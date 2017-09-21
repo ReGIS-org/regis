@@ -119,7 +119,7 @@ gulp.task('tsconfig', function () {
     var config = {
         tsOrder: ['**/*.ts'],
         tsConfig: {
-            version: '2.2.1',
+            version: '2.5.1',
             compilerOptions: {
                 target: 'es6',
                 module: 'commonjs',
@@ -128,7 +128,10 @@ gulp.task('tsconfig', function () {
                 preserveConstEnums: true,
                 noLib: false,
                 outDir: '.',
-                sourceMap: true
+                sourceMap: true,
+                typeRoots: [
+                    "node_modules/@types"
+                ]
             },
             filesGlob: globPattern
         }

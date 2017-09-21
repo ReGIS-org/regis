@@ -57,7 +57,7 @@ module App {
                         type: 'object',
                         properties: response.data.properties,
                         resourceTypeUrl: response.data.resourceTypeUrl,
-                        title: response.data.title || "New simulation"
+                        title: response.data.title || 'New simulation'
                     };
 
                     if (response.data.hasOwnProperty('form')) {

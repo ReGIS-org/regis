@@ -111,7 +111,7 @@ module App {
     export class SimWebService {
         public static $inject = ['SimAdminService', 'SchemaService', 'layerService', 'messageBusService', '$http', '$q', '$log'];
 
-        private simulationsCache: ng.IPromise<ISimWebSimulations>;
+        private simulationsCache: ng.IPromise<{}>;
 
         constructor(private SimAdminService: App.SimAdminService,
                     private SimSchemaService: App.SchemaService,
@@ -178,7 +178,7 @@ module App {
         }
 
         /** List possible simulators. */
-        public simulations(): ng.IPromise<ISimWebSimulations>  {
+        public simulations(): ng.IPromise<{}>  {
             return this.simulationsCache;
         }
 
