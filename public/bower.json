@@ -31,11 +31,13 @@
     "angularUtils-pagination": "angular-utils-pagination#^0.11.1",
     "font-awesome-extension": "*",
     "angular-ui-select": "^0.19.6",
-    "angular-moment": "^1.0.1",
-    "angular-route": "^1.6.4"
+    "angular-moment": "1.0.1",
+    "angular-route": "1.6.2"
   },
   "resolutions": {
     "jquery": "^3.1.1",
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "angular-route": "1.6.2",
+    "angular": "1.6.2"
   }
 }
