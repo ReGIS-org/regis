@@ -1,0 +1,130 @@
+{
+    "id": "mysim",
+    "title": "mysim",
+    "featureTypes": {
+        "centre": {
+            "id": "SimCity#centre",
+            "name": "centre",
+            "style": {
+                "drawingMode": "Point",
+                "iconUri": "images/brandweerposten/Brandweerkazerne.png",
+                "cornerRadius": 50,
+                "fillColor": "#ffffff",
+                "iconWidth": 30,
+                "iconHeight": 30,
+                "strokeColor": "#ffffff"
+            },
+            "propertyTypeKeys": "title,notes",
+            "u": "bower_components/csweb/dist-bower/images/marker.png"
+        },
+        "Fire": {
+            "id": "SimCity#fire",
+            "name": "Fire",
+            "style": {
+                "drawingMode": "Point",
+                "iconUri": "data/images/fire.png",
+                "cornerRadius": 50,
+                "fillColor": "#ffffff",
+                "iconWidth": 30,
+                "iconHeight": 30,
+                "strokeColor": "#ffffff"
+            },
+            "propertyTypeKeys": "title,notes",
+            "u": "bower_components/csweb/dist-bower/images/marker.png"
+        }
+    },
+    "propertyTypeData": {
+        "ward_no": {
+            "label": "ward_no",
+            "type": "text",
+            "title": "Ward Number",
+            "visibleInCallOut": true,
+            "canEdit": false,
+            "isSearchable": true,
+            "section": "Metadata"
+        },
+        "ward_name": {
+            "label": "Name",
+            "type": "text",
+            "title": "Name",
+            "visibleInCallOut": true,
+            "canEdit": false,
+            "isSearchable": true,
+            "section": "Metadata"
+        },
+        "cmc_mc_nm": {
+            "label": "cmc_mc_nm",
+            "type": "number",
+            "title": "City Name",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true,
+            "section": "Metadata"
+        },
+        "first_responder": {
+            "label": "first_responder",
+            "type": "number",
+            "title": "First Responder",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "second_responder": {
+            "label": "second_responder",
+            "type": "number",
+            "title": "Second Responder",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "tot_p": {
+            "label": "tot_p",
+            "type": "number",
+            "title": "Total Population",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "departure": {
+            "label": "departure",
+            "type": "number",
+            "title": "Departure",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "arrival":{
+            "label": "arrival",
+            "type": "number",
+            "title": "Arrival",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "responsetime":{
+            "label": "responsetime",
+            "type": "number",
+            "title": "Response Time",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "finish": {
+            "label": "finsh",
+            "type": "number",
+            "title": "Finish",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        },
+        "return": {
+            "label": "return",
+            "type": "number",
+            "title": "Return",
+            "canEdit": false,
+            "isSearchable": true,
+            "visibleInCallOut": true
+        }
+    },
+    "isDynamic": false
+}

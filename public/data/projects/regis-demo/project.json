@@ -1,7 +1,7 @@
 {
-    "title": "SimCity",
-    "description": "Description for SimCity",
-    "url": "https://github.com/NLeSC/sim-city-cs",
+    "title": "ReGIS Demo CommonSense",
+    "description": "Description for ReGIS",
+    "url": "https://github.com/ReGIS-org/regis-stack",
     "connected": true,
     "isDynamic": true,
     "datasources": [],
@@ -27,7 +27,7 @@
             "top": "82px",
             "width": "300px",
             "data": {
-                "layerGroup": "SimCity",
+                "layerGroup": "ReGIS CommonSense",
                 "buttons": []
             }
         },
@@ -42,7 +42,7 @@
             "bottom": "25px",
             "width": "450px",
             "data": {
-                "layerGroup": "SimCity"
+                "layerGroup": "ReGIS CommonSense"
             },
             "collapse": true
         }],
@@ -101,7 +101,7 @@
         "languages": {
             "en": {
                 "title": "Test Layer",
-                "description": "SimCity layers manipulation buttons"
+                "description": "ReGIS layers manipulation buttons"
             }
         },
         "layers": [
@@ -115,8 +115,8 @@
                      }
                  },
                  "type": "GeoJson",
-                 "url": "data/projects/simcity/resources/Firepaths.json",
-                 "typeUrl": "data/projects/simcity/resources/matsim.json",
+                 "url": "data/projects/regis-demo/resources/Firepaths.json",
+                 "typeUrl": "data/projects/regis-demo/resources/matsim.json",
                  "enabled": false,
                  "opacity": 50
 
@@ -124,45 +124,19 @@
         ]
     },
     {
-        "id": "SimCity",
+        "id": "ReGIS CommonSense",
         "languages": {
             "en": {
-                "title": "SimCity",
-                "description": "SimCity layers manipulation buttons"
+                "title": "ReGIS CommonSense",
+                "description": "ReGIS layers manipulation buttons"
             }
         },
         "layers": []
-    }, {
-        "languages": {
-            "en": {
-                "title": "Vector layers (dynamic)",
-                "description": "SimCity vector layers from OWS"
-            }
-        },
-        "clustering": true,
-        "layers": [],
-        "owsurl": "/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
-        "owsgeojson": true
-    }, {
-        "languages": {
-            "en": {
-                "title": "Bhuvan layers (dynamic)",
-                "description": "Bhuvan layers from OWS"
-            }
-        },
-        "clustering": true,
-        "layers": [],
-        "owsurl": "/bhuvan/gwc/service/wms?service=wms&request=getCapabilities",
-        "owsgeojson": false
     }],
     "simAdmin": {
         "webserviceUrl": "/explore",
-        "simulationName": "matsim",
+        "simulationName": "mysim",
         "simulationVersion": "latest"
-    },
-    "simulationEngines": [{
-        "name": "MatSim",
-        "launcher": "/explore/simulate/matsim/0.5",
-        "results": "/couchdb/simcity/_design/matsim_0.5/_view/all_docs"
-    }]
+    }
 }
+
