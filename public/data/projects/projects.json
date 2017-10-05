@@ -82,6 +82,12 @@
         "preview": "http://a.basemaps.cartocdn.com/light_nolabels/12/2103/1347.png"
     }],
     "projects": [{
+        "title": "SimCity",
+        "url": "data/projects/simcity/project.json"
+      }, {
+        "title": "Kumbh Mela",
+        "url": "data/projects/kumbh-mela/project.json"
+      }, {
         "title": "ReGIS demo",
         "url": "data/projects/regis-demo/project.json"
     }]

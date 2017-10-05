@@ -1,0 +1,168 @@
+{
+    "title": "SimCity",
+    "description": "Description for SimCity",
+    "url": "https://github.com/NLeSC/sim-city-cs",
+    "connected": true,
+    "isDynamic": true,
+    "datasources": [],
+    "dashboards": [{
+        "id": "home",
+        "name": "Home",
+        "editMode": false,
+        "showMap": true,
+        "showTimeline": false,
+        "showLeftmenu": true,
+        "showLegend": true,
+        "showBackgroundImage": false,
+        "visiblelayers": [
+            "fireresponse"
+        ],
+        "widgets": [{
+            "id": "1086ec94-4c54-4d84-dc04-9d3673df6d35",
+            "directive": "buttonwidget",
+            "enabled": true,
+            "style": "transparent",
+            "left": "435px",
+            "right": "",
+            "top": "82px",
+            "width": "300px",
+            "data": {
+                "layerGroup": "SimCity",
+                "buttons": []
+            }
+        },
+        {
+            "id": "simulation-form",
+            "directive": "sim-form",
+            "enabled": true,
+            "style": "transparent",
+            "left": "435px",
+            "right": "",
+            "top": "180px",
+            "bottom": "25px",
+            "width": "450px",
+            "data": {
+                "layerGroup": "SimCity"
+            },
+            "collapse": true
+        }],
+        "visibleLeftMenuItems": [
+            "!lm-layers"
+        ]
+    },
+    {
+        "id": "monitor",
+        "name": "Job Monitor",
+        "editMode": false,
+        "showMap": false,
+        "showTimeline": false,
+        "showLeftmenu": false,
+        "showLegend": false,
+        "showBackgroundImage": true,
+        "visiblelayers": [
+        ],
+        "widgets": [{
+            "id": "9086ec94-4c54-4d84-dc04-9d3673df6d35",
+            "directive": "sim-summary",
+            "enabled": true,
+            "style": "transparent",
+            "left": "50px",
+            "right": "",
+            "top": "82px",
+            "width": "300px"
+        },
+        {
+            "id": "cb86ec94-4c54-4d84-dc04-9d3673df6d35",
+            "directive": "sim-job",
+            "enabled": true,
+            "style": "transparent",
+            "left": "375px",
+            "right": "",
+            "top": "82px"
+        }
+        ],
+        "visibleLeftMenuItems": []
+    }
+    ],
+    "expertMode": 3,
+    "userPrivileges": {
+        "mca": {
+            "expertMode": true
+        },
+        "heatmap": {
+            "expertMode": true
+        }
+    },
+    "accentColor": "Green",
+    "baselayers": {},
+    "groups": [
+    {
+        "id": "Testlayer",
+        "languages": {
+            "en": {
+                "title": "Test Layer",
+                "description": "SimCity layers manipulation buttons"
+            }
+        },
+        "layers": [
+            {
+                 "id": "FirePaths",
+                 "reference": "firepaths",
+                 "languages": {
+                     "en": {
+                         "title": "Fire Paths",
+                         "description": "Emergency response time for each ward"
+                     }
+                 },
+                 "type": "GeoJson",
+                 "url": "data/projects/simcity/resources/Firepaths.json",
+                 "typeUrl": "data/projects/simcity/resources/matsim.json",
+                 "enabled": false,
+                 "opacity": 50
+
+            }
+        ]
+    },
+    {
+        "id": "SimCity",
+        "languages": {
+            "en": {
+                "title": "SimCity",
+                "description": "SimCity layers manipulation buttons"
+            }
+        },
+        "layers": []
+    }, {
+        "languages": {
+            "en": {
+                "title": "Vector layers (dynamic)",
+                "description": "SimCity vector layers from OWS"
+            }
+        },
+        "clustering": true,
+        "layers": [],
+        "owsurl": "/geoserver/Bangalore/ows?service=wms&request=getCapabilities",
+        "owsgeojson": true
+    }, {
+        "languages": {
+            "en": {
+                "title": "Bhuvan layers (dynamic)",
+                "description": "Bhuvan layers from OWS"
+            }
+        },
+        "clustering": true,
+        "layers": [],
+        "owsurl": "/bhuvan/gwc/service/wms?service=wms&request=getCapabilities",
+        "owsgeojson": false
+    }],
+    "simAdmin": {
+        "webserviceUrl": "/explore",
+        "simulationName": "matsim",
+        "simulationVersion": "latest"
+    },
+    "simulationEngines": [{
+        "name": "MatSim",
+        "launcher": "/explore/simulate/matsim/0.5",
+        "results": "/couchdb/simcity/_design/matsim_0.5/_view/all_docs"
+    }]
+}
