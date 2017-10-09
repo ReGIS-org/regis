@@ -46,10 +46,8 @@ module App {
             $logProvider.debugEnabled(true);
         })
         .config($translateProvider => {
-            // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT
-            // http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
-            // Translations.English.locale['MAP_LABEL'] = 'MY AWESOME MAP';
-            // Append local translations if present
+            $translateProvider.translations('nl', Translations.Dutch.locale);
+            $translateProvider.translations('en', Translations.English.locale);
             $translateProvider.preferredLanguage('en');
             // Enable escaping of HTML
             $translateProvider.useSanitizeValueStrategy('escape');
