@@ -14,40 +14,27 @@ RUN apt-get update && apt-get install -y nodejs nodejs-legacy npm git libsass-de
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
 RUN apt-get install -y nodejs
 
-RUN /usr/sbin/useradd -p $(openssl passwd regis) -d /home/regis -m --shell /bin/bash regis
+WORKDIR /root
+RUN echo '{ "allow_root": true }' > /root/.bowerrc
+RUN mkdir /root/npm && echo "prefix = /root/npm" > /root/.npmrc && \
+    echo "export PATH=/root/npm/bin:$PATH" >> /root/.profile && \
+    . /root/.profile && echo "export PATH=/root/npm/bin:$PATH" >> /root/.bashrc
+ENV PATH=/root/npm/bin:$PATH
 
-USER regis
-
-RUN mkdir /home/regis/npm && echo "prefix = /home/regis/npm" > /home/regis/.npmrc && echo "export PATH=/home/regis/npm/bin:$PATH" >> /home/regis/.profile && . /home/regis/.profile && echo "export PATH=/home/regis/npm/bin:$PATH" >> /home/regis/.bashrc
-ENV PATH=/home/regis/npm/bin:$PATH
-
-WORKDIR /home/regis
-RUN a=3;
-RUN git clone https://github.com/ReGIS-org/regis.git
-
-WORKDIR /home/regis/
-
-ENV N_PREFIX=/home/regis
+ENV N_PREFIX=/root
 RUN npm i -g npm
 RUN npm i -g n
 RUN n latest
 RUN npm i -g typescript bower nodemon http-server gulp node-gyp js-beautify typings
 RUN npm i -g randomatic arr-flatten throat readable-stream write-file-atomic
 
-COPY build.sh /home/regis/
-COPY start.sh /home/regis/
+ADD . /regis
+RUN chmod +x /regis/build.sh
+RUN chmod +x /regis/start.sh
 
-USER root
-RUN chmod +x /home/regis/build.sh
-RUN chmod +x /home/regis/start.sh
-
-USER regis
-RUN /home/regis/build.sh
-USER root
+RUN /regis/build.sh
 
 COPY run /etc/service/regis/
-COPY projects /home/regis/regis/public/data/projects
-
 EXPOSE 3003
 
 CMD ["/sbin/my_init"]

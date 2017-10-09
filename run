@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd /regis
+exec /sbin/setuser root ./start.sh

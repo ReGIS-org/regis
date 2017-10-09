@@ -1,8 +1,8 @@
 #!/bin/sh
-cd /home/regis/regis
+cd /regis
 yarn install
-cd /home/regis/regis/public
+cd /regis/public
 bower install
-cd /home/regis/regis/
+cd /regis/
 typings install
 gulp init
