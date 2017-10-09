@@ -14,14 +14,6 @@ RUN apt-get update && apt-get install -y libkrb5-dev
 USER node
 ENV HOME /home/node
 RUN mkdir /home/node/npm && echo "prefix = /home/node/npm" > /home/node/.npmrc && echo "export PATH=/home/node/npm/bin:$PATH" >> /home/node/.profile && . /home/node/.profile
-RUN git clone https://github.com/indodutch/csWeb.git /home/node/csWeb
-WORKDIR /home/node/csWeb
-RUN npm install && \
-  bower install && \
-  gulp init && \
-  bower link
-WORKDIR /home/node/csWeb/out/csServerComp
-RUN npm link
 
 ADD . /home/node/app
 
@@ -30,9 +22,9 @@ WORKDIR /home/node/app
 RUN chown -R node .
 
 USER node
-RUN npm link csweb && npm install
+RUN npm install
 WORKDIR /home/node/app/public
-RUN bower link csweb && bower install
+RUN bower install
 WORKDIR /home/node/app
 RUN gulp
 

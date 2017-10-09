@@ -1,5 +1,2 @@
 {
-    "bagConnectionStringDesc": "Add the BAG connection string here, including username and pwd, if any.",
-    "bagConnectionString": "postgres://bag_user:bag4all@localhost:5432/bag",
-    "resolveAddress": "/lookup_address/zip_number/:zip/:number"
 }
