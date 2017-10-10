@@ -147,9 +147,20 @@ module App {
         public onSubmit(form: any) {
             // Check if the form is valid
             if (form.$valid) {
+                // Copy model and delete 'extraData' if necessary
+                let modelCopy = Object.keys(this.model).reduce((ret, key) => {
+                    if(this.model[key].hasOwnProperty('extraData')) {
+                        ret[key] = jQuery.extend(true, {}, this.model[key]);
+                        delete ret[key]['extraData'];
+                    } else {
+                        ret[key] = this.model[key];
+                    }
+                    return ret;
+                }, {});
+
                 this.SimWebService.submit(this.SimAdminService.simulationName,
                                           this.SimAdminService.simulationVersion,
-                                          this.model)
+                                          modelCopy)
                     .then(() => {
                             this.messageBusService.publish('sim-task', 'submitted');
                             this.messageBusService.notify('New simulation', 'Submitted simulation',
@@ -234,6 +245,7 @@ module App {
                     // A point2d is a cartesian coordinate point on the map
                     formItem.type = 'template';
                     formItem.selectFeature = (featureId) => {
+                        console.log('Starting FormDirective SelectFeature -- point2d');
                         let feature = this.layerService.findFeatureById(featureId);
                         if (feature) {
                             this.layerService.selectFeature(feature, false, true);
@@ -321,41 +333,53 @@ module App {
                 dataLayer: (formItem, _schemaItem, schema) => {
                   let key = formItem.key;
                   var g = this.layerService.findGroupById(_schemaItem.layerGroup);
-                  formItem.type = 'template';
+
                   formItem.selectFeature = (item) => {
-                      let layerUrl = this.model[item.key[0]]; // selected
+                      console.log('Starting FormDirective SelectFeature -- dataLayer');
+                      let modelItem = this.model[item.key[0]];
+                      let selectedItem = modelItem.extraData.selectedLayer;
+                      let layerUrl = selectedItem.url; // selected
+                      modelItem.layerName = selectedItem.url;
 
                       this.$http({
                         method: 'get',
                         url: layerUrl,
                         cache: true
                       }).then(resp => {
-                        var columns = new Set();
+                        var columns = [];
                         L.geoJson(resp.data, {
                           onEachFeature: (feature, layer) => {
-                            for(var prop in feature.properties) {
-                              columns.add(prop);
-                            }
+                            columns = _.union(columns, Object.keys(feature.properties));
                           }
                         });
-                        console.log("We want to load layer: " + layerUrl);
-                        console.log("  layer has these columns: ");
-                        console.log(columns);
-                        console.log("  we should choose one of these columns.");
+                        modelItem.extraData.columns = columns;
                       });
                   };
-                  this.model[key] = '';
+                  this.model[key] = {
+                    "layerName": "",
+                    "columnName": "size", // This should be dynamic
+                    "extraData": {  // Using 'extraData' to keep all layers & columns
+                      "layers": g.layers,
+                      "columns": [],
+                      "selectedLayer": ''
+                    }
+                  };
 
-                  let options = '';
-                  formItem.layerURLs = {};
-                  g.layers.forEach(layer => {
-                      options += '<option value="' + layer.url + '">' + layer.title + '</option>';
-                      formItem.layerURLs[layer.id] = layer.url;
-                  });
                   formItem.type = 'template';
+                  formItem.template = '<div>';
+                  // formItem.template += '<select ng-model="model[\'' + key + '\'].extraData.selectedLayer" ' +
+                  formItem.template += '<select ng-model="model[\'' + key + '\'].layerName" ' +
+                                      // 'ng-change="form.selectFeature(form)" ' +
+                                      'ng-options="layer.url as layer.title for layer in model[\'' + key + '\'].extraData.layers track by layer.id">' +
+                                      '</select>';
+                  // formItem.template += '<div>Column</div>';
+                  // formItem.template += '<select ng-model="model[\'' + key + '\'].columnName" ' +
+                  //                     'ng-options="col for col in model[\'' + key + '\'].extraData.columns">' +
+                  //                     '</select>';
+                  // formItem.template += '<div sf-message="form.description"></div>';
+                  // formItem.template += '<div>???{{ model[\'' + key + '\'].layerName }}</div>';
+                  formItem.template += '</div>';
 
-                  formItem.template = '<select ng-model="model[\'' + key + '\']" ng-change="form.selectFeature(form)">' + options + '</select>';
-                  formItem.template += '<br><b>Add to form: column on layer</b>';
                 }
             };
         }

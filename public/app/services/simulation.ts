@@ -309,6 +309,10 @@ module App {
                     if (task.defaultFeatureType) {
                         layerDescription.defaultFeatureType = task.defaultFeatureType;
                     }
+
+                    layerDescription.defaultFeatureType = "fill";
+                    layerDescription.typeUrl = "data/projects/simcity-demo/resources/necklace.json";
+                    layerDescription.defaultLegendProperty = "fill";
                     let newLayer = this.createLayer(layerDescription, group);
 
                     this.messageBusService.publish('layer', 'initialized', newLayer);
