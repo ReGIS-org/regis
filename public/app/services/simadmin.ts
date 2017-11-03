@@ -3,6 +3,7 @@ module App {
         webserviceUrl: string;
         simulationName: string;
         simulationVersion: string;
+        layerGroup: string;
     }
 
     export interface SimAdminMessage {
@@ -15,9 +16,11 @@ module App {
     }
 
     export class SimAdminService {
-        private webserviceUrl;
         public simulationName;
         public simulationVersion;
+        public layerGroup: string;
+
+        private webserviceUrl;
         private deferredWebserviceUrl: ng.IDeferred<string>;
 
         $inject = ['messageBusService', '$q', '$log'];
@@ -33,13 +36,15 @@ module App {
                         this.deferredWebserviceUrl.reject();
                     } else if (!project.simAdmin.hasOwnProperty('webserviceUrl') ||
                                !project.simAdmin.hasOwnProperty('simulationName') ||
-                               !project.simAdmin.hasOwnProperty('simulationVersion')) {
+                               !project.simAdmin.hasOwnProperty('simulationVersion') ||
+                               !project.simAdmin.hasOwnProperty('layerGroup')) {
                         $log.error('Not all properties set in simAdmin in project.json');
                         this.deferredWebserviceUrl.reject();
                     } else {
                         this.webserviceUrl = project.simAdmin.webserviceUrl;
                         this.deferredWebserviceUrl.resolve(this.webserviceUrl);
                         this.setSimulationVersion(project.simAdmin.simulationName, project.simAdmin.simulationVersion);
+                        this.layerGroup = project.simAdmin.layerGroup;
                     }
                 }
             });
@@ -70,5 +75,5 @@ module App {
 
     angular
         .module('csWebApp')
-        .service('SimAdminService', SimAdminService);
+        .service('simAdminService', SimAdminService);
 }

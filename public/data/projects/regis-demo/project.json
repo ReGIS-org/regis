@@ -1,5 +1,5 @@
 {
-    "title": "ReGIS Demo CommonSense",
+    "title": "ReGIS Demo",
     "description": "Description for ReGIS",
     "url": "https://github.com/ReGIS-org/regis-stack",
     "connected": true,
@@ -18,33 +18,22 @@
             "fireresponse"
         ],
         "widgets": [{
-            "id": "1086ec94-4c54-4d84-dc04-9d3673df6d35",
-            "directive": "buttonwidget",
+            "id": "sim-legend",
+            "directive": "legend-directive",
+            "title": "Legend",
+            "position": "dashboard",
+            "hideIfLeftPanel": true,
             "enabled": true,
-            "style": "transparent",
-            "left": "435px",
-            "right": "",
-            "top": "82px",
-            "width": "300px",
-            "data": {
-                "layerGroup": "ReGIS CommonSense",
-                "buttons": []
-            }
-        },
-        {
-            "id": "simulation-form",
-            "directive": "sim-form",
-            "enabled": true,
-            "style": "transparent",
-            "left": "435px",
-            "right": "",
-            "top": "180px",
-            "bottom": "25px",
-            "width": "450px",
-            "data": {
-                "layerGroup": "ReGIS CommonSense"
+            "left": "25px",
+            "top": "150px",
+            "customStyle": {
+                "background": "white",
+                "borderColor": "black",
+                "borderWidth": "1px"
             },
-            "collapse": true
+            "data": {
+                "mode": "lastSelectedStyle"
+            }
         }],
         "visibleLeftMenuItems": [
             "!lm-layers"
@@ -59,8 +48,7 @@
         "showLeftmenu": false,
         "showLegend": false,
         "showBackgroundImage": true,
-        "visiblelayers": [
-        ],
+        "visiblelayers": [],
         "widgets": [{
             "id": "9086ec94-4c54-4d84-dc04-9d3673df6d35",
             "directive": "sim-summary",
@@ -120,7 +108,24 @@
                  "enabled": false,
                  "opacity": 50
 
-            }
+            },
+            {
+                "id": "WardGeo",
+                "reference": "wardgeo",
+                "languages": {
+                    "en": {
+                        "title": "Ward Fire Response",
+                        "description": "Emergency response time for each ward"
+                    }
+                },
+                "type": "GeoJson",
+                "url": "data/projects/regis-demo/resources/WardGeoResponse.json",
+                "typeUrl": "data/projects/regis-demo/resources/matsim.json",
+                "defaultFeatureType": "Ward",
+                "enabled": false,
+                "opacity": 50
+
+           }
         ]
     },
     {
@@ -134,9 +139,10 @@
         "layers": []
     }],
     "simAdmin": {
-        "webserviceUrl": "/explore",
+        "webserviceUrl": "http://localhost:8008/explore",
         "simulationName": "mysim",
-        "simulationVersion": "latest"
+        "simulationVersion": "latest",
+        "layerGroup": "ReGIS CommonSense"
     }
 }
 

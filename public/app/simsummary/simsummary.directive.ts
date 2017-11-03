@@ -19,12 +19,12 @@ module App {
             private subscriptions: csComp.Services.MessageBusHandle[];
             private update: ng.IPromise<void>;
 
-            public static $inject = ['$interval', 'messageBusService', 'SimAdminService', 'SimWebService'];
+            public static $inject = ['$interval', 'messageBusService', 'simAdminService', 'simWebService'];
             constructor(
                 private $interval: ng.IIntervalService,
                 private messageBusService: csComp.Services.MessageBusService,
-                private SimAdminService: App.SimAdminService,
-                private SimWebService: App.SimWebService) {
+                private simAdminService: App.SimAdminService,
+                private simWebService: App.SimWebService) {
                 this.jobs = [];
                 this.tasks = [];
                 this.status = 'Loading...';
@@ -49,7 +49,7 @@ module App {
              * Loads and populates the overview
              */
             public loadOverview = (): void => {
-                this.SimWebService.summary()
+                this.simWebService.summary()
                     .then((data: ISimWebSummary) => {
                         this.jobs = data.jobs;
                         this.tasks = data.tasks;

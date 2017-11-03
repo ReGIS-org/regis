@@ -109,31 +109,31 @@ module App {
      * All methods take a webservice base URL.
      */
     export class SimWebService {
-        public static $inject = ['SimAdminService', 'SchemaService', 'layerService', 'messageBusService', '$http', '$q', '$log'];
+        public static $inject = ['simAdminService', 'schemaService', 'layerService', 'messageBusService', '$http', '$q', '$log'];
 
         private simulationsCache: ng.IPromise<{}>;
 
-        constructor(private SimAdminService: App.SimAdminService,
-                    private SimSchemaService: App.SchemaService,
+        constructor(private simAdminService: App.SimAdminService,
+                    private simSchemaService: App.SchemaService,
                     private layerService: csComp.Services.LayerService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private $http: ng.IHttpService,
                     private $q: ng.IQService,
                     private $log: ng.ILogService) {
-            this.simulationsCache = this.SimAdminService.getWebserviceUrl()
+            this.simulationsCache = this.simAdminService.getWebserviceUrl()
                 .then(webserviceUrl => this.$http.get(webserviceUrl + '/simulate'))
                 .then(response => response.data);
         }
 
         /** List all tasks from a given simulator of a given version. */
         public list(simulation: string, version: string): ng.IHttpPromise<ISimWebList<ITask>> {
-            return this.SimAdminService.getWebserviceUrl()
+            return this.simAdminService.getWebserviceUrl()
                 .then(webserviceUrl => this.$http.get(webserviceUrl + '/view/simulations/' + simulation + '/' + version));
         }
 
         /** Get a detailed task view of a single task. */
         public get(id: string): ng.IPromise<ITask> {
-            return this.SimAdminService.getWebserviceUrl()
+            return this.simAdminService.getWebserviceUrl()
                 .then((webserviceUrl : string) : ng.IHttpPromise<ITask>  => this.$http.get(webserviceUrl + '/simulation/' + id))
                 .then((result : ng.IHttpPromiseCallbackArg<ITask>) : ITask => {
                     let task: ITask = result.data;
@@ -154,7 +154,7 @@ module App {
 
         /** Start a job on the infrastructure. */
         public startJob(host: string = null): ng.IPromise<any> {
-            return this.SimAdminService.getWebserviceUrl()
+            return this.simAdminService.getWebserviceUrl()
                 .then(webserviceUrl => this.$http.post(host ? webserviceUrl + '/job?host=' + host : webserviceUrl + '/job', null))
                 .then(null, response => {
                     if (response.status === 503) {
@@ -168,12 +168,12 @@ module App {
         }
 
         public jobs() : ng.IHttpPromise<ISimWebList<IJob>> {
-            return this.SimAdminService.getWebserviceUrl()
+            return this.simAdminService.getWebserviceUrl()
                 .then(webserviceUrl => this.$http.get(webserviceUrl + '/view/jobs/'));
         }
 
         public hosts() : ng.IHttpPromise<ISimWebObject<IHost>> {
-            return this.SimAdminService.getWebserviceUrl()
+            return this.simAdminService.getWebserviceUrl()
                 .then(webserviceUrl => this.$http.get(webserviceUrl + '/hosts/'));
         }
 
@@ -184,7 +184,7 @@ module App {
 
         /** Submit a new task to the webservice, where the parameters adhere to the JSON Schema of the simulator. */
         public submit(simulation: string, version: string, params: any): ng.IPromise<{name: string, url: string}> {
-            return this.SimAdminService.getWebserviceUrl()
+            return this.simAdminService.getWebserviceUrl()
                 .then(webserviceUrl => {
                     var url = webserviceUrl + '/simulate/' + simulation;
                     if (version) {
@@ -214,13 +214,13 @@ module App {
 
         /** Delete a task. If the task is currently active, it may re-appear. */
         public delete(id: string, rev: string): ng.IHttpPromise<void> {
-            return this.SimAdminService.getWebserviceUrl()
+            return this.simAdminService.getWebserviceUrl()
                 .then(webserviceUrl => this.http('DELETE', webserviceUrl + '/simulation/' + id, {rev: rev}));
         }
 
         /** Summary of the infrastructure that the webservice is currently using. */
         public summary(): ng.IPromise<ISimWebSummary> {
-            return this.SimAdminService.getWebserviceUrl()
+            return this.simAdminService.getWebserviceUrl()
                 .then(webserviceUrl => this.$http.get(webserviceUrl + '/view/totals'))
                 .then(response => {
                     let data = <any> response.data;
@@ -271,7 +271,7 @@ module App {
         }
 
         public getAttachmentUrl(task: ITask, name: string): ng.IPromise<string> {
-            return this.SimAdminService.getWebserviceUrl().then(webserviceUrl => {
+            return this.simAdminService.getWebserviceUrl().then(webserviceUrl => {
                 return webserviceUrl + '/simulation/' + task._id + '/' + name;
             });
         }
@@ -342,17 +342,19 @@ module App {
 
         public createLayer(layerDescription: ILayerDescription, group: ProjectGroup): ProjectLayer {
             let newLayer : ProjectLayer = $.extend(new ProjectLayer(), layerDescription);
+            var layerSource = newLayer.type.toLowerCase();
+            newLayer.layerSource = this.layerService.layerSources[layerSource];
 
             this.layerService.initLayer(group, newLayer);
+
             group.layers.push(newLayer);
 
             this.messageBusService.publish('layer', 'created', newLayer);
-
             return newLayer;
         }
 
         public visualizeInput(task: ITask) {
-            this.SimSchemaService.getSchema({
+            this.simSchemaService.getSchema({
                 layer: (formItem, _schemaItem, schema) => {
                     let featureId = formItem.featureId;
                     let key = formItem.key;
@@ -379,37 +381,40 @@ module App {
                             };
                             layer = this.createLayer(layerDescription, group);
                         }
-                        layer.data = {
-                            type: 'featureCollection',
-                            features: [],
-                        };
-                        layer.typeUrl = schema.resourceTypeUrl;
-                        task.input[key].forEach(feature => {
-                            let f = {
-                                type: 'Feature',
-                                id: feature.id,
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: [
-                                        feature.x, feature.y
-                                    ]
-                                },
-                                properties: {
-                                    Name: feature.name,
-                                    featureTypeId: featureId
-                                }
-                            };
-
-                            layer.data.features.push(f);
-                        });
+                        this.doVisualize(task, layer, schema, key, featureId);
                     }
                 }
             });
+        }
 
+        private doVisualize(task, layer, schema, key, featureId) {
+            layer.data = {
+                type: 'featureCollection',
+                features: [],
+            };
+            layer.typeUrl = schema.resourceTypeUrl;
+            task.input[key].forEach(feature => {
+                let f = {
+                    type: 'Feature',
+                    id: feature.id,
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [
+                            feature.x, feature.y
+                        ]
+                    },
+                    properties: {
+                        Name: feature.name,
+                        featureTypeId: featureId
+                    }
+                };
+
+                layer.data.features.push(f);
+            });
         }
     }
 
     angular
         .module('csWebApp')
-        .service('SimWebService', SimWebService);
+        .service('simWebService', SimWebService);
 }

@@ -139,8 +139,12 @@
                             <i class="fa fa-filter" aria-hidden="true"></i>
                         </li>
 
-                        <li class="lp-tab active" data-target="#simlist" data-toggle="tab">
+                        <li class="lp-tab" data-target="#simlist" data-toggle="tab">
                             <i class="fa fa-flask" aria-hidden="true"></i>
+                        </li>
+
+                        <li class="lp-tab active" data-target="#simform" data-toggle="tab">
+                            <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                         </li>
 
                         <li class="lp-tab" data-target="#settings" data-toggle="tab">
@@ -155,9 +159,10 @@
                         <base-map-list class="tab-pane" id="basestyles"></base-map-list>
                         <layers-directive class="tab-pane" id="layers"></layers-directive>
                         <filter-list ng-hide="vm.$layerService.noFilters" class="tab-pane" id="filters"></filter-list>
-                        <style-list class="tab-pane" id="styles"></style-list>
+                        <style-list class="tab-pane" id="styles" > </style-list>
                         <dashboard-selection class="tab-pane" id="dashboardselection"></dashboard-selection>
-                        <sim-list class="tab-pane active" id="simlist" form-id="simulation-form"></sim-list>
+                        <sim-list class="tab-pane" id="simlist" form-id="simulation-form"></sim-list>
+                        <sim-form class="tab-pane active" id="simform"></sim-form>
                         <div class="tab-pane" id="settings">
                             <sim-admin></sim-admin>
                             <fieldset>

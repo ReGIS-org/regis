@@ -32,11 +32,11 @@ module App {
         private hosts: string[];
         private selectedHost: string;
 
-        public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', 'layerService', '$interval', '$timeout', '$q', '$scope', '$log',
-                                 'SimTaskService'];
+        public static $inject = ['simAdminService', 'simWebService', 'messageBusService', 'layerService', '$interval', '$timeout', '$q', '$scope', '$log',
+                                 'simTaskService'];
 
-        constructor(private SimAdminService: App.SimAdminService,
-                    private SimWebService: App.SimWebService,
+        constructor(private simAdminService: App.SimAdminService,
+                    private simWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private layerService: csComp.Services.LayerService,
                     private $interval: ng.IIntervalService,
@@ -44,7 +44,7 @@ module App {
                     private $q: ng.IQService,
                     private $scope: SimJobScope,
                     private $log: ng.ILogService,
-                    private SimTaskService: App.SimTaskService) {
+                    private simTaskService: App.SimTaskService) {
             this.subscriptions = [];
             this.hosts = [];
             this.subscriptions.push(this.messageBusService.subscribe('sim-task', this.updateView));
@@ -55,7 +55,7 @@ module App {
             }));
 
             this.selectedHost = null;
-            this.SimWebService.hosts().then(result => {
+            this.simWebService.hosts().then(result => {
                 let hostList : ISimWebObject<IHost> = result.data;
                 Object.keys(hostList).forEach(hostname => {
                     this.hosts.push(hostname);
@@ -83,7 +83,7 @@ module App {
         }
 
         public startJob() {
-            this.SimWebService.startJob(this.selectedHost)
+            this.simWebService.startJob(this.selectedHost)
             .then(() => this.updateView(), (response) => {
                 this.messageBusService.notifyError('Failed to start job', response.message);
             });
@@ -100,7 +100,7 @@ module App {
                 this.$scope.loading = true;
                 this.$q.all([
                     this.$timeout(1000),
-                    this.SimWebService.jobs()
+                    this.simWebService.jobs()
                     .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<IJob>>) => {
                         this.jobs = {};
                         response.data.rows.forEach(el => {

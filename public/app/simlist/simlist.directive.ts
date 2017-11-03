@@ -33,20 +33,19 @@ module App {
         private status: string;
         private subscriptions: MessageBusHandle[];
         private widget: IWidget;
-        private formId: string;
         private update: ng.IPromise<void>;
 
-        public static $inject = ['SimAdminService', 'SimWebService', 'messageBusService', 'layerService', '$interval', '$scope', '$log',
-                                 'SimTaskService'];
+        public static $inject = ['simAdminService', 'simWebService', 'messageBusService', 'layerService', '$interval', '$scope', '$log',
+                                 'simTaskService'];
 
-        constructor(private SimAdminService: App.SimAdminService,
-                    private SimWebService: App.SimWebService,
+        constructor(private simAdminService: App.SimAdminService,
+                    private simWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private layerService: csComp.Services.LayerService,
                     private $interval: ng.IIntervalService,
                     private $scope: SimListScope,
                     private $log: ng.ILogService,
-                    private SimTaskService: App.SimTaskService) {
+                    private simTaskService: App.SimTaskService) {
 
             this.$scope.show = true;
 
@@ -59,13 +58,7 @@ module App {
             }));
             this.subscriptions.push(this.messageBusService.subscribe('project', (title: string, data?: any): void => {
                 if (title === 'loaded') {
-                    this.update = this.$interval(this.updateView, 100000);
-                    this.widget = this.layerService.findWidgetById(this.formId);
-                }
-            }));
-            this.subscriptions.push(this.messageBusService.subscribe('sim-task', (title: string, data?: any): void => {
-                if (title === 'submitted' || title === 'cancelled') {
-                    this.$scope.show = true;
+                    this.update = this.$interval(this.updateView, 2000);
                 }
             }));
             this.tasks = [];
@@ -92,7 +85,7 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateView = (): ng.IPromise<void> => {
-            return this.SimWebService.list(this.SimAdminService.simulationName, this.SimAdminService.simulationVersion)
+            return this.simWebService.list(this.simAdminService.simulationName, this.simAdminService.simulationVersion)
                 .then((response: ng.IHttpPromiseCallbackArg<ISimWebList<ITask>>) => {
                     this.tasks = response.data.rows.map(el => el.value);
                     var start: TaskEnsemble = {};
@@ -125,7 +118,7 @@ module App {
                 Object.keys(task.files).forEach(name => {
                     if (task.files[name].content_type === 'application/json'
                         || task.files[name].content_type === 'application/vnd.geo+json') {
-                        this.SimWebService.visualize(task, name);
+                        this.simWebService.visualize(task, name);
                     }
                 });
             }
@@ -133,15 +126,15 @@ module App {
                 Object.keys(task._attachments).forEach(name => {
                     if (task._attachments[name].content_type === 'application/json'
                         || task.files[name].content_type === 'application/vnd.geo+json') {
-                        this.SimWebService.visualize(task, name);
+                        this.simWebService.visualize(task, name);
                     }
                 });
             }
-            this.SimWebService.visualizeInput(task);
+            this.simWebService.visualizeInput(task);
         }
 
         public viewTask(task: ITask, activeTab: string) {
-            this.SimTaskService.show(task, activeTab);
+            this.simTaskService.show(task, activeTab);
         }
 
         /** Remove given task. */
@@ -152,7 +145,7 @@ module App {
                 ' (with id "' + task._id + '" from ensemble ' + task.input.ensemble + ')',
                 (confirmed: boolean) => {
                     if (confirmed) {
-                        this.SimWebService.delete(task._id, task._rev)
+                        this.simWebService.delete(task._id, task._rev)
                             .then(() => {
                                     this.messageBusService.publish('sim-task', 'removed');
                                     this.messageBusService.notify('Simulation', 'Removed simulation.',
@@ -171,13 +164,6 @@ module App {
                                 });
                     }
             });
-        }
-
-        public toggleSimulationForm() {
-            this.$scope.show = !this.$scope.show;
-            if (this.widget) {
-                this.widget.collapse = !this.widget.collapse;
-            }
         }
     }
 }

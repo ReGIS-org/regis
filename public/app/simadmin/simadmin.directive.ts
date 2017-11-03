@@ -42,13 +42,13 @@ module App {
         private versionOptions: string[];
         private simulationOptions: string[];
 
-        public static $inject = ['$scope', '$log', 'SimAdminService', 'SchemaService', 'SimWebService', 'messageBusService', 'mapService'];
+        public static $inject = ['$scope', '$log', 'simAdminService', 'schemaService', 'simWebService', 'messageBusService', 'mapService'];
 
         constructor(private $scope: ISimAdminScope,
                     private $log: ng.ILogService,
-                    private SimAdminService: App.SimAdminService,
-                    private SchemaService: App.SchemaService,
-                    private SimWebService: App.SimWebService,
+                    private simAdminService: App.SimAdminService,
+                    private schemaService: App.SchemaService,
+                    private simWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
                     private mapService: csComp.Services.MapService) {
 
@@ -105,7 +105,7 @@ module App {
             this.hideAdminForm = false;
 
             if (this.simulationOptions.length === 0) {
-                this.SimWebService.simulations()
+                this.simWebService.simulations()
                     .then((data) => {
                         this.simulationOptions = Object.keys(data);
                         if (this.simulation && this.simulation in data) {
@@ -121,7 +121,7 @@ module App {
          * Populate the version select
          */
         public simulationChanged(): void {
-            this.SimWebService.simulations()
+            this.simWebService.simulations()
                 .then(data => {
                     this.versionOptions = data[this.simulation].versions;
                     this.simulationVersionChanged();
@@ -134,7 +134,7 @@ module App {
          * Update the schema, form and model
          */
         public simulationVersionChanged(): void {
-            this.SimAdminService.setSimulationVersion(this.simulation, this.version);
+            this.simAdminService.setSimulationVersion(this.simulation, this.version);
         }
     }
 }

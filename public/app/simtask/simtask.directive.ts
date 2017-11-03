@@ -25,10 +25,10 @@ module App {
         private hasAttachments: boolean;
         private webserviceUrl: string;
 
-        public static $inject = ['SimWebService', 'SimAdminService', '$log', '$scope', 'layerService', 'messageBusService'];
+        public static $inject = ['simWebService', 'simAdminService', '$log', '$scope', 'layerService', 'messageBusService'];
 
-        constructor(private SimWebService: App.SimWebService,
-                    private SimAdminService: App.SimAdminService,
+        constructor(private simWebService: App.SimWebService,
+                    private simAdminService: App.SimAdminService,
                     private $log: ng.ILogService,
                     private $scope: ng.IScope,
                     private layerService : csComp.Services.LayerService,
@@ -51,7 +51,7 @@ module App {
                 this.tab = parameters.tab;
             }
 
-            this.SimAdminService.getWebserviceUrl().then(webserviceUrl => this.webserviceUrl = webserviceUrl);
+            this.simAdminService.getWebserviceUrl().then(webserviceUrl => this.webserviceUrl = webserviceUrl);
 
             this.status = 'Loading task...';
             this.task = null;
@@ -66,7 +66,7 @@ module App {
          * @todo notice the strange syntax, which is to preserve the this reference!
          */
         public updateTask = (): ng.IPromise<void> => {
-            return this.SimWebService.get(this.id)
+            return this.simWebService.get(this.id)
                 .then((task: ITask) => {
                     this.task = task;
                     this.hasAttachments = ((this.task._attachments && !angular.equals(this.task._attachments, {})) ||
@@ -88,7 +88,7 @@ module App {
         };
 
         public visualize(name: string) {
-            this.SimWebService.visualize(this.task, name);
+            this.simWebService.visualize(this.task, name);
         }
 
         public isSimpleValue(value): Boolean {

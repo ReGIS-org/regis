@@ -1,20 +1,26 @@
-<div id="sim-form" style="padding: 5px;" class="s3d form-container">
-    <fieldset class="schema-form-fieldset">
-        <legend>{{ vm.legend }}</legend>
-        <form name="simulationForm"
-              data-ng-hide="!vm.schema"
-              sf-schema="vm.schema"
-              sf-form="vm.form"
-              sf-model="vm.model"
-              sf-options="">
-        </form>
-        <button data-ng-click="vm.cancel()"
-                class="btn btn-secondary">Cancel
-        </button>
-        <button data-ng-hide="!vm.schema"
-                data-ng-click="vm.onSubmit(simulationForm)"
-                class="btn btn-success"
-                data-ng-disabled="simulationForm.$invalid">Submit
-        </button>
-    </fieldset>
+<div class="sim-form">
+    <h4>{{ vm.legend }}</h4>
+    <div id="sim-form-button-widget">
+        <h5>Layer Features:</h5>
+        <layereditor ng-if="vm.layerLoaded" layer="vm._layer" view="icons" class="button-layer-editor" />
+    </div>
+    <div style="padding: 5px;" class="form-container">
+        <fieldset class="schema-form-fieldset">
+            <form name="simulationForm"
+                data-ng-hide="!vm.schema"
+                sf-schema="vm.schema"
+                sf-form="vm.form"
+                sf-model="vm.model"
+                sf-options="">
+            </form>
+            <button data-ng-click="vm.cancel()"
+                    class="btn btn-secondary">Cancel
+            </button>
+            <button data-ng-hide="!vm.schema"
+                    data-ng-click="vm.onSubmit(simulationForm)"
+                    class="btn btn-success"
+                    data-ng-disabled="simulationForm.$invalid">Submit
+            </button>
+        </fieldset>
+    </div>
 </div>

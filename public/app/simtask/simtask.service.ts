@@ -22,5 +22,5 @@ module App {
 
     angular
         .module('csWebApp')
-        .service('SimTaskService', SimTaskService);
+        .service('simTaskService', SimTaskService);
 }

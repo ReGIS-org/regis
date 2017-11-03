@@ -33,9 +33,9 @@ module App {
      * The web service serves the schema with an Angular Schema Form.
      */
     export class SchemaService {
-        public static $inject = ['SimAdminService', '$http', '$log'];
+        public static $inject = ['simAdminService', '$http', '$log'];
 
-        constructor(private SimAdminService: App.SimAdminService,
+        constructor(private simAdminService: App.SimAdminService,
                     private $http: ng.IHttpService,
                     private $log: ng.ILogService) {
 
@@ -47,10 +47,10 @@ module App {
          * is taken as the type parameter of the schema and form items.
          */
         public getSchema(customTypeParsers: StringMap<ICustomTypeParser> = {}): ng.IPromise<{schema: IJsonSchema, form: IAngularForm}> {
-            return this.SimAdminService.getWebserviceUrl()
+            return this.simAdminService.getWebserviceUrl()
                 .then(webserviceUrl => this.$http.get(webserviceUrl + '/simulate/' +
-                                  this.SimAdminService.simulationName + '/' +
-                                  this.SimAdminService.simulationVersion))
+                                  this.simAdminService.simulationName + '/' +
+                                  this.simAdminService.simulationVersion))
                 .then((response: ng.IHttpPromiseCallbackArg<IJsonSchema>) => {
                     // Transform Resource object to JSON
                     var newSchema: IJsonSchema = {
@@ -174,5 +174,5 @@ module App {
 
     angular
         .module('csWebApp')
-        .service('SchemaService', SchemaService);
+        .service('schemaService', SchemaService);
 }

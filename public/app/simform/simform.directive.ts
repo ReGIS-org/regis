@@ -8,7 +8,7 @@ module App {
     import ICustomTypeParser = App.ICustomTypeParser;
     import StringMap = App.StringMap;
     import ProjectLayer = csComp.Services.ProjectLayer;
-    import IWidget = csComp.Services.IWidget;
+    import IButton = ButtonWidget.IButton;
 
     /**
      * Define sim-form directive.
@@ -48,6 +48,12 @@ module App {
         vm:SimFormController;
     }
 
+    export interface ICreateLayerDescription {
+        layerId: string;
+        layerTitle: string;
+        typeUrl: string;
+    }
+
     /**
      * The SimFormController controls The simulation submition form for the parameters and submitting a task.
      *    This form is generated using angular-json-schema-form from the json description
@@ -58,9 +64,7 @@ module App {
          * Directive parameters
          */
         private subscriptions: MessageBusHandle[];
-        private layerGroup: string;
         private formLayers: string[];
-        private widget: IWidget;
 
         /**
          * The schema, and form for simulation submision
@@ -70,6 +74,9 @@ module App {
         private form: IAngularForm;
         private model: any;
         private legend: string;
+        private buttons: IButton[];
+        private layerLoaded: boolean;
+        private _layer: csComp.Services.ProjectLayer;
 
         /**
          * Custom type handlers
@@ -77,35 +84,22 @@ module App {
         private featureSubscriptions: MessageBusHandle[];
         private customTypeParsers: StringMap<ICustomTypeParser>;
 
-        public static $inject = ['$scope', '$log', '$q', '$http', 'SimAdminService', 'SchemaService', 'SimWebService', 'messageBusService', 'layerService'];
+        public static $inject = ['$scope', '$log', '$q', '$http',
+                                 'simAdminService', 'schemaService',
+                                 'simWebService', 'messageBusService',
+                                 'layerService', '$sce', 'actionService'];
 
         constructor(private $scope: ISimFormScope,
                     private $log: ng.ILogService,
                     private $q: ng.IQService,
                     private $http: ng.IHttpService,
-                    private SimAdminService: App.SimAdminService,
-                    private SchemaService: App.SchemaService,
-                    private SimWebService: App.SimWebService,
+                    private simAdminService: App.SimAdminService,
+                    private schemaService: App.SchemaService,
+                    private simWebService: App.SimWebService,
                     private messageBusService: csComp.Services.MessageBusService,
-                    private layerService: csComp.Services.LayerService) {
-
-            var parameters: any = {};
-            if ($scope.$parent.hasOwnProperty('widget')) {
-                if ($scope.$parent['widget'].hasOwnProperty('data')) {
-                    parameters = $scope.$parent['widget']['data'];
-                }
-
-                // If we are embedded as a widget, this is set.
-                this.widget = $scope.$parent['widget'];
-            }
-            if (!this.layerGroup) {
-                if (parameters.hasOwnProperty('layerGroup')) {
-                    this.layerGroup = parameters.layerGroup;
-                } else {
-                    $log.warn('SimFormDirective.FormController: No layerGroup defined using ReGIS');
-                    this.layerGroup = 'ReGIS';
-                }
-            }
+                    private layerService: csComp.Services.LayerService,
+                    private $sce: ng.ISCEService,
+                    private actionService: csComp.Services.ActionService) {
 
             // Initialize the simulation form
             this.schema = {};
@@ -114,9 +108,9 @@ module App {
             this.featureSubscriptions = [];
             this.formLayers = [];
             this.legend = '';
+            this.layerLoaded = false;
 
-            // Initialize custom type mapping BEFORE getting
-            // the simulation form
+
             this.initializeCustomTypes();
 
             this.subscriptions = [];
@@ -129,8 +123,6 @@ module App {
             $scope.$on('$destroy', () => {
                 this.stop();
             });
-
-            this.simulationChanged();
         }
 
         /**
@@ -151,14 +143,14 @@ module App {
         public onSubmit(form: any) {
             // Check if the form is valid
             if (form.$valid) {
-                this.SimWebService.submit(this.SimAdminService.simulationName,
-                                          this.SimAdminService.simulationVersion,
+                this.simWebService.submit(this.simAdminService.simulationName,
+                                          this.simAdminService.simulationVersion,
                                           this.model)
                     .then(() => {
                             this.messageBusService.publish('sim-task', 'submitted');
                             this.messageBusService.notify('New simulation', 'Submitted simulation',
                                 undefined, NotifyType.Success);
-                            this.toggleWidget();
+                            this.resetForm();
                         }, message => {
                             this.messageBusService.notify('New simulation', 'Failed to submit simulation: '
                                 + message.message, undefined, NotifyType.Error);
@@ -173,14 +165,7 @@ module App {
          * Cancel the form.
          */
         public cancel() {
-            this.toggleWidget();
             this.messageBusService.publish('sim-task', 'cancelled');
-        }
-
-        public toggleWidget() {
-            if (this.widget) {
-                this.widget.collapse = !this.widget.collapse;
-            }
         }
 
         /**
@@ -201,7 +186,7 @@ module App {
          * Get the simulation form from the webservice.
          */
         private getForm(): ng.IPromise<void> {
-            return this.SchemaService.getSchema(this.customTypeParsers)
+            return this.schemaService.getSchema(this.customTypeParsers)
                 .then((data) => {
                     if (data != null) {
                         this.schema = data.schema;
@@ -212,8 +197,8 @@ module App {
                     } else {
                         this.resetForm();
                         this.messageBusService.notifyError('No valid form', 'The webservice did not return a valid form for this simulation: ' +
-                                                            this.SimAdminService.simulationName + '@' +
-                                                            this.SimAdminService.simulationVersion);
+                                                            this.simAdminService.simulationName + '@' +
+                                                            this.simAdminService.simulationVersion);
                     }
                 });
         }
@@ -267,7 +252,12 @@ module App {
                     key = formItem.key;
 
                     // Check if layer exists, and if not create it.
-                    this.checkAndCreateLayer(layerId, layerTitle, schema.resourceTypeUrl);
+                    let description = {
+                        layerId: layerId,
+                        layerTitle: layerTitle,
+                        typeUrl: schema.resourceTypeUrl
+                    };
+                    this.checkAndCreateLayer(description);
 
                     // Subscribe to feature update messages
                     let subscription = this.messageBusService.subscribe('feature', (title: string, feature: IFeature) => {
@@ -379,7 +369,7 @@ module App {
         }
 
         private resetLayers() {
-            let group = this.layerService.findGroupById(this.layerGroup);
+            let group = this.layerService.findGroupById(this.simAdminService.layerGroup);
             if (group && group.layers) {
                 group.layers.forEach((layer: csComp.Services.IProjectLayer) => {
                     // unfortunately there is no reset layer function
@@ -392,19 +382,19 @@ module App {
         /**
          * Check if the specified layer exists, and if it doesn't, create it.
          */
-        private checkAndCreateLayer(layerId: string, layerTitle: string, typeUrl: string) {
-            let layer = this.layerService.findLayer(layerId);
+        private checkAndCreateLayer(description: ICreateLayerDescription) {
+            let layer = this.layerService.findLayer(description.layerId);
             if (!layer) {
-                let group = this.layerService.findGroupById(this.layerGroup);
+                let group = this.layerService.findGroupById(this.simAdminService.layerGroup);
                 if (!group) {
-                    group = this.SimWebService.createGroup(this.layerGroup, this.layerGroup);
+                    group = this.simWebService.createGroup(this.simAdminService.layerGroup, this.simAdminService.layerGroup);
                 }
 
                 let layerDescription : ILayerDescription = {
-                    id: layerId,
-                    title: layerTitle,
+                    id: description.layerId,
+                    title: description.layerTitle,
                     type: 'editablegeojson',
-                    typeUrl: typeUrl,
+                    typeUrl: description.typeUrl,
                     timeAware: false,
                     opacity: 75,
                     data: {
@@ -414,20 +404,53 @@ module App {
                     }
                 };
 
-                layer = this.SimWebService.createLayer(layerDescription, group);
+                layer = this.simWebService.createLayer(layerDescription, group);
+                this.formLayers.push(layer.id);
+                this.layerService.loadTypeResources(layer.typeUrl, false, () => {
+                    console.log('Type resources loaded for: ' + layer.title);
+                    this.toggleEditLayer(layer.id);
+                    this.layerLoaded = true;
+                });
+            } else {
+                // remember that we need this layer
+                this.formLayers.push(layer.id);
+                this.toggleEditLayer(layer.id);
+                this.layerLoaded = true;
             }
-            // remember that we need this layer
-            this.formLayers.push(layer.id);
         }
 
         private removeExcessLayers() {
-            let group = this.layerService.findGroupById(this.layerGroup);
+            let group = this.layerService.findGroupById(this.simAdminService.layerGroup);
             if (group) {
                 group.layers.forEach((layer: ProjectLayer) => {
                     if (this.formLayers.indexOf(layer.id) === -1) {
                         this.layerService.removeLayer(layer, true);
                     }
                 });
+            }
+        }
+
+        public toggleEditLayer(layerId) {
+            if (!_.isUndefined(layerId)) {
+                this._layer = this.layerService.findLayer(layerId);
+
+                this.actionService.execute('activate layer', {
+                    layerId: this._layer.id,
+                });
+
+                if (this._layer._gui.hasOwnProperty('editing') && this._layer._gui['editing'] === true) {
+                    (<csComp.Services.EditableGeoJsonSource>this._layer.layerSource).stopEditing(this._layer);
+                    this._layer.data.features.forEach(f => {
+                        delete f._gui['editMode'];
+                        this.layerService.updateFeature(f);
+                        this.layerService.saveFeature(f);
+                    });
+                } else {
+                    (<csComp.Services.EditableGeoJsonSource>this._layer.layerSource).startEditing(this._layer);
+                    this._layer.data.features.forEach(f => {
+                        this.layerService.editFeature(f, false);
+                    });
+                }
             }
         }
     }
